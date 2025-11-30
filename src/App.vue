@@ -64,21 +64,21 @@
         </button>
       </div>
 
-      <!-- Feedback Toast -->
-      <Transition name="feedback-toast">
+      <!-- Subtle Feedback Indicator -->
+      <Transition name="feedback-subtle">
         <div
           v-if="showFeedbackToast"
-          class="fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-50"
+          class="absolute top-16 right-4 pointer-events-none z-40"
         >
           <div
             :class="[
-              'px-6 py-3 rounded-full text-lg font-bold shadow-2xl',
+              'text-xs font-medium px-2 py-1 rounded',
               gameStore.lastFeedback.type === 'correct'
-                ? 'bg-emerald-500/90 text-white'
-                : 'bg-red-500/90 text-white'
+                ? 'text-emerald-400'
+                : 'text-red-400'
             ]"
           >
-            {{ gameStore.lastFeedback.type === 'correct' ? '✓ Correct!' : '✗ Wrong' }}
+            {{ gameStore.lastFeedback.type === 'correct' ? '✓' : '✗' }}
           </div>
         </div>
       </Transition>
@@ -443,66 +443,44 @@ export default {
   transform: translateY(-10px);
 }
 
-/* Correct answer button flash */
+/* Subtle correct answer button indicator */
 @keyframes correct-flash {
   0% {
-    background-color: rgb(34 197 94); /* green-500 */
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+    border-color: rgb(34 197 94);
   }
   100% {
-    background-color: rgb(30 41 59 / 0.5); /* slate-800/50 */
-    box-shadow: none;
+    border-color: transparent;
   }
 }
 
 .animate-correct-flash {
-  animation: correct-flash 0.5s ease-out forwards;
+  animation: correct-flash 0.4s ease-out forwards;
+  border: 2px solid rgb(34 197 94);
 }
 
-/* Incorrect answer button flash */
+/* Subtle incorrect answer button indicator */
 @keyframes incorrect-flash {
   0% {
-    background-color: rgb(239 68 68); /* red-500 */
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+    border-color: rgb(239 68 68);
   }
   100% {
-    background-color: rgb(30 41 59 / 0.5); /* slate-800/50 */
-    box-shadow: none;
+    border-color: transparent;
   }
 }
 
 .animate-incorrect-flash {
-  animation: incorrect-flash 0.5s ease-out forwards;
+  animation: incorrect-flash 0.4s ease-out forwards;
+  border: 2px solid rgb(239 68 68);
 }
 
-/* Feedback toast transitions */
-.feedback-toast-enter-active {
-  animation: toast-in 0.3s ease-out, toast-out 0.3s ease-in 0.5s forwards;
+/* Subtle feedback indicator */
+.feedback-subtle-enter-active,
+.feedback-subtle-leave-active {
+  transition: opacity 0.15s ease;
 }
 
-.feedback-toast-leave-active {
-  animation: toast-out 0.2s ease-in forwards;
-}
-
-@keyframes toast-in {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.8);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-@keyframes toast-out {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.8);
-  }
+.feedback-subtle-enter-from,
+.feedback-subtle-leave-to {
+  opacity: 0;
 }
 </style>
