@@ -48,18 +48,15 @@ export const useGameStore = defineStore('game', {
       const positions = ['left', 'center', 'right'];
       const shapes = ['circle', 'square', 'triangle'];
 
-      const stimulus = {
+      return {
         color: colors[Math.floor(Math.random() * colors.length)],
         emoji: emojis[Math.floor(Math.random() * emojis.length)],
         position: positions[Math.floor(Math.random() * positions.length)],
         shape: shapes[Math.floor(Math.random() * shapes.length)],
       };
-      // console.log("Generated random stimulus:", stimulus);
-      return stimulus;
     },
     setNewStimulus() {
       if (this.isStopped) {
-        console.log("Game is paused. Skipping setNewStimulus.");
         return;
       }
 
@@ -84,24 +81,15 @@ export const useGameStore = defineStore('game', {
         const nBackStimulus = this.stimulusHistory[this.stimulusHistory.length - this.nBack];
         let potentialMatches = 0;
 
-        const colorMatch = nBackStimulus.color === this.currentStimulus.color;
-        const emojiMatch = nBackStimulus.emoji === this.currentStimulus.emoji;
-        const positionMatch = nBackStimulus.position === this.currentStimulus.position;
-        const shapeMatch = nBackStimulus.shape === this.currentStimulus.shape;
-
-        potentialMatches += colorMatch ? 1 : 0;
-        potentialMatches += emojiMatch ? 1 : 0;
-        potentialMatches += positionMatch ? 1 : 0;
-        potentialMatches += shapeMatch ? 1 : 0;
+        if (nBackStimulus.color === this.currentStimulus.color) potentialMatches++;
+        if (nBackStimulus.emoji === this.currentStimulus.emoji) potentialMatches++;
+        if (nBackStimulus.position === this.currentStimulus.position) potentialMatches++;
+        if (nBackStimulus.shape === this.currentStimulus.shape) potentialMatches++;
 
         this.previousPotentialCorrectAnswers += potentialMatches;
-
-        console.log("Updated `previousPotentialCorrectAnswers`:", this.previousPotentialCorrectAnswers);
-        console.log("Potential match details:", { positionMatch, colorMatch, shapeMatch, emojiMatch });
       }
 
       this.stimulusHistory.push({ ...this.currentStimulus });
-      console.log("Setting new stimulus:", { ...this.currentStimulus });
       this.flashBorder = true;
       this.playSound(this.stimulusSound);
       setTimeout(() => {
@@ -119,11 +107,9 @@ export const useGameStore = defineStore('game', {
     },
     toggleDeterministicMode() {
       this.isDeterministic = !this.isDeterministic;
-      console.log(`Deterministic mode toggled. Now: ${this.isDeterministic}`);
       this.startGame();
     },
     resetGameState() {
-      console.log("Resetting game state");
       clearInterval(this.timer);
       this.score = 0;
       this.incorrectResponses = 0;
@@ -148,36 +134,30 @@ export const useGameStore = defineStore('game', {
       this.isNewHighScore = false;
     },
     resetHighScore() {
-      console.log("Resetting high score");
       this.highScoreData = { score: 0, potentialCorrectAnswers: 0 };
       localStorage.setItem('highScoreData', JSON.stringify(this.highScoreData));
     },
     startGame(timeLeft = 5) {
-      console.log("Starting game");
       this.resetGameState();
       this.timeLeft = timeLeft;
       this.timer = setInterval(() => {
         if (this.timeLeft > 1) {
-            this.timeLeft -= 1;
+          this.timeLeft -= 1;
         } else {
-            this.setNewStimulus();
-            this.timeLeft = timeLeft;
+          this.setNewStimulus();
+          this.timeLeft = timeLeft;
         }
       }, 1000);
     },
     stopGame() {
-      console.log("Stopping game");
       clearInterval(this.timer);
       this.isStopped = true;
     },
     respondToStimulus(stimulusType) {
-      console.log(`Responding to stimulus: ${stimulusType}`);
       const nBackIndex = this.stimulusHistory.length - this.nBack - 1;
-      console.log(`nBackIndex: ${nBackIndex}`);
 
       if (nBackIndex >= 0) {
         const nBackStimulus = this.stimulusHistory[nBackIndex];
-        console.log("Comparing current stimulus and n-back stimulus", {current: this.currentStimulus, nBack: nBackStimulus});
 
         const isCorrect = (
           stimulusType === 'color' && this.currentStimulus.color === nBackStimulus.color ||
@@ -185,8 +165,6 @@ export const useGameStore = defineStore('game', {
           stimulusType === 'position' && this.currentStimulus.position === nBackStimulus.position ||
           stimulusType === 'shape' && this.currentStimulus.shape === nBackStimulus.shape
         );
-
-        console.log("Is response correct:", isCorrect);
 
         if (isCorrect) {
           this.score += 1;
@@ -198,6 +176,7 @@ export const useGameStore = defineStore('game', {
           this.strikeSound.currentTime = 0;
           this.playSound(this.strikeSound);
           this.incorrectResponses += 1;
+
           if (this.incorrectResponses >= 3) {
             const currentAccuracy = Math.round((this.score / this.previousPotentialCorrectAnswers) * 100);
             const highScoreAccuracy = Math.round((this.highScoreData.score / this.highScoreData.potentialCorrectAnswers) * 100);
@@ -222,9 +201,6 @@ export const useGameStore = defineStore('game', {
             this.showGameOverModal = true;
           }
         }
-        console.log(`Response is ${isCorrect ? 'correct' : 'incorrect'}. Score: ${this.score}`);
-      } else {
-        console.log("Not enough turns have passed to respond.");
       }
       this.respondedThisTurn[stimulusType] = true;
     },

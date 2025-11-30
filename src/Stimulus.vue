@@ -1,6 +1,5 @@
 <template>
   <div class="flex justify-center space-x-2">
-    <!-- Cells -->
     <div v-for="cellPosition in ['left', 'center', 'right']" :key="cellPosition"
          :class="[cellClass, 'flex-1 h-32 bg-slate-950 rounded-md flex items-center justify-center relative']">
       <template v-if="position === cellPosition">
@@ -15,7 +14,6 @@
 </template>
 
 <script>
-import { watch } from 'vue';
 import { useGameStore } from './store/gameStore';
 
 export default {
@@ -26,26 +24,9 @@ export default {
     position: String,
     shape: String,
   },
-  setup(props) {
+  setup() {
     const gameStore = useGameStore();
-
-    // Watching prop changes for logging
-    // watch(() => props.color, (newVal, oldVal) => {
-    //   console.log(`Stimulus color changed from ${oldVal} to ${newVal}`);
-    // });
-    // watch(() => props.emoji, (newVal, oldVal) => {
-    //   console.log(`Stimulus emoji changed from ${oldVal} to ${newVal}`);
-    // });
-    // watch(() => props.position, (newVal, oldVal) => {
-    //   console.log(`Stimulus position changed from ${oldVal} to ${newVal}`);
-    // });
-    // watch(() => props.shape, (newVal, oldVal) => {
-    //   console.log(`Stimulus shape changed from ${oldVal} to ${newVal}`);
-    // });
-
-    return {
-      gameStore
-    };
+    return { gameStore };
   },
   computed: {
     colorClass() {

@@ -77,36 +77,11 @@
           @startGame="startGame"
         />
       </div>
-      <!-- <button @click="toggleGame" class="mx-1 mt-3 bg-gray-800 hover:bg-gray-950 text-gray-400 py-1 px-2 rounded">
-        {{ gameStore.isStopped ? 'Start' : 'Stop' }} Game
-      </button>
-      <button
-        @click="toggleDeterministicMode"
-        class="mx-1 my-1 bg-gray-800 hover:bg-gray-950 text-gray-400 py-1 px-2 rounded"
-      >
-        {{ gameStore.isDeterministic ? 'Disable' : 'Enable' }} Deterministic
-      </button> -->
       <div class="mt-3">
         <button class="text-xs text-gray-600 bg-gray-600 hover:bg-gray-500 p-1 rounded-full focus:outline-none" @click="toggleAudio">
           <img v-if="gameStore.isAudioEnabled" class="h-5 w-5" :src="volumeUpIcon" alt="Volume Up" />
           <img v-else class="h-5 w-5" :src="volumeMuteIcon" alt="Volume Mute" />
         </button>
-      </div>
-      <div
-        v-if="gameStore.isDeterministic"
-        class="mt-4 text-center text-sm"
-      >
-        <div v-for="stimulus, index in gameStore.deterministicStimuli" :key="index" class="mt-1">
-            {{ gameStore.deterministicIndex - 1 === index ? '->' : '' }}
-            <span :class="colorClass(stimulus.color)">{{ stimulus.color }}</span>
-            •
-            {{ stimulus.emoji }}
-            •
-            {{ stimulus.position }}
-            •
-            {{ stimulus.shape }}
-            {{ gameStore.deterministicIndex - 1 === index ? '<-' : '' }}
-        </div>
       </div>
       <Footer />
     </div>
@@ -128,7 +103,7 @@
 </template>
 
 <script>
-import { onUnmounted, ref, watch, computed } from 'vue';
+import { onUnmounted, ref, watch } from 'vue';
 import { useGameStore } from './store/gameStore';
 import volumeUpIcon from './assets/volume-up-solid.svg';
 import volumeMuteIcon from './assets/volume-mute-solid.svg';
@@ -157,35 +132,20 @@ export default {
     const showInstructionMessage = ref(true);
 
     const dismissInstructionMessage = () => {
-      console.log("Instruction message dismissed");
       showInstructionMessage.value = false;
-    }
+    };
 
-    watch(nBackInput, (newNBack, oldNBack) => {
-      console.log(`N-Back changed from ${oldNBack} to ${newNBack}`);
+    watch(nBackInput, (newNBack) => {
       gameStore.nBack = newNBack;
     });
 
-    watch(timeLeftInput, (newTimeLeft, oldTimeLeft) => {
-      console.log(`Time left changed from ${oldTimeLeft} to ${newTimeLeft}`);
+    watch(timeLeftInput, (newTimeLeft) => {
       gameStore.timeLeft = newTimeLeft;
     });
 
     const startGame = () => {
-      console.log("Start game button clicked");
-
       showModal.value = false;
       gameStore.startGame(timeLeftInput.value);
-    };
-
-    const toggleDeterministicMode = () => {
-      console.log("Toggle deterministic mode");
-      gameStore.toggleDeterministicMode();
-    };
-
-    const toggleGame = () => {
-      console.log(gameStore.isStopped ? "Resuming game" : "Stopping game");
-      gameStore.isStopped ? gameStore.startGame(timeLeftInput.value) : gameStore.stopGame();
     };
 
     onUnmounted(() => {
@@ -193,7 +153,6 @@ export default {
     });
 
     const respond = (stimulusType) => {
-      console.log(`Responding to stimulus type: ${stimulusType}`);
       gameStore.respondToStimulus(stimulusType);
     };
 
@@ -202,30 +161,6 @@ export default {
         return 'p-4 rounded text-lg bg-gray-950';
       } else {
         return 'p-4 rounded text-lg bg-blue-900 hover:bg-blue-800';
-      }
-    };
-
-    const previousScore = ref(gameStore.score);
-
-    watch(() => gameStore.score, (newScore, oldScore) => {
-      console.log(`Score changed from ${oldScore} to ${newScore}`);
-      previousScore.value = oldScore;
-    });
-
-    const scoreClass = computed(() => {
-      return gameStore.score > previousScore.value
-        ? 'text-green-500'
-        : gameStore.score < previousScore.value
-        ? 'text-red-500'
-        : 'text-xl font-medium';
-    });
-
-    const colorClass = (color) => {
-      switch (color) {
-        case 'purple': return 'text-purple-500';
-        case 'green': return 'text-green-500';
-        case 'blue': return 'text-blue-500';
-        default: return '';
       }
     };
 
@@ -260,7 +195,6 @@ export default {
 
     return {
       buttonClass,
-      colorClass,
       dismissInstructionMessage,
       gameStore,
       handleGameOverClose,
@@ -270,14 +204,11 @@ export default {
       resetHighScore,
       respond,
       responseButtons,
-      scoreClass,
       showInstructionMessage,
       showModal,
       startGame,
       timeLeftInput,
       toggleAudio,
-      toggleDeterministicMode,
-      toggleGame,
       volumeMuteIcon,
       volumeUpIcon,
     };
