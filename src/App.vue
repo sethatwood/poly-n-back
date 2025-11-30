@@ -257,7 +257,7 @@ export default {
     const buttonClass = (isResponded, isEarlyInGame, isPaused) => {
       const base = 'p-4 rounded-lg text-lg font-medium shadow-lg';
       if (isResponded || isEarlyInGame || isPaused) {
-        return `${base} bg-slate-800/50 text-slate-600 cursor-not-allowed`;
+        return `${base} bg-slate-700/40 text-slate-500 cursor-not-allowed`;
       } else {
         return `${base} bg-blue-600 hover:bg-blue-500 active:scale-95 active:bg-blue-700 shadow-blue-600/25 hover:shadow-blue-500/40`;
       }
