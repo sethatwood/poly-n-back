@@ -16,22 +16,7 @@
       </div>
     </div>
     <div v-else key="game" class="w-screen max-w-md mx-auto px-4 text-center uppercase text-white relative">
-      <!-- Pause Button (top right) -->
-      <button
-        v-if="!gameStore.isStopped"
-        @click="handlePause"
-        class="absolute top-2 right-4 p-2 text-gray-400 hover:text-white transition-colors"
-        title="Pause"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </button>
-
-      <div v-if="showInstructionMessage" class="my-6 text-center text-gray-400 text-sm cursor-pointer" @click="dismissInstructionMessage">
-        &#x24E7; Match attributes from {{ gameStore.nBack }} steps back
-      </div>
-      <div class="mt-8 mb-3">
+      <div class="mt-4">
         <p
           class="countdown-text transition-all duration-200"
           :class="{
@@ -39,6 +24,22 @@
             'scale-110': gameStore.timeLeft <= 1 && !gameStore.isPaused
           }"
         >{{ gameStore.timeLeft }}</p>
+      </div>
+      <!-- Feedback Indicator (centered below timer) -->
+      <div class="h-4 flex items-center justify-center mb-2">
+        <Transition name="feedback-subtle">
+          <div
+            v-if="showFeedbackToast"
+            :class="[
+              'text-xs font-medium',
+              gameStore.lastFeedback.type === 'correct'
+                ? 'text-emerald-400'
+                : 'text-red-400'
+            ]"
+          >
+            {{ gameStore.lastFeedback.type === 'correct' ? '✓' : '✗' }}
+          </div>
+        </Transition>
       </div>
       <Stimulus
         class="mb-3"
@@ -64,24 +65,6 @@
         </button>
       </div>
 
-      <!-- Subtle Feedback Indicator -->
-      <Transition name="feedback-subtle">
-        <div
-          v-if="showFeedbackToast"
-          class="absolute top-16 right-4 pointer-events-none z-40"
-        >
-          <div
-            :class="[
-              'text-xs font-medium px-2 py-1 rounded',
-              gameStore.lastFeedback.type === 'correct'
-                ? 'text-emerald-400'
-                : 'text-red-400'
-            ]"
-          >
-            {{ gameStore.lastFeedback.type === 'correct' ? '✓' : '✗' }}
-          </div>
-        </div>
-      </Transition>
       <div class="text-center">
         <div v-if="!gameStore.isStopped" class="strikes-score">
           <div
@@ -137,6 +120,18 @@
       <Footer />
     </div>
     </Transition>
+
+    <!-- Pause Button (outside transition, viewport top right) -->
+    <button
+      v-if="!showModal && !gameStore.isStopped"
+      @click="handlePause"
+      class="fixed top-4 right-4 p-2 text-gray-500 hover:text-white transition-colors z-30"
+      title="Pause"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </button>
 
     <!-- Achievements -->
     <AchievementToast />
@@ -210,7 +205,6 @@ export default {
     const nBackInput = ref(gameStore.nBack);
     const timeLeftInput = ref(gameStore.timeLeft);
     const showModal = ref(true);
-    const showInstructionMessage = ref(true);
     const scoreAnimating = ref(false);
     const strikeAnimating = ref(false);
 
@@ -236,10 +230,6 @@ export default {
         setTimeout(() => { strikeAnimating.value = false; }, 500);
       }
     });
-
-    const dismissInstructionMessage = () => {
-      showInstructionMessage.value = false;
-    };
 
     watch(nBackInput, (newNBack) => {
       gameStore.nBack = newNBack;
@@ -284,12 +274,22 @@ export default {
       return '';
     };
 
-    // Show toast briefly after each response
-    const showFeedbackToast = computed(() => {
-      if (!gameStore.lastFeedback.timestamp) return false;
-      // Toast is controlled by CSS animation, this just triggers it
-      return gameStore.lastFeedback.type !== null;
+    // Show feedback indicator briefly after each response
+    const feedbackVisible = ref(false);
+    let feedbackTimeout = null;
+
+    // Watch for feedback changes and auto-hide after 1 second
+    watch(() => gameStore.lastFeedback.timestamp, (newTimestamp) => {
+      if (newTimestamp && gameStore.lastFeedback.type) {
+        feedbackVisible.value = true;
+        if (feedbackTimeout) clearTimeout(feedbackTimeout);
+        feedbackTimeout = setTimeout(() => {
+          feedbackVisible.value = false;
+        }, 2000);
+      }
     });
+
+    const showFeedbackToast = computed(() => feedbackVisible.value);
 
     const responseButtons = [
       { type: 'color', label: 'Color' },
@@ -338,7 +338,6 @@ export default {
 
     return {
       buttonClass,
-      dismissInstructionMessage,
       feedbackClass,
       gameStore,
       handleGameOverClose,
@@ -354,7 +353,6 @@ export default {
       responseButtons,
       scoreAnimating,
       showFeedbackToast,
-      showInstructionMessage,
       showModal,
       showTutorial,
       startGame,
@@ -372,6 +370,7 @@ export default {
 .countdown-text {
   font-size: 3.33rem;
   font-weight: bold;
+  line-height: 1;
 }
 
 /* Score pulse animation */

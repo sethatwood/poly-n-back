@@ -19,7 +19,7 @@ html, body {
 
 /* Unified game background */
 .game-background {
-  background: #0c1222;
+  background: #0f1729;
   position: relative;
 }
 
@@ -33,9 +33,9 @@ html, body {
   bottom: 0;
   background:
     /* Soft center glow */
-    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(30, 58, 95, 0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(40, 75, 120, 0.45) 0%, transparent 60%),
     /* Subtle vignette */
-    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.3) 100%);
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.2) 100%);
   pointer-events: none;
   z-index: 0;
 }

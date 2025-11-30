@@ -25,11 +25,6 @@ export default {
     const shownHints = ref(new Set());
 
     const hints = {
-      earlyGame: {
-        icon: '⏳',
-        text: 'Wait for history to build...',
-        priority: 1
-      },
       firstMatch: {
         icon: '👀',
         text: 'Now watch for matches!',
@@ -72,13 +67,6 @@ export default {
         currentHint.value = null;
       }, 2500);
     };
-
-    // Watch for early game state
-    watch(() => gameStore.isEarlyInGame, (isEarly) => {
-      if (isEarly && !gameStore.isStopped && !gameStore.isPaused) {
-        showHint('earlyGame');
-      }
-    }, { immediate: true });
 
     // Watch for when game becomes "ready" (no longer early)
     watch(() => gameStore.isEarlyInGame, (isEarly, wasEarly) => {
