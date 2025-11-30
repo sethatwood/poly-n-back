@@ -1,7 +1,8 @@
 <template>
-  <div class="h-screen flex items-center justify-center">
-    <div v-if="showModal" class="max-w-xl mx-auto flex items-center text-white" id="howToPlayModal">
-      <div class="relative mx-auto p-5 container bg-slate-900">
+  <div class="h-screen flex items-center justify-center overflow-hidden">
+    <Transition name="screen-fade" mode="out-in">
+      <div v-if="showModal" key="menu" class="max-w-xl mx-auto flex items-center text-white" id="howToPlayModal">
+        <div class="relative mx-auto p-5 container bg-slate-900">
         <IntroHead />
         <ConfigStart
           :nBack="Number(nBackInput)"
@@ -14,7 +15,7 @@
         <Footer />
       </div>
     </div>
-    <div v-else class="w-screen max-w-md mx-auto px-4 text-center uppercase text-white bg-slate-900 relative">
+    <div v-else key="game" class="w-screen max-w-md mx-auto px-4 text-center uppercase text-white bg-slate-900 relative">
       <!-- Pause Button (top right) -->
       <button
         v-if="!gameStore.isStopped"
@@ -31,7 +32,13 @@
         &#x24E7; Match attributes from {{ gameStore.nBack }} steps back
       </div>
       <div class="mt-8 mb-3">
-        <p class="countdown-text">{{ gameStore.timeLeft }}</p>
+        <p
+          class="countdown-text transition-all duration-200"
+          :class="{
+            'text-amber-500 animate-pulse-urgent': gameStore.timeLeft <= 2 && !gameStore.isPaused,
+            'scale-110': gameStore.timeLeft <= 1 && !gameStore.isPaused
+          }"
+        >{{ gameStore.timeLeft }}</p>
       </div>
       <Stimulus
         class="mb-3"
@@ -42,19 +49,29 @@
         :flashBorder="gameStore.flashBorder"
       />
       <div class="grid grid-cols-2 gap-3">
-        <button v-for="button in responseButtons" :key="button.type" class="w-full"
+        <button
+          v-for="button in responseButtons"
+          :key="button.type"
+          class="w-full transform transition-all duration-150"
           :disabled="gameStore.respondedThisTurn[button.type] || gameStore.isEarlyInGame || gameStore.isPaused"
           :class="buttonClass(gameStore.respondedThisTurn[button.type], gameStore.isEarlyInGame, gameStore.isPaused)"
-          @click="respond(button.type)">
+          @click="respond(button.type)"
+        >
           {{ button.label }}
         </button>
       </div>
       <div class="text-center">
         <div v-if="!gameStore.isStopped" class="strikes-score">
-          <div class="mt-4 text-sm uppercase text-red-500 flex items-center justify-center">
+          <div
+            class="mt-4 text-sm uppercase text-red-500 flex items-center justify-center transition-transform"
+            :class="{ 'animate-strike-shake': strikeAnimating }"
+          >
             <span class="text-2xl font-bold">{{ gameStore.incorrectResponses }}</span>&nbsp;Strikes
           </div>
-          <div class="text-sm uppercase text-green-500 flex items-center justify-center">
+          <div
+            class="text-sm uppercase text-emerald-400 flex items-center justify-center"
+            :class="{ 'animate-score-pulse': scoreAnimating }"
+          >
             <span class="text-3xl font-bold">{{ gameStore.score }}</span>
           </div>
         </div>
@@ -97,6 +114,7 @@
       </div>
       <Footer />
     </div>
+    </Transition>
 
     <!-- Pause Modal -->
     <PauseModal
@@ -124,7 +142,7 @@
 </template>
 
 <script>
-import { onUnmounted, ref, watch } from 'vue';
+import { onUnmounted, ref, watch, computed } from 'vue';
 import { useGameStore } from './store/gameStore';
 import volumeUpIcon from './assets/volume-up-solid.svg';
 import volumeMuteIcon from './assets/volume-mute-solid.svg';
@@ -153,6 +171,24 @@ export default {
     const timeLeftInput = ref(gameStore.timeLeft);
     const showModal = ref(true);
     const showInstructionMessage = ref(true);
+    const scoreAnimating = ref(false);
+    const strikeAnimating = ref(false);
+
+    // Watch for score changes to trigger animation
+    watch(() => gameStore.score, (newScore, oldScore) => {
+      if (newScore > oldScore) {
+        scoreAnimating.value = true;
+        setTimeout(() => { scoreAnimating.value = false; }, 400);
+      }
+    });
+
+    // Watch for strike changes to trigger animation
+    watch(() => gameStore.incorrectResponses, (newStrikes, oldStrikes) => {
+      if (newStrikes > oldStrikes) {
+        strikeAnimating.value = true;
+        setTimeout(() => { strikeAnimating.value = false; }, 500);
+      }
+    });
 
     const dismissInstructionMessage = () => {
       showInstructionMessage.value = false;
@@ -182,10 +218,11 @@ export default {
     };
 
     const buttonClass = (isResponded, isEarlyInGame, isPaused) => {
+      const base = 'p-4 rounded-lg text-lg font-medium shadow-lg';
       if (isResponded || isEarlyInGame || isPaused) {
-        return 'p-4 rounded text-lg bg-gray-950';
+        return `${base} bg-slate-800/50 text-slate-600 cursor-not-allowed`;
       } else {
-        return 'p-4 rounded text-lg bg-blue-900 hover:bg-blue-800';
+        return `${base} bg-blue-600 hover:bg-blue-500 active:scale-95 active:bg-blue-700 shadow-blue-600/25 hover:shadow-blue-500/40`;
       }
     };
 
@@ -248,9 +285,11 @@ export default {
       resetHighScore,
       respond,
       responseButtons,
+      scoreAnimating,
       showInstructionMessage,
       showModal,
       startGame,
+      strikeAnimating,
       timeLeftInput,
       toggleAudio,
       volumeMuteIcon,
@@ -264,5 +303,74 @@ export default {
 .countdown-text {
   font-size: 3.33rem;
   font-weight: bold;
+}
+
+/* Score pulse animation */
+@keyframes score-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+    text-shadow: 0 0 20px rgba(52, 211, 153, 0.8);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-score-pulse {
+  animation: score-pulse 0.4s ease-out;
+}
+
+/* Strike shake animation */
+@keyframes strike-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-strike-shake {
+  animation: strike-shake 0.5s ease-in-out;
+  color: #ef4444;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
+/* Timer urgency pulse */
+@keyframes pulse-urgent {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse-urgent {
+  animation: pulse-urgent 0.5s ease-in-out infinite;
+}
+
+/* Screen transitions */
+.screen-fade-enter-active,
+.screen-fade-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.screen-fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.screen-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>
