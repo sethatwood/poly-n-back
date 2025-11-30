@@ -125,7 +125,8 @@
     <button
       v-if="!showModal && !gameStore.isStopped"
       @click="handlePause"
-      class="fixed top-4 right-4 p-2 text-gray-500 hover:text-white transition-colors z-30"
+      class="fixed right-4 p-2 text-gray-500 hover:text-white transition-colors z-30"
+      style="top: calc(env(safe-area-inset-top, 0px) + 1rem)"
       title="Pause"
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

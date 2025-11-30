@@ -5,9 +5,9 @@
       <div class="absolute inset-0 bg-[#0c1222]"></div>
 
       <!-- Tutorial Content -->
-      <div class="relative h-full flex flex-col items-center justify-center text-white p-6">
+      <div class="relative h-full flex flex-col items-center justify-center text-white p-6 safe-area-padding">
         <!-- Progress dots -->
-        <div class="absolute top-6 flex gap-2">
+        <div class="absolute flex gap-2" style="top: calc(env(safe-area-inset-top, 0px) + 1.5rem)">
           <div
             v-for="(_, index) in steps"
             :key="index"
@@ -47,7 +47,7 @@
         </Transition>
 
         <!-- Navigation -->
-        <div class="absolute bottom-8 flex items-center gap-4">
+        <div class="absolute flex items-center gap-4" style="bottom: calc(env(safe-area-inset-bottom, 0px) + 2rem)">
           <button
             v-if="currentStep > 0"
             @click="prevStep"
@@ -67,7 +67,8 @@
         <!-- Skip button -->
         <button
           @click="skip"
-          class="absolute top-6 right-6 text-gray-500 hover:text-white text-sm transition-colors"
+          class="absolute right-6 text-gray-500 hover:text-white text-sm transition-colors"
+          style="top: calc(env(safe-area-inset-top, 0px) + 1.5rem)"
         >
           Skip Tutorial
         </button>

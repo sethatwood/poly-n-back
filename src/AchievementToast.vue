@@ -2,7 +2,8 @@
   <Transition name="achievement">
     <div
       v-if="achievement"
-      class="fixed top-8 left-1/2 transform -translate-x-1/2 z-50"
+      class="fixed left-1/2 transform -translate-x-1/2 z-50"
+      style="top: calc(env(safe-area-inset-top, 0px) + 2rem)"
     >
       <div class="bg-gradient-to-r from-amber-600 to-yellow-500 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-amber-500/30 flex items-center gap-4 min-w-[280px]">
         <!-- Trophy icon with animation -->
