@@ -18,6 +18,8 @@ export const useGameStore = defineStore('game', {
     flashBorder: false,
     highScoreData: JSON.parse(localStorage.getItem('highScoreData')) || { score: 0, potentialCorrectAnswers: 0, nBack: null },
     incorrectResponses: 0,
+    isNewHighScore: false,
+    showGameOverModal: false,
     incrementSound: new Audio(incrementSound),
     isAudioEnabled: JSON.parse(localStorage.getItem('isAudioEnabled')) ?? true,
     isDeterministic: false,
@@ -127,6 +129,8 @@ export const useGameStore = defineStore('game', {
       this.incorrectResponses = 0;
       this.timeLeft = 5;
       this.isStopped = false;
+      this.showGameOverModal = false;
+      this.isNewHighScore = false;
       this.stimulusHistory = [];
       this.potentialCorrectAnswers = 0;
       this.previousPotentialCorrectAnswers = 0;
@@ -138,6 +142,10 @@ export const useGameStore = defineStore('game', {
       };
       this.deterministicIndex = 0;
       this.setNewStimulus();
+    },
+    dismissGameOverModal() {
+      this.showGameOverModal = false;
+      this.isNewHighScore = false;
     },
     resetHighScore() {
       console.log("Resetting high score");
@@ -198,7 +206,10 @@ export const useGameStore = defineStore('game', {
             const isSameScoreButBetterAccuracy = this.score === this.highScoreData.score && currentAccuracy > highScoreAccuracy;
             const isHigherNBack = this.nBack > this.highScoreData.nBack;
 
-            if (isNewHighScore || isSameScoreButBetterAccuracy || isHigherNBack) {
+            // Track if this is a new high score before updating
+            this.isNewHighScore = isNewHighScore || isSameScoreButBetterAccuracy || isHigherNBack;
+
+            if (this.isNewHighScore) {
               this.highScoreData = {
                 score: this.score,
                 potentialCorrectAnswers: this.previousPotentialCorrectAnswers,
@@ -208,7 +219,7 @@ export const useGameStore = defineStore('game', {
             }
 
             this.stopGame();
-            alert("Game over! You've reached 3 strikes.");
+            this.showGameOverModal = true;
           }
         }
         console.log(`Response is ${isCorrect ? 'correct' : 'incorrect'}. Score: ${this.score}`);

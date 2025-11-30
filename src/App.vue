@@ -110,6 +110,20 @@
       </div>
       <Footer />
     </div>
+
+    <!-- Game Over Modal -->
+    <GameOverModal
+      :show="gameStore.showGameOverModal"
+      :score="gameStore.score"
+      :possiblePoints="gameStore.previousPotentialCorrectAnswers"
+      :accuracy="gameStore.finalScoreAccuracy"
+      :nBack="gameStore.nBack"
+      :timer="Number(timeLeftInput)"
+      :isNewHighScore="gameStore.isNewHighScore"
+      @close="handleGameOverClose"
+      @playAgain="handlePlayAgain"
+      @mainMenu="handleMainMenu"
+    />
   </div>
 </template>
 
@@ -123,6 +137,7 @@ import IntroContent from './IntroContent.vue';
 import ConfigStart from './ConfigStart.vue';
 import Stimulus from './Stimulus.vue';
 import Footer from './Footer.vue';
+import GameOverModal from './GameOverModal.vue';
 
 export default {
   name: 'App',
@@ -132,8 +147,8 @@ export default {
     ConfigStart,
     Stimulus,
     Footer,
-    IntroHead
-},
+    GameOverModal,
+  },
   setup() {
     const gameStore = useGameStore();
     const nBackInput = ref(gameStore.nBack);
@@ -229,11 +244,28 @@ export default {
       gameStore.resetHighScore();
     };
 
+    const handleGameOverClose = () => {
+      gameStore.dismissGameOverModal();
+    };
+
+    const handlePlayAgain = () => {
+      gameStore.dismissGameOverModal();
+      gameStore.startGame(timeLeftInput.value);
+    };
+
+    const handleMainMenu = () => {
+      gameStore.dismissGameOverModal();
+      showModal.value = true;
+    };
+
     return {
       buttonClass,
       colorClass,
       dismissInstructionMessage,
       gameStore,
+      handleGameOverClose,
+      handleMainMenu,
+      handlePlayAgain,
       nBackInput,
       resetHighScore,
       respond,
