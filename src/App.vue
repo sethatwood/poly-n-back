@@ -14,7 +14,19 @@
         <Footer />
       </div>
     </div>
-    <div v-else class="w-screen max-w-md mx-auto px-4 text-center uppercase text-white bg-slate-900">
+    <div v-else class="w-screen max-w-md mx-auto px-4 text-center uppercase text-white bg-slate-900 relative">
+      <!-- Pause Button (top right) -->
+      <button
+        v-if="!gameStore.isStopped"
+        @click="handlePause"
+        class="absolute top-2 right-4 p-2 text-gray-400 hover:text-white transition-colors"
+        title="Pause"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </button>
+
       <div v-if="showInstructionMessage" class="my-6 text-center text-gray-400 text-sm cursor-pointer" @click="dismissInstructionMessage">
         &#x24E7; Match attributes from {{ gameStore.nBack }} steps back
       </div>
@@ -31,8 +43,8 @@
       />
       <div class="grid grid-cols-2 gap-3">
         <button v-for="button in responseButtons" :key="button.type" class="w-full"
-          :disabled="gameStore.respondedThisTurn[button.type] || gameStore.isEarlyInGame"
-          :class="buttonClass(gameStore.respondedThisTurn[button.type], gameStore.isEarlyInGame)"
+          :disabled="gameStore.respondedThisTurn[button.type] || gameStore.isEarlyInGame || gameStore.isPaused"
+          :class="buttonClass(gameStore.respondedThisTurn[button.type], gameStore.isEarlyInGame, gameStore.isPaused)"
           @click="respond(button.type)">
           {{ button.label }}
         </button>
@@ -86,6 +98,15 @@
       <Footer />
     </div>
 
+    <!-- Pause Modal -->
+    <PauseModal
+      :show="gameStore.isPaused"
+      :score="gameStore.score"
+      :strikes="gameStore.incorrectResponses"
+      @resume="handleResume"
+      @quit="handleQuit"
+    />
+
     <!-- Game Over Modal -->
     <GameOverModal
       :show="gameStore.showGameOverModal"
@@ -113,6 +134,7 @@ import ConfigStart from './ConfigStart.vue';
 import Stimulus from './Stimulus.vue';
 import Footer from './Footer.vue';
 import GameOverModal from './GameOverModal.vue';
+import PauseModal from './PauseModal.vue';
 
 export default {
   name: 'App',
@@ -123,6 +145,7 @@ export default {
     Stimulus,
     Footer,
     GameOverModal,
+    PauseModal,
   },
   setup() {
     const gameStore = useGameStore();
@@ -153,11 +176,13 @@ export default {
     });
 
     const respond = (stimulusType) => {
-      gameStore.respondToStimulus(stimulusType);
+      if (!gameStore.isPaused) {
+        gameStore.respondToStimulus(stimulusType);
+      }
     };
 
-    const buttonClass = (isResponded, isEarlyInGame) => {
-      if (isResponded || isEarlyInGame) {
+    const buttonClass = (isResponded, isEarlyInGame, isPaused) => {
+      if (isResponded || isEarlyInGame || isPaused) {
         return 'p-4 rounded text-lg bg-gray-950';
       } else {
         return 'p-4 rounded text-lg bg-blue-900 hover:bg-blue-800';
@@ -179,6 +204,22 @@ export default {
       gameStore.resetHighScore();
     };
 
+    // Pause handlers
+    const handlePause = () => {
+      gameStore.pauseGame();
+    };
+
+    const handleResume = () => {
+      gameStore.resumeGame();
+    };
+
+    const handleQuit = () => {
+      gameStore.resumeGame();
+      gameStore.stopGame();
+      showModal.value = true;
+    };
+
+    // Game Over handlers
     const handleGameOverClose = () => {
       gameStore.dismissGameOverModal();
     };
@@ -199,7 +240,10 @@ export default {
       gameStore,
       handleGameOverClose,
       handleMainMenu,
+      handlePause,
       handlePlayAgain,
+      handleQuit,
+      handleResume,
       nBackInput,
       resetHighScore,
       respond,

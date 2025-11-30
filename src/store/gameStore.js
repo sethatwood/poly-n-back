@@ -23,8 +23,10 @@ export const useGameStore = defineStore('game', {
     incrementSound: new Audio(incrementSound),
     isAudioEnabled: JSON.parse(localStorage.getItem('isAudioEnabled')) ?? true,
     isDeterministic: false,
+    isPaused: false,
     isStopped: false,
     level: 1,
+    timerInterval: 5,
     nBack: 2,
     potentialCorrectAnswers: 0,
     previousPotentialCorrectAnswers: 0,
@@ -56,7 +58,7 @@ export const useGameStore = defineStore('game', {
       };
     },
     setNewStimulus() {
-      if (this.isStopped) {
+      if (this.isStopped || this.isPaused) {
         return;
       }
 
@@ -114,6 +116,7 @@ export const useGameStore = defineStore('game', {
       this.score = 0;
       this.incorrectResponses = 0;
       this.timeLeft = 5;
+      this.isPaused = false;
       this.isStopped = false;
       this.showGameOverModal = false;
       this.isNewHighScore = false;
@@ -139,15 +142,23 @@ export const useGameStore = defineStore('game', {
     },
     startGame(timeLeft = 5) {
       this.resetGameState();
+      this.timerInterval = timeLeft;
       this.timeLeft = timeLeft;
       this.timer = setInterval(() => {
+        if (this.isPaused) return;
         if (this.timeLeft > 1) {
           this.timeLeft -= 1;
         } else {
           this.setNewStimulus();
-          this.timeLeft = timeLeft;
+          this.timeLeft = this.timerInterval;
         }
       }, 1000);
+    },
+    pauseGame() {
+      this.isPaused = true;
+    },
+    resumeGame() {
+      this.isPaused = false;
     },
     stopGame() {
       clearInterval(this.timer);
