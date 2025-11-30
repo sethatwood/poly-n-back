@@ -36,6 +36,11 @@ export const useGameStore = defineStore('game', {
       position: false,
       shape: false,
     },
+    lastFeedback: {
+      type: null,      // 'correct' or 'incorrect'
+      button: null,    // which button was pressed
+      timestamp: null, // for animation timing
+    },
     score: 0,
     strikeSound: new Audio(strikeSound),
     stimulusHistory: [],
@@ -67,6 +72,13 @@ export const useGameStore = defineStore('game', {
         emoji: false,
         position: false,
         shape: false,
+      };
+
+      // Reset feedback state for new turn
+      this.lastFeedback = {
+        type: null,
+        button: null,
+        timestamp: null,
       };
 
       this.potentialCorrectAnswers = this.previousPotentialCorrectAnswers;
@@ -176,6 +188,13 @@ export const useGameStore = defineStore('game', {
           stimulusType === 'position' && this.currentStimulus.position === nBackStimulus.position ||
           stimulusType === 'shape' && this.currentStimulus.shape === nBackStimulus.shape
         );
+
+        // Set feedback state for visual effects
+        this.lastFeedback = {
+          type: isCorrect ? 'correct' : 'incorrect',
+          button: stimulusType,
+          timestamp: Date.now(),
+        };
 
         if (isCorrect) {
           this.score += 1;

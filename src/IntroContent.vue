@@ -15,6 +15,14 @@
     <p class="mt-2">
       • High scores are saved.
     </p>
+    <p class="mt-4">
+      <button
+        @click="$emit('showTutorial')"
+        class="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors"
+      >
+        📖 Full Tutorial
+      </button>
+    </p>
   </div>
 </template>
 
@@ -23,6 +31,7 @@ import { useGameStore } from './store/gameStore';
 
 export default {
   name: "IntroContent",
+  emits: ['showTutorial'],
   setup() {
     const gameStore = useGameStore();
 

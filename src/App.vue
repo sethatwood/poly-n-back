@@ -11,7 +11,7 @@
           @update:timeLeft="timeLeftInput = $event"
           @startGame="startGame"
         />
-        <IntroContent :n-back="gameStore.nBack" />
+        <IntroContent :n-back="gameStore.nBack" @showTutorial="showTutorial = true" />
         <Footer />
       </div>
     </div>
@@ -54,12 +54,34 @@
           :key="button.type"
           class="w-full transform transition-all duration-150"
           :disabled="gameStore.respondedThisTurn[button.type] || gameStore.isEarlyInGame || gameStore.isPaused"
-          :class="buttonClass(gameStore.respondedThisTurn[button.type], gameStore.isEarlyInGame, gameStore.isPaused)"
+          :class="[
+            buttonClass(gameStore.respondedThisTurn[button.type], gameStore.isEarlyInGame, gameStore.isPaused),
+            feedbackClass(button.type)
+          ]"
           @click="respond(button.type)"
         >
           {{ button.label }}
         </button>
       </div>
+
+      <!-- Feedback Toast -->
+      <Transition name="feedback-toast">
+        <div
+          v-if="showFeedbackToast"
+          class="fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-50"
+        >
+          <div
+            :class="[
+              'px-6 py-3 rounded-full text-lg font-bold shadow-2xl',
+              gameStore.lastFeedback.type === 'correct'
+                ? 'bg-emerald-500/90 text-white'
+                : 'bg-red-500/90 text-white'
+            ]"
+          >
+            {{ gameStore.lastFeedback.type === 'correct' ? '✓ Correct!' : '✗ Wrong' }}
+          </div>
+        </div>
+      </Transition>
       <div class="text-center">
         <div v-if="!gameStore.isStopped" class="strikes-score">
           <div
@@ -116,6 +138,12 @@
     </div>
     </Transition>
 
+    <!-- Achievements -->
+    <AchievementToast />
+
+    <!-- Contextual Game Hints -->
+    <GameHint />
+
     <!-- Pause Modal -->
     <PauseModal
       :show="gameStore.isPaused"
@@ -138,6 +166,12 @@
       @playAgain="handlePlayAgain"
       @mainMenu="handleMainMenu"
     />
+
+    <!-- First-time Tutorial -->
+    <TutorialOverlay
+      :show="showTutorial"
+      @complete="handleTutorialComplete"
+    />
   </div>
 </template>
 
@@ -153,6 +187,9 @@ import Stimulus from './Stimulus.vue';
 import Footer from './Footer.vue';
 import GameOverModal from './GameOverModal.vue';
 import PauseModal from './PauseModal.vue';
+import TutorialOverlay from './TutorialOverlay.vue';
+import GameHint from './GameHint.vue';
+import AchievementToast from './AchievementToast.vue';
 
 export default {
   name: 'App',
@@ -164,6 +201,9 @@ export default {
     Footer,
     GameOverModal,
     PauseModal,
+    TutorialOverlay,
+    GameHint,
+    AchievementToast,
   },
   setup() {
     const gameStore = useGameStore();
@@ -173,6 +213,13 @@ export default {
     const showInstructionMessage = ref(true);
     const scoreAnimating = ref(false);
     const strikeAnimating = ref(false);
+
+    // Tutorial state - show on first visit
+    const showTutorial = ref(!localStorage.getItem('tutorialCompleted'));
+
+    const handleTutorialComplete = () => {
+      showTutorial.value = false;
+    };
 
     // Watch for score changes to trigger animation
     watch(() => gameStore.score, (newScore, oldScore) => {
@@ -226,6 +273,24 @@ export default {
       }
     };
 
+    // Feedback class for button flash effect
+    const feedbackClass = (buttonType) => {
+      const feedback = gameStore.lastFeedback;
+      if (feedback.button === buttonType && feedback.type) {
+        return feedback.type === 'correct'
+          ? 'animate-correct-flash'
+          : 'animate-incorrect-flash';
+      }
+      return '';
+    };
+
+    // Show toast briefly after each response
+    const showFeedbackToast = computed(() => {
+      if (!gameStore.lastFeedback.timestamp) return false;
+      // Toast is controlled by CSS animation, this just triggers it
+      return gameStore.lastFeedback.type !== null;
+    });
+
     const responseButtons = [
       { type: 'color', label: 'Color' },
       { type: 'emoji', label: 'Emoji' },
@@ -274,6 +339,7 @@ export default {
     return {
       buttonClass,
       dismissInstructionMessage,
+      feedbackClass,
       gameStore,
       handleGameOverClose,
       handleMainMenu,
@@ -281,13 +347,16 @@ export default {
       handlePlayAgain,
       handleQuit,
       handleResume,
+      handleTutorialComplete,
       nBackInput,
       resetHighScore,
       respond,
       responseButtons,
       scoreAnimating,
+      showFeedbackToast,
       showInstructionMessage,
       showModal,
+      showTutorial,
       startGame,
       strikeAnimating,
       timeLeftInput,
@@ -372,5 +441,68 @@ export default {
 .screen-fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+/* Correct answer button flash */
+@keyframes correct-flash {
+  0% {
+    background-color: rgb(34 197 94); /* green-500 */
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+  }
+  100% {
+    background-color: rgb(30 41 59 / 0.5); /* slate-800/50 */
+    box-shadow: none;
+  }
+}
+
+.animate-correct-flash {
+  animation: correct-flash 0.5s ease-out forwards;
+}
+
+/* Incorrect answer button flash */
+@keyframes incorrect-flash {
+  0% {
+    background-color: rgb(239 68 68); /* red-500 */
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+  }
+  100% {
+    background-color: rgb(30 41 59 / 0.5); /* slate-800/50 */
+    box-shadow: none;
+  }
+}
+
+.animate-incorrect-flash {
+  animation: incorrect-flash 0.5s ease-out forwards;
+}
+
+/* Feedback toast transitions */
+.feedback-toast-enter-active {
+  animation: toast-in 0.3s ease-out, toast-out 0.3s ease-in 0.5s forwards;
+}
+
+.feedback-toast-leave-active {
+  animation: toast-out 0.2s ease-in forwards;
+}
+
+@keyframes toast-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes toast-out {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
 }
 </style>
