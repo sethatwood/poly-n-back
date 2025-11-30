@@ -62,11 +62,6 @@ html, body {
   opacity: 0.8;
 }
 
-/* Ensure content is above background layers */
-.game-background > * {
-  position: relative;
-  z-index: 1;
-}
 
 /* Smooth scrolling */
 html {

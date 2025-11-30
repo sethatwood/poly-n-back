@@ -2,7 +2,7 @@
   <Transition name="modal">
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center">
       <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+      <div class="absolute inset-0 bg-[#0c1222]/95 backdrop-blur-sm"></div>
 
       <!-- Modal Content -->
       <div class="relative z-10 w-full max-w-sm mx-4 p-6 bg-slate-800 rounded-2xl shadow-2xl border border-slate-700">

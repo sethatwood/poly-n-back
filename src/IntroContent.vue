@@ -15,12 +15,12 @@
     <p class="mt-2">
       • High scores are saved.
     </p>
-    <p class="mt-4">
+    <p class="mt-5 text-center">
       <button
         @click="$emit('showTutorial')"
-        class="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors"
+        class="px-4 py-2 text-sm text-gray-300 border border-gray-600 rounded-lg hover:border-gray-400 hover:text-white active:scale-95 transition-all"
       >
-        📖 Full Tutorial
+        ? How to Play
       </button>
     </p>
   </div>

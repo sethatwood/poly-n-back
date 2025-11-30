@@ -3,7 +3,7 @@
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center">
       <!-- Backdrop -->
       <div
-        class="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        class="absolute inset-0 bg-[#0c1222]/95 backdrop-blur-sm"
         @click="$emit('close')"
       ></div>
 

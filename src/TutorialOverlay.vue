@@ -1,8 +1,8 @@
 <template>
   <Transition name="tutorial">
-    <div v-if="show" class="fixed inset-0 z-50">
-      <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/90"></div>
+    <div v-if="show" class="fixed inset-0 z-50 bg-[#0c1222]">
+      <!-- Backdrop (solid, matching game background) -->
+      <div class="absolute inset-0 bg-[#0c1222]"></div>
 
       <!-- Tutorial Content -->
       <div class="relative h-full flex flex-col items-center justify-center text-white p-6">
