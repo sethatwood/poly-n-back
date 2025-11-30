@@ -1,8 +1,8 @@
 <template>
-  <div class="h-screen flex items-center justify-center overflow-hidden">
+  <div class="min-h-screen flex items-center justify-center overflow-hidden game-background">
     <Transition name="screen-fade" mode="out-in">
       <div v-if="showModal" key="menu" class="max-w-xl mx-auto flex items-center text-white" id="howToPlayModal">
-        <div class="relative mx-auto p-5 container bg-slate-900">
+        <div class="relative mx-auto p-5 container">
         <IntroHead />
         <ConfigStart
           :nBack="Number(nBackInput)"
@@ -15,7 +15,7 @@
         <Footer />
       </div>
     </div>
-    <div v-else key="game" class="w-screen max-w-md mx-auto px-4 text-center uppercase text-white bg-slate-900 relative">
+    <div v-else key="game" class="w-screen max-w-md mx-auto px-4 text-center uppercase text-white relative">
       <!-- Pause Button (top right) -->
       <button
         v-if="!gameStore.isStopped"
