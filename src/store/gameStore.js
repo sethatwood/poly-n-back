@@ -1,7 +1,66 @@
 import { defineStore } from 'pinia';
-import stimulusSound from '../assets/stimulus.wav';
-import incrementSound from '../assets/ting.mp3';
-import strikeSound from '../assets/whip.mp3';
+import stimulusSoundUrl from '../assets/stimulus.wav';
+import incrementSoundUrl from '../assets/ting.mp3';
+import strikeSoundUrl from '../assets/whip.mp3';
+
+// Web Audio API manager - much better iOS support for concurrent sounds
+const audioManager = {
+  context: null,
+  buffers: {},
+  unlocked: false,
+
+  async init() {
+    // Create audio context (will be suspended on iOS until user gesture)
+    this.context = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Load all sound buffers
+    await Promise.all([
+      this.loadSound('stimulus', stimulusSoundUrl),
+      this.loadSound('increment', incrementSoundUrl),
+      this.loadSound('strike', strikeSoundUrl),
+    ]);
+  },
+
+  async loadSound(name, url) {
+    try {
+      const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
+      this.buffers[name] = await this.context.decodeAudioData(arrayBuffer);
+    } catch (error) {
+      console.warn(`Failed to load sound: ${name}`, error);
+    }
+  },
+
+  // Call this on first user interaction to unlock audio on iOS
+  unlock() {
+    if (this.unlocked || !this.context) return;
+
+    // Resume the audio context (required on iOS after user gesture)
+    if (this.context.state === 'suspended') {
+      this.context.resume();
+    }
+
+    this.unlocked = true;
+  },
+
+  play(soundName) {
+    if (!this.context || !this.buffers[soundName]) return;
+
+    // Make sure context is running
+    if (this.context.state === 'suspended') {
+      this.context.resume();
+    }
+
+    // Create a new buffer source for each play (they're one-shot)
+    const source = this.context.createBufferSource();
+    source.buffer = this.buffers[soundName];
+    source.connect(this.context.destination);
+    source.start(0);
+  }
+};
+
+// Initialize audio manager
+audioManager.init();
 
 export const useGameStore = defineStore('game', {
   state: () => ({
@@ -20,7 +79,6 @@ export const useGameStore = defineStore('game', {
     incorrectResponses: 0,
     isNewHighScore: false,
     showGameOverModal: false,
-    incrementSound: new Audio(incrementSound),
     isAudioEnabled: JSON.parse(localStorage.getItem('isAudioEnabled')) ?? true,
     isDeterministic: false,
     isPaused: false,
@@ -42,9 +100,7 @@ export const useGameStore = defineStore('game', {
       timestamp: null, // for animation timing
     },
     score: 0,
-    strikeSound: new Audio(strikeSound),
     stimulusHistory: [],
-    stimulusSound: new Audio(stimulusSound),
     timeLeft: 5,
     timer: null,
   }),
@@ -105,7 +161,7 @@ export const useGameStore = defineStore('game', {
 
       this.stimulusHistory.push({ ...this.currentStimulus });
       this.flashBorder = true;
-      this.playSound(this.stimulusSound);
+      this.playSound('stimulus');
       setTimeout(() => {
         this.flashBorder = false;
       }, 300);
@@ -114,9 +170,13 @@ export const useGameStore = defineStore('game', {
       this.isAudioEnabled = !this.isAudioEnabled;
       localStorage.setItem('isAudioEnabled', JSON.stringify(this.isAudioEnabled));
     },
-    playSound(sound) {
+    // Unlock audio on iOS - call this on first user interaction
+    unlockAudio() {
+      audioManager.unlock();
+    },
+    playSound(soundName) {
       if (this.isAudioEnabled) {
-        sound.play();
+        audioManager.play(soundName);
       }
     },
     toggleDeterministicMode() {
@@ -153,6 +213,8 @@ export const useGameStore = defineStore('game', {
       localStorage.setItem('highScoreData', JSON.stringify(this.highScoreData));
     },
     startGame(timeLeft = 5) {
+      // Unlock audio on iOS when user starts game
+      this.unlockAudio();
       this.resetGameState();
       this.timerInterval = timeLeft;
       this.timeLeft = timeLeft;
@@ -198,13 +260,9 @@ export const useGameStore = defineStore('game', {
 
         if (isCorrect) {
           this.score += 1;
-          this.incrementSound.pause();
-          this.incrementSound.currentTime = 0;
-          this.playSound(this.incrementSound);
+          this.playSound('increment');
         } else {
-          this.strikeSound.pause();
-          this.strikeSound.currentTime = 0;
-          this.playSound(this.strikeSound);
+          this.playSound('strike');
           this.incorrectResponses += 1;
 
           if (this.incorrectResponses >= 3) {

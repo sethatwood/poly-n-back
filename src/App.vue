@@ -214,6 +214,8 @@ export default {
 
     const handleTutorialComplete = () => {
       showTutorial.value = false;
+      // Unlock audio on iOS when user completes/skips tutorial
+      gameStore.unlockAudio();
     };
 
     // Watch for score changes to trigger animation
