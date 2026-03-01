@@ -51,16 +51,18 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 02-01-PLAN.md -- Migrate Tailwind 3 to 4 with upgrade tool, manual post-fixes, and visual verification
 
 ### Phase 3: Capacitor Migration
-**Goal**: The native shell is updated through four major versions (5 to 8) with verified iOS and Android builds at each step
+**Goal**: The native shell is updated from Capacitor 5 directly to 8 with fresh native project regeneration and verified iOS/Android builds
 **Depends on**: Phase 2
 **Requirements**: DEPS-06
 **Success Criteria** (what must be TRUE):
-  1. Capacitor 8 is installed with all core plugins at matching major version
+  1. Capacitor 8 is installed with all core packages at matching major version (core, cli, ios, android at ^8.1.0)
   2. iOS build compiles and runs in Xcode 26 simulator without errors
   3. Android build compiles and runs in Android Studio without errors
-  4. Existing persisted data (high scores, achievements, audio preference, tutorial state) survives the migration on both platforms
+  4. Existing persisted data (high scores, achievements, audio preference, tutorial state) remains accessible on both platforms
   5. Audio playback and iOS audio context unlock continue working on device
-**Plans**: TBD
+  6. App ID is com.polynback on both platforms
+**Plans:** 1 plan
+- [ ] 03-01-PLAN.md -- Upgrade Capacitor 5 to 8 with fresh native projects, config migration to TS, and build verification
 
 ### Phase 4: Linting & Bug Fixes
 **Goal**: All documented defects are resolved and code quality tooling prevents new ones
