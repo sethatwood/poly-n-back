@@ -34,7 +34,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Vue 3.5, Pinia 3, and Vite 7 with @vitejs/plugin-vue 6.x are installed and the app starts without console errors
   4. Dead dependencies (postcss, autoprefixer, register-service-worker, @vue/cli-plugin-pwa) are gone from package.json and registerServiceWorker.js is deleted
   5. All existing gameplay works without regression (start game, play rounds, see scores, hear audio)
-**Plans**: TBD
+**Plans:** 2 plans
+- [ ] 01-01-PLAN.md -- Upgrade deps (Node 22, Vue 3.5, Vite 7) and remove dead packages
+- [ ] 01-02-PLAN.md -- Upgrade Pinia 3 and migrate gameStore to setup syntax
 
 ### Phase 2: Tailwind Migration
 **Goal**: The visual styling system is modernized to Tailwind 4 without any visual regressions in the game UI
@@ -137,7 +139,7 @@ Phases execute in numeric order: 1 to 2 to 3 to 4 to 5 to 6 to 7 to 8 to 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Toolchain Upgrade | 0/? | Not started | - |
+| 1. Core Toolchain Upgrade | 0/2 | Planned | - |
 | 2. Tailwind Migration | 0/? | Not started | - |
 | 3. Capacitor Migration | 0/? | Not started | - |
 | 4. Linting & Bug Fixes | 0/? | Not started | - |
