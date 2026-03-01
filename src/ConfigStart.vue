@@ -8,7 +8,7 @@
         v-model="localNBack"
         @blur="enforceMinNBack"
         min="1"
-        class="text-black mt-1 p-1 block w-20 rounded-md border-gray-300 shadow-xs focus:border-indigo-300 focus:ring-3 focus:ring-indigo-200/50"
+        class="bg-white text-black mt-1 p-1 block w-20 rounded-md border border-gray-300 shadow-xs focus:border-indigo-300 focus:ring-3 focus:ring-indigo-200/50"
       />
     </div>
     <div>
@@ -19,7 +19,7 @@
         v-model="localTimeLeft"
         @blur="enforceMinTimeLeft"
         min="1"
-        class="text-black mt-1 p-1 block w-20 rounded-md border-gray-300 shadow-xs focus:border-indigo-300 focus:ring-3 focus:ring-indigo-200/50"
+        class="bg-white text-black mt-1 p-1 block w-20 rounded-md border border-gray-300 shadow-xs focus:border-indigo-300 focus:ring-3 focus:ring-indigo-200/50"
       />
     </div>
   </div>

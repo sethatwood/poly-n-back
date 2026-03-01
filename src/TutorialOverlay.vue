@@ -38,7 +38,7 @@
                   :key="i"
                   class="flex flex-col items-center gap-2"
                 >
-                  <div class="text-3xl">{{ item.emoji }}</div>
+                  <div class="text-3xl" :class="item.color">{{ item.emoji }}</div>
                   <div class="text-xs text-gray-400">{{ item.label }}</div>
                 </div>
               </div>
@@ -119,8 +119,8 @@ export default {
         title: 'Score Points, Avoid Strikes',
         description: 'Correct matches earn points. Wrong taps give you strikes. Three strikes and the game ends. Try to build the highest score!',
         example: [
-          { emoji: '✓', label: '+1 Point' },
-          { emoji: '✗', label: '+1 Strike' },
+          { emoji: '✓', label: '+1 Point', color: 'text-green-500' },
+          { emoji: '✗', label: '+1 Strike', color: 'text-red-500' },
         ]
       },
       {
