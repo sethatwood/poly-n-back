@@ -4,7 +4,7 @@
       v-if="currentHint"
       class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-40 pointer-events-none"
     >
-      <div class="bg-slate-800/95 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-lg text-sm flex items-center gap-2 max-w-xs">
+      <div class="bg-slate-800/95 backdrop-blur-xs text-white px-4 py-2 rounded-full shadow-lg text-sm flex items-center gap-2 max-w-xs">
         <span class="text-lg">{{ currentHint.icon }}</span>
         <span class="text-gray-200">{{ currentHint.text }}</span>
       </div>

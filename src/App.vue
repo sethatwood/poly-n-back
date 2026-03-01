@@ -112,7 +112,7 @@
         />
       </div>
       <div class="mt-3">
-        <button class="text-xs text-gray-600 bg-gray-600 hover:bg-gray-500 p-1 rounded-full focus:outline-none" @click="toggleAudio">
+        <button class="text-xs text-gray-600 bg-gray-600 hover:bg-gray-500 p-1 rounded-full focus:outline-hidden" @click="toggleAudio">
           <img v-if="gameStore.isAudioEnabled" class="h-5 w-5" :src="volumeUpIcon" alt="Volume Up" />
           <img v-else class="h-5 w-5" :src="volumeMuteIcon" alt="Volume Mute" />
         </button>

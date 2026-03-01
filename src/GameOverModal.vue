@@ -3,7 +3,7 @@
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center">
       <!-- Backdrop -->
       <div
-        class="absolute inset-0 bg-[#0c1222]/95 backdrop-blur-sm"
+        class="absolute inset-0 bg-[#0c1222]/95 backdrop-blur-xs"
         @click="$emit('close')"
       ></div>
 
@@ -19,7 +19,7 @@
 
         <!-- New High Score Celebration -->
         <div v-if="isNewHighScore" class="mb-6 text-center">
-          <div class="inline-block px-4 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-full border border-yellow-500/50">
+          <div class="inline-block px-4 py-2 bg-linear-to-r from-yellow-500/20 to-orange-500/20 rounded-full border border-yellow-500/50">
             <span class="text-yellow-400 font-bold animate-bounce-subtle">
               🏆 New High Score! 🏆
             </span>

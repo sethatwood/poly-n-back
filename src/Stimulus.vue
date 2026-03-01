@@ -68,7 +68,7 @@ export default {
       }
     },
     cellClass() {
-      return this.gameStore.flashBorder ? 'ring-2 ring-slate-600 ring-opacity-50' : '';
+      return this.gameStore.flashBorder ? 'ring-2 ring-slate-600/50' : '';
     },
   },
 };

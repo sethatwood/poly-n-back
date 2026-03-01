@@ -8,7 +8,7 @@
         v-model="localNBack"
         @blur="enforceMinNBack"
         min="1"
-        class="text-black mt-1 p-1 block w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+        class="text-black mt-1 p-1 block w-20 rounded-md border-gray-300 shadow-xs focus:border-indigo-300 focus:ring-3 focus:ring-indigo-200/50"
       />
     </div>
     <div>
@@ -19,11 +19,11 @@
         v-model="localTimeLeft"
         @blur="enforceMinTimeLeft"
         min="1"
-        class="text-black mt-1 p-1 block w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+        class="text-black mt-1 p-1 block w-20 rounded-md border-gray-300 shadow-xs focus:border-indigo-300 focus:ring-3 focus:ring-indigo-200/50"
       />
     </div>
   </div>
-  <button @click="handleStartGame" class="mb-2 p-4 text-lg bg-blue-900 text-white font-medium rounded-md w-full shadow-sm hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300">
+  <button @click="handleStartGame" class="mb-2 p-4 text-lg bg-blue-900 text-white font-medium rounded-md w-full shadow-xs hover:bg-blue-800 focus:outline-hidden focus:ring-2 focus:ring-blue-300">
     Start Game
   </button>
 </template>
