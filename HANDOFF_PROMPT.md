@@ -32,16 +32,21 @@ The codebase concerns in `.planning/codebase/CONCERNS.md` are the immediate prio
 - **Target feel**: "One more round" (addictive loop) + "I'm actually getting smarter" (science credibility).
 - **Core value**: The n-back gameplay loop must feel incredible — responsive, satisfying, impossible to put down.
 
-## What the GSD roadmap should cover (two major milestones)
+## Milestone 1: Harden the Foundation (this `/gsd:new-project` scope)
 
-**Milestone 1: Harden the Foundation**
+GSD handles one milestone at a time. This `/gsd:new-project` should create PROJECT.md, REQUIREMENTS.md, and ROADMAP.md scoped to Milestone 1:
+
+- Update all dependencies to latest (they're 2-3 years stale). Key migrations: Capacitor 5→8, Vite 4→7, Tailwind 3→4, Pinia 2→3, Vue 3.3→3.5. These are major version jumps with breaking changes — Tailwind v4 and Capacitor 8 especially need careful migration. This should happen early so all subsequent work builds on a current foundation.
 - Address concerns from `.planning/codebase/CONCERNS.md` systematically (memory leaks, error handling, type safety, edge cases, test coverage)
 - Component extraction from monolithic App.vue (488 lines)
 - TypeScript migration
 - Unit and integration test infrastructure
 - Polish what exists (the game already has charm — protect it)
 
-**Milestone 2: Monetized Platform**
+## Milestone 2: Monetized Platform (future — via `/gsd:new-milestone` after M1 completes)
+
+For context only. This will be planned after Milestone 1 is complete and audited:
+
 - Laravel API backend (auth via Sanctum, social logins, session sync, subscription webhooks)
 - RevenueCat integration for cross-platform subscriptions
 - User accounts and cross-device progress sync
@@ -60,6 +65,6 @@ The codebase concerns in `.planning/codebase/CONCERNS.md` are the immediate prio
 
 ## How to proceed
 
-Please start with `/gsd:new-project`. The codebase is already mapped (`.planning/codebase/` exists). The reference docs above should give you everything you need for PROJECT.md and REQUIREMENTS.md without extensive re-questioning — the decisions are made. Focus the roadmap on the two milestones described above.
+Please start with `/gsd:new-project`. The codebase is already mapped (`.planning/codebase/` exists). The reference docs above should give you everything you need for PROJECT.md and REQUIREMENTS.md without extensive re-questioning — the decisions are made. Focus the roadmap on Milestone 1 only. Milestone 2 is provided as future context so PROJECT.md captures the full vision.
 
-Before you begin, please create and switch to a new git branch `feat/gsd-hardening` from the current `feat/gsd` branch, and commit the current doc changes (deleted POLYNBACK_IDEA.md and AUDIT_AND_ROADMAP.md, added GAME_DESIGN.md, updated ABOUT_POLY_NBACK.md) with a message like "docs: consolidate planning docs, extract game design reference".
+We're on the `feat/gsd` branch. All doc consolidation is already committed. `main` stays untouched to preserve the live GitHub Pages deployment at polynback.fun.
