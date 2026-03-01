@@ -377,5 +377,5 @@ Poly N-Back was created through Human+AI collaboration—combining human creativ
 
 *Train your brain. Expand your mind. Play Poly N-Back.*
 
-🧠 **polynback.fun**
+🧠 **polynback.com**
 
