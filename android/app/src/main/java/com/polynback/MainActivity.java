@@ -1,4 +1,4 @@
-package fun.polynback;
+package com.polynback;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core Toolchain Upgrade** - Node 22, Vue 3.5, Pinia 3, Vite 7, dead dependency removal
 - [x] **Phase 2: Tailwind Migration** - Tailwind 3 to 4 with visual regression audit
-- [ ] **Phase 3: Capacitor Migration** - Sequential 5 to 6 to 7 to 8 with native build verification
+- [ ] **Phase 3: Capacitor Migration** - Direct 5 to 8 with fresh native project regeneration and verified builds
 - [ ] **Phase 4: Linting & Bug Fixes** - ESLint 9 setup and all documented defect resolutions
 - [ ] **Phase 5: Store Extraction** - audioStore, persistenceStore, composables extracted from monolith
 - [ ] **Phase 6: Component Extraction** - App.vue decomposed into focused screen and game components
