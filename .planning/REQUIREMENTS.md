@@ -9,13 +9,13 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 
 ### Dependency Modernization
 
-- [ ] **DEPS-01**: Node.js upgraded from 18 to 22 LTS with .nvmrc file
-- [ ] **DEPS-02**: Vue upgraded from 3.3 to 3.5.x with no regressions
+- [x] **DEPS-01**: Node.js upgraded from 18 to 22 LTS with .nvmrc file
+- [x] **DEPS-02**: Vue upgraded from 3.3 to 3.5.x with no regressions
 - [ ] **DEPS-03**: Pinia upgraded from 2 to 3 with deprecated API removals addressed
-- [ ] **DEPS-04**: Vite upgraded from 4 to 7 with @vitejs/plugin-vue 6.x
+- [x] **DEPS-04**: Vite upgraded from 4 to 7 with @vitejs/plugin-vue 6.x
 - [ ] **DEPS-05**: Tailwind CSS upgraded from 3 to 4.2+ with @tailwindcss/vite replacing PostCSS pipeline
 - [ ] **DEPS-06**: Capacitor upgraded from 5 to 8 (sequential 5->6->7->8, native build verified at each step)
-- [ ] **DEPS-07**: Dead dependencies removed (postcss, autoprefixer, register-service-worker, @vue/cli-plugin-pwa, registerServiceWorker.js)
+- [x] **DEPS-07**: Dead dependencies removed (postcss, autoprefixer, register-service-worker, @vue/cli-plugin-pwa, registerServiceWorker.js)
 - [ ] **DEPS-08**: ESLint 9 flat config + Prettier configured and passing on all source files
 
 ### Bug Fixes & Resilience
@@ -137,13 +137,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DEPS-01 | Phase 1: Core Toolchain Upgrade | Pending |
-| DEPS-02 | Phase 1: Core Toolchain Upgrade | Pending |
+| DEPS-01 | Phase 1: Core Toolchain Upgrade | Complete |
+| DEPS-02 | Phase 1: Core Toolchain Upgrade | Complete |
 | DEPS-03 | Phase 1: Core Toolchain Upgrade | Pending |
-| DEPS-04 | Phase 1: Core Toolchain Upgrade | Pending |
+| DEPS-04 | Phase 1: Core Toolchain Upgrade | Complete |
 | DEPS-05 | Phase 2: Tailwind Migration | Pending |
 | DEPS-06 | Phase 3: Capacitor Migration | Pending |
-| DEPS-07 | Phase 1: Core Toolchain Upgrade | Pending |
+| DEPS-07 | Phase 1: Core Toolchain Upgrade | Complete |
 | DEPS-08 | Phase 4: Linting & Bug Fixes | Pending |
 | FIX-01 | Phase 4: Linting & Bug Fixes | Pending |
 | FIX-02 | Phase 4: Linting & Bug Fixes | Pending |

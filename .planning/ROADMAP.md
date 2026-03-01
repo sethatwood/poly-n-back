@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Dead dependencies (postcss, autoprefixer, register-service-worker, @vue/cli-plugin-pwa) are gone from package.json and registerServiceWorker.js is deleted
   5. All existing gameplay works without regression (start game, play rounds, see scores, hear audio)
 **Plans:** 2 plans
-- [ ] 01-01-PLAN.md -- Upgrade deps (Node 22, Vue 3.5, Vite 7) and remove dead packages
+- [x] 01-01-PLAN.md -- Upgrade deps (Node 22, Vue 3.5, Vite 7) and remove dead packages
 - [ ] 01-02-PLAN.md -- Upgrade Pinia 3 and migrate gameStore to setup syntax
 
 ### Phase 2: Tailwind Migration

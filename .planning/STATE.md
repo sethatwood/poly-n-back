@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 1 of 9 (Core Toolchain Upgrade)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-03-01 -- Roadmap created with 9 phases covering 44 requirements
+Plan: 1 of 2 in current phase
+Status: Executing
+Last activity: 2026-03-01 -- Completed 01-01 (Core Toolchain Upgrade)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 5%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 3min
+- Total execution time: 0.05 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-core-toolchain-upgrade | 1 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: -
+- Last 5 plans: 01-01 (3min)
 - Trend: -
 
 *Updated after each plan completion*
@@ -46,6 +46,8 @@ Recent decisions affecting current work:
 - [Roadmap]: App store submission items (icons, splash, privacy policy) deferred to M2.
 - [Roadmap]: Haptic feedback is opt-in toggle, off by default.
 - [Roadmap]: ESLint 9 setup grouped with bug fixes (Phase 4) -- lint before code changes, after deps stable.
+- [01-01]: Regenerated package-lock.json from scratch to eliminate stale Vite 4 resolution trees.
+- [01-01]: Removed all dead dependencies in one pass rather than incremental cleanup.
 
 ### Pending Todos
 
@@ -59,5 +61,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Roadmap created, ready to plan Phase 1
+Stopped at: Completed 01-01-PLAN.md (Core Toolchain Upgrade)
 Resume file: None
