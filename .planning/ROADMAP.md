@@ -47,7 +47,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. All game screens look identical to pre-migration (menu, gameplay, game over, pause, tutorial overlay)
   3. Dynamic class bindings in game logic (button colors, feedback states, score animations) render correctly
   4. Dark theme has no unintended white borders or color shifts from Tailwind 4 default changes
-**Plans**: TBD
+**Plans:** 1 plan
+- [ ] 02-01-PLAN.md -- Migrate Tailwind 3 to 4 with upgrade tool, manual post-fixes, and visual verification
 
 ### Phase 3: Capacitor Migration
 **Goal**: The native shell is updated through four major versions (5 to 8) with verified iOS and Android builds at each step
