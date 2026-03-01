@@ -1,7 +1,7 @@
-# Requirements: Poly N-Back — Milestone 1 (Harden the Foundation)
+# Requirements: Poly N-Back -- Milestone 1 (Harden the Foundation)
 
 **Defined:** 2026-03-01
-**Core Value:** The n-back gameplay loop must feel incredible — responsive, satisfying, impossible to put down.
+**Core Value:** The n-back gameplay loop must feel incredible -- responsive, satisfying, impossible to put down.
 
 ## v1 Requirements
 
@@ -14,7 +14,7 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 - [ ] **DEPS-03**: Pinia upgraded from 2 to 3 with deprecated API removals addressed
 - [ ] **DEPS-04**: Vite upgraded from 4 to 7 with @vitejs/plugin-vue 6.x
 - [ ] **DEPS-05**: Tailwind CSS upgraded from 3 to 4.2+ with @tailwindcss/vite replacing PostCSS pipeline
-- [ ] **DEPS-06**: Capacitor upgraded from 5 to 8 (sequential 5→6→7→8, native build verified at each step)
+- [ ] **DEPS-06**: Capacitor upgraded from 5 to 8 (sequential 5->6->7->8, native build verified at each step)
 - [ ] **DEPS-07**: Dead dependencies removed (postcss, autoprefixer, register-service-worker, @vue/cli-plugin-pwa, registerServiceWorker.js)
 - [ ] **DEPS-08**: ESLint 9 flat config + Prettier configured and passing on all source files
 
@@ -49,7 +49,7 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 - [ ] **TS-03**: All Pinia stores fully typed with setup syntax
 - [ ] **TS-04**: All composables fully typed with explicit return types
 - [ ] **TS-05**: All Vue components migrated to `<script setup lang="ts">`
-- [ ] **TS-06**: Strict mode enabled incrementally (noImplicitAny → strictNullChecks → strict: true)
+- [ ] **TS-06**: Strict mode enabled incrementally (noImplicitAny -> strictNullChecks -> strict: true)
 - [ ] **TS-07**: vue-tsc --noEmit type checking passing with zero errors
 
 ### Testing
@@ -58,8 +58,8 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 - [ ] **TEST-02**: gameStore unit tests covering stimulus generation, response evaluation, score calculation, turn management, and high score logic
 - [ ] **TEST-03**: persistenceStore unit tests covering error handling paths, schema validation, and default fallbacks
 - [ ] **TEST-04**: audioStore unit tests covering initialization failure and graceful degradation
-- [ ] **TEST-05**: Integration tests for full game flow (start → gameplay → game over)
-- [ ] **TEST-06**: Integration tests for state transitions (menu → game → pause → resume → game over)
+- [ ] **TEST-05**: Integration tests for full game flow (start -> gameplay -> game over)
+- [ ] **TEST-06**: Integration tests for state transitions (menu -> game -> pause -> resume -> game over)
 - [ ] **TEST-07**: Playwright E2E configured with WebKit + Chromium test targets
 - [ ] **TEST-08**: CI pipeline runs type-check, unit tests, and build on every push
 
@@ -113,7 +113,7 @@ Deferred to Milestone 2 (Monetized Platform). Tracked but not in current roadmap
 - **PLAT-01**: Laravel API backend deployed on Forge
 - **PLAT-02**: Marketing site at polynback.com
 - **PLAT-03**: Web teaser with limited free play funneling to app stores
-- **PLAT-04**: polynback.fun → polynback.com cutover
+- **PLAT-04**: polynback.fun -> polynback.com cutover
 
 ## Out of Scope
 
@@ -121,7 +121,7 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Ads of any kind | Focus is sacred in cognitive training — never |
+| Ads of any kind | Focus is sacred in cognitive training -- never |
 | New game attributes (sound, size, rotation, 2D grid) | M2+ feature expansion, not hardening |
 | Service worker / PWA | iOS WKWebView doesn't support service workers; Capacitor bundles assets natively |
 | Dark mode toggle | App is already dark-themed; toggle adds complexity without value |
@@ -137,56 +137,56 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DEPS-01 | — | Pending |
-| DEPS-02 | — | Pending |
-| DEPS-03 | — | Pending |
-| DEPS-04 | — | Pending |
-| DEPS-05 | — | Pending |
-| DEPS-06 | — | Pending |
-| DEPS-07 | — | Pending |
-| DEPS-08 | — | Pending |
-| FIX-01 | — | Pending |
-| FIX-02 | — | Pending |
-| FIX-03 | — | Pending |
-| FIX-04 | — | Pending |
-| FIX-05 | — | Pending |
-| FIX-06 | — | Pending |
-| FIX-07 | — | Pending |
-| FIX-08 | — | Pending |
-| FIX-09 | — | Pending |
-| FIX-10 | — | Pending |
-| ARCH-01 | — | Pending |
-| ARCH-02 | — | Pending |
-| ARCH-03 | — | Pending |
-| ARCH-04 | — | Pending |
-| ARCH-05 | — | Pending |
-| ARCH-06 | — | Pending |
-| ARCH-07 | — | Pending |
-| ARCH-08 | — | Pending |
-| TS-01 | — | Pending |
-| TS-02 | — | Pending |
-| TS-03 | — | Pending |
-| TS-04 | — | Pending |
-| TS-05 | — | Pending |
-| TS-06 | — | Pending |
-| TS-07 | — | Pending |
-| TEST-01 | — | Pending |
-| TEST-02 | — | Pending |
-| TEST-03 | — | Pending |
-| TEST-04 | — | Pending |
-| TEST-05 | — | Pending |
-| TEST-06 | — | Pending |
-| TEST-07 | — | Pending |
-| TEST-08 | — | Pending |
-| PLSH-01 | — | Pending |
-| PLSH-02 | — | Pending |
-| PLSH-03 | — | Pending |
+| DEPS-01 | Phase 1: Core Toolchain Upgrade | Pending |
+| DEPS-02 | Phase 1: Core Toolchain Upgrade | Pending |
+| DEPS-03 | Phase 1: Core Toolchain Upgrade | Pending |
+| DEPS-04 | Phase 1: Core Toolchain Upgrade | Pending |
+| DEPS-05 | Phase 2: Tailwind Migration | Pending |
+| DEPS-06 | Phase 3: Capacitor Migration | Pending |
+| DEPS-07 | Phase 1: Core Toolchain Upgrade | Pending |
+| DEPS-08 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-01 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-02 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-03 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-04 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-05 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-06 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-07 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-08 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-09 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-10 | Phase 4: Linting & Bug Fixes | Pending |
+| ARCH-01 | Phase 6: Component Extraction | Pending |
+| ARCH-02 | Phase 6: Component Extraction | Pending |
+| ARCH-03 | Phase 6: Component Extraction | Pending |
+| ARCH-04 | Phase 6: Component Extraction | Pending |
+| ARCH-05 | Phase 5: Store Extraction | Pending |
+| ARCH-06 | Phase 5: Store Extraction | Pending |
+| ARCH-07 | Phase 5: Store Extraction | Pending |
+| ARCH-08 | Phase 5: Store Extraction | Pending |
+| TS-01 | Phase 7: TypeScript Migration | Pending |
+| TS-02 | Phase 7: TypeScript Migration | Pending |
+| TS-03 | Phase 7: TypeScript Migration | Pending |
+| TS-04 | Phase 7: TypeScript Migration | Pending |
+| TS-05 | Phase 7: TypeScript Migration | Pending |
+| TS-06 | Phase 7: TypeScript Migration | Pending |
+| TS-07 | Phase 7: TypeScript Migration | Pending |
+| TEST-01 | Phase 8: Testing & CI | Pending |
+| TEST-02 | Phase 8: Testing & CI | Pending |
+| TEST-03 | Phase 8: Testing & CI | Pending |
+| TEST-04 | Phase 8: Testing & CI | Pending |
+| TEST-05 | Phase 8: Testing & CI | Pending |
+| TEST-06 | Phase 8: Testing & CI | Pending |
+| TEST-07 | Phase 8: Testing & CI | Pending |
+| TEST-08 | Phase 8: Testing & CI | Pending |
+| PLSH-01 | Phase 9: Platform Polish | Pending |
+| PLSH-02 | Phase 9: Platform Polish | Pending |
+| PLSH-03 | Phase 9: Platform Polish | Pending |
 
 **Coverage:**
-- v1 requirements: 41 total
-- Mapped to phases: 0
-- Unmapped: 41 ⚠️
+- v1 requirements: 44 total
+- Mapped to phases: 44
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 after initial definition*
+*Last updated: 2026-03-01 after roadmap creation*
