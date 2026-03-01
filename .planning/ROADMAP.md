@@ -12,7 +12,7 @@ Milestone 1 transforms the working-but-fragile Poly N-Back app into a production
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Core Toolchain Upgrade** - Node 22, Vue 3.5, Pinia 3, Vite 7, dead dependency removal
+- [x] **Phase 1: Core Toolchain Upgrade** - Node 22, Vue 3.5, Pinia 3, Vite 7, dead dependency removal
 - [ ] **Phase 2: Tailwind Migration** - Tailwind 3 to 4 with visual regression audit
 - [ ] **Phase 3: Capacitor Migration** - Sequential 5 to 6 to 7 to 8 with native build verification
 - [ ] **Phase 4: Linting & Bug Fixes** - ESLint 9 setup and all documented defect resolutions
@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. All existing gameplay works without regression (start game, play rounds, see scores, hear audio)
 **Plans:** 2 plans
 - [x] 01-01-PLAN.md -- Upgrade deps (Node 22, Vue 3.5, Vite 7) and remove dead packages
-- [ ] 01-02-PLAN.md -- Upgrade Pinia 3 and migrate gameStore to setup syntax
+- [x] 01-02-PLAN.md -- Upgrade Pinia 3 and migrate gameStore to setup syntax
 
 ### Phase 2: Tailwind Migration
 **Goal**: The visual styling system is modernized to Tailwind 4 without any visual regressions in the game UI
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 to 2 to 3 to 4 to 5 to 6 to 7 to 8 to 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Toolchain Upgrade | 0/2 | Planned | - |
+| 1. Core Toolchain Upgrade | 2/2 | Complete | 2026-03-01 |
 | 2. Tailwind Migration | 0/? | Not started | - |
 | 3. Capacitor Migration | 0/? | Not started | - |
 | 4. Linting & Bug Fixes | 0/? | Not started | - |

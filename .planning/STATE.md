@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** The n-back gameplay loop must feel incredible -- responsive, satisfying, impossible to put down.
-**Current focus:** Phase 1: Core Toolchain Upgrade
+**Current focus:** Phase 1 complete. Ready for Phase 2: Tailwind Migration
 
 ## Current Position
 
-Phase: 1 of 9 (Core Toolchain Upgrade)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-03-01 -- Completed 01-01 (Core Toolchain Upgrade)
+Phase: 1 of 9 (Core Toolchain Upgrade) -- COMPLETE
+Plan: 2 of 2 in current phase (all done)
+Status: Phase Complete
+Last activity: 2026-03-01 -- Completed 01-02 (Pinia 3 + Setup Syntax Migration)
 
-Progress: [█░░░░░░░░░] 5%
+Progress: [██░░░░░░░░] 11%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 3min
-- Total execution time: 0.05 hours
+- Total plans completed: 2
+- Average duration: 3.5min
+- Total execution time: 0.12 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-core-toolchain-upgrade | 1 | 3min | 3min |
+| 01-core-toolchain-upgrade | 2 | 7min | 3.5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3min)
-- Trend: -
+- Last 5 plans: 01-01 (3min), 01-02 (4min)
+- Trend: stable
 
 *Updated after each plan completion*
 
@@ -48,6 +48,7 @@ Recent decisions affecting current work:
 - [Roadmap]: ESLint 9 setup grouped with bug fixes (Phase 4) -- lint before code changes, after deps stable.
 - [01-01]: Regenerated package-lock.json from scratch to eliminate stale Vite 4 resolution trees.
 - [01-01]: Removed all dead dependencies in one pass rather than incremental cleanup.
+- [01-02]: Migrated gameStore in-place to Pinia 3 setup syntax while store is a single file -- minimizes risk vs doing it after extraction.
 
 ### Pending Todos
 
@@ -61,5 +62,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 01-01-PLAN.md (Core Toolchain Upgrade)
+Stopped at: Completed 01-02-PLAN.md (Pinia 3 + Setup Syntax Migration) -- Phase 1 complete
 Resume file: None
