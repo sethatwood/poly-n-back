@@ -14,7 +14,7 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 - [x] **DEPS-03**: Pinia upgraded from 2 to 3 with deprecated API removals addressed
 - [x] **DEPS-04**: Vite upgraded from 4 to 7 with @vitejs/plugin-vue 6.x
 - [x] **DEPS-05**: Tailwind CSS upgraded from 3 to 4.2+ with @tailwindcss/vite replacing PostCSS pipeline
-- [ ] **DEPS-06**: Capacitor upgraded from 5 to 8 (sequential 5->6->7->8, native build verified at each step)
+- [x] **DEPS-06**: Capacitor upgraded from 5 to 8 (sequential 5->6->7->8, native build verified at each step)
 - [x] **DEPS-07**: Dead dependencies removed (postcss, autoprefixer, register-service-worker, @vue/cli-plugin-pwa, registerServiceWorker.js)
 - [ ] **DEPS-08**: ESLint 9 flat config + Prettier configured and passing on all source files
 
@@ -142,7 +142,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEPS-03 | Phase 1: Core Toolchain Upgrade | Complete |
 | DEPS-04 | Phase 1: Core Toolchain Upgrade | Complete |
 | DEPS-05 | Phase 2: Tailwind Migration | Complete |
-| DEPS-06 | Phase 3: Capacitor Migration | Pending |
+| DEPS-06 | Phase 3: Capacitor Migration | Complete |
 | DEPS-07 | Phase 1: Core Toolchain Upgrade | Complete |
 | DEPS-08 | Phase 4: Linting & Bug Fixes | Pending |
 | FIX-01 | Phase 4: Linting & Bug Fixes | Pending |

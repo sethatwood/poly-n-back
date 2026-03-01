@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core Toolchain Upgrade** - Node 22, Vue 3.5, Pinia 3, Vite 7, dead dependency removal
 - [x] **Phase 2: Tailwind Migration** - Tailwind 3 to 4 with visual regression audit
-- [ ] **Phase 3: Capacitor Migration** - Direct 5 to 8 with fresh native project regeneration and verified builds
+- [x] **Phase 3: Capacitor Migration** - Direct 5 to 8 with fresh native project regeneration and verified builds
 - [ ] **Phase 4: Linting & Bug Fixes** - ESLint 9 setup and all documented defect resolutions
 - [ ] **Phase 5: Store Extraction** - audioStore, persistenceStore, composables extracted from monolith
 - [ ] **Phase 6: Component Extraction** - App.vue decomposed into focused screen and game components
@@ -62,7 +62,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Audio playback and iOS audio context unlock continue working on device
   6. App ID is com.polynback on both platforms
 **Plans:** 1 plan
-- [ ] 03-01-PLAN.md -- Upgrade Capacitor 5 to 8 with fresh native projects, config migration to TS, and build verification
+- [x] 03-01-PLAN.md -- Upgrade Capacitor 5 to 8 with fresh native projects, config migration to TS, and build verification
 
 ### Phase 4: Linting & Bug Fixes
 **Goal**: All documented defects are resolved and code quality tooling prevents new ones
@@ -144,7 +144,7 @@ Phases execute in numeric order: 1 to 2 to 3 to 4 to 5 to 6 to 7 to 8 to 9
 |-------|----------------|--------|-----------|
 | 1. Core Toolchain Upgrade | 2/2 | Complete | 2026-03-01 |
 | 2. Tailwind Migration | 1/1 | Complete | 2026-03-01 |
-| 3. Capacitor Migration | 0/? | Not started | - |
+| 3. Capacitor Migration | 1/1 | Complete | 2026-03-01 |
 | 4. Linting & Bug Fixes | 0/? | Not started | - |
 | 5. Store Extraction | 0/? | Not started | - |
 | 6. Component Extraction | 0/? | Not started | - |
