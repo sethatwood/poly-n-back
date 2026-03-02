@@ -26,5 +26,5 @@ app.mount('#app');
 
 // For debugging: Bind gameStore to the window object
 if (import.meta.env.DEV) {
-  window.gameStore = useGameStore();
+  (window as any).gameStore = useGameStore();
 }
