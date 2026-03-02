@@ -240,6 +240,7 @@
 import { onMounted, onUnmounted, ref, watch, computed } from 'vue';
 import { Preferences } from '@capacitor/preferences';
 import { useGameStore } from './store/gameStore';
+import { useManagedTimeout } from './composables/useManagedTimeout';
 import volumeUpIcon from './assets/volume-up-solid.svg';
 import volumeMuteIcon from './assets/volume-mute-solid.svg';
 import IntroHead from './IntroHead.vue';
@@ -269,6 +270,7 @@ export default {
   },
   setup() {
     const gameStore = useGameStore();
+    const { managedSetTimeout, clearManagedTimeout } = useManagedTimeout();
     const nBackInput = ref(gameStore.nBack);
     const timeLeftInput = ref(gameStore.timeLeft);
     const showModal = ref(true);
@@ -298,7 +300,7 @@ export default {
       (newScore, oldScore) => {
         if (newScore > oldScore) {
           scoreAnimating.value = true;
-          setTimeout(() => {
+          managedSetTimeout(() => {
             scoreAnimating.value = false;
           }, 400);
         }
@@ -311,7 +313,7 @@ export default {
       (newStrikes, oldStrikes) => {
         if (newStrikes > oldStrikes) {
           strikeAnimating.value = true;
-          setTimeout(() => {
+          managedSetTimeout(() => {
             strikeAnimating.value = false;
           }, 500);
         }
@@ -363,7 +365,7 @@ export default {
 
     // Show feedback indicator briefly after each response
     const feedbackVisible = ref(false);
-    let feedbackTimeout = null;
+    let feedbackTimeoutId = null;
 
     // Watch for feedback changes and auto-hide after 1 second
     watch(
@@ -371,8 +373,8 @@ export default {
       (newTimestamp) => {
         if (newTimestamp && gameStore.lastFeedback.type) {
           feedbackVisible.value = true;
-          if (feedbackTimeout) clearTimeout(feedbackTimeout);
-          feedbackTimeout = setTimeout(() => {
+          if (feedbackTimeoutId) clearManagedTimeout(feedbackTimeoutId);
+          feedbackTimeoutId = managedSetTimeout(() => {
             feedbackVisible.value = false;
           }, 2000);
         }

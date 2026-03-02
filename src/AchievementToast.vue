@@ -30,9 +30,10 @@
 </template>
 
 <script>
-import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { Preferences } from '@capacitor/preferences';
 import { useGameStore } from './store/gameStore';
+import { useManagedTimeout } from './composables/useManagedTimeout';
 
 // Achievement definitions
 const ACHIEVEMENTS = {
@@ -84,6 +85,7 @@ export default {
   name: 'AchievementToast',
   setup() {
     const gameStore = useGameStore();
+    const { managedSetTimeout, clearManagedTimeout } = useManagedTimeout();
     const achievement = ref(null);
     const toastTimeout = ref(null);
 
@@ -124,11 +126,11 @@ export default {
       }
 
       // Show toast
-      if (toastTimeout.value) clearTimeout(toastTimeout.value);
+      if (toastTimeout.value) clearManagedTimeout(toastTimeout.value);
       achievement.value = ach;
 
       // Auto-hide after 4 seconds
-      toastTimeout.value = setTimeout(() => {
+      toastTimeout.value = managedSetTimeout(() => {
         achievement.value = null;
       }, 4000);
     };
@@ -204,10 +206,6 @@ export default {
         }
       },
     );
-
-    onUnmounted(() => {
-      if (toastTimeout.value) clearTimeout(toastTimeout.value);
-    });
 
     return {
       achievement,

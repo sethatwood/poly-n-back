@@ -15,13 +15,15 @@
 </template>
 
 <script>
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
+import { ref, watch } from 'vue';
 import { useGameStore } from './store/gameStore';
+import { useManagedTimeout } from './composables/useManagedTimeout';
 
 export default {
   name: 'GameHint',
   setup() {
     const gameStore = useGameStore();
+    const { managedSetTimeout, clearManagedTimeout } = useManagedTimeout();
     const currentHint = ref(null);
     const hintTimeout = ref(null);
     const shownHints = ref(new Set());
@@ -58,14 +60,14 @@ export default {
 
       // Clear any existing hint
       if (hintTimeout.value) {
-        clearTimeout(hintTimeout.value);
+        clearManagedTimeout(hintTimeout.value);
       }
 
       currentHint.value = hint;
       shownHints.value.add(hintKey);
 
       // Auto-hide after 2.5 seconds
-      hintTimeout.value = setTimeout(() => {
+      hintTimeout.value = managedSetTimeout(() => {
         currentHint.value = null;
       }, 2500);
     };
@@ -137,13 +139,6 @@ export default {
         }
       },
     );
-
-    // Cleanup
-    onUnmounted(() => {
-      if (hintTimeout.value) {
-        clearTimeout(hintTimeout.value);
-      }
-    });
 
     return {
       currentHint,
