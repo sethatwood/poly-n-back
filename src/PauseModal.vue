@@ -49,25 +49,18 @@
   </Transition>
 </template>
 
-<script>
-export default {
-  name: 'PauseModal',
-  props: {
-    show: {
-      type: Boolean,
-      required: true,
-    },
-    score: {
-      type: Number,
-      required: true,
-    },
-    strikes: {
-      type: Number,
-      required: true,
-    },
-  },
-  emits: ['resume', 'quit'],
-};
+<script setup lang="ts">
+interface Props {
+  show: boolean
+  score: number
+  strikes: number
+}
+
+defineProps<Props>()
+defineEmits<{
+  resume: []
+  quit: []
+}>()
 </script>
 
 <style scoped>

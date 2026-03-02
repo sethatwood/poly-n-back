@@ -38,19 +38,19 @@
   </p>
 </template>
 
-<script>
-export default {
-  name: 'GameOverDisplay',
-  props: {
-    score: { type: Number, required: true },
-    previousPotentialCorrectAnswers: { type: Number, required: true },
-    finalScoreAccuracy: { type: Number, required: true },
-    highScoreData: { type: Object, required: true },
-    highScoreAccuracy: { type: Number, required: true },
-  },
-  emits: ['reset-high-score'],
-  setup() {
-    return {};
-  },
-};
+<script setup lang="ts">
+import type { HighScoreData } from '@/types/game'
+
+interface Props {
+  score: number
+  previousPotentialCorrectAnswers: number
+  finalScoreAccuracy: number
+  highScoreData: HighScoreData
+  highScoreAccuracy: number
+}
+
+defineProps<Props>()
+defineEmits<{
+  'reset-high-score': []
+}>()
 </script>

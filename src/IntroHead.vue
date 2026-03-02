@@ -21,8 +21,6 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'IntroHead',
-};
+<script setup lang="ts">
+// No props or logic needed -- template-only component
 </script>

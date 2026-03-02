@@ -39,55 +39,41 @@
   </div>
 </template>
 
-<script>
-import { computed } from 'vue';
-import { useGameStore } from './stores/gameStore';
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useGameStore } from './stores/gameStore'
+import type { StimulusColor, StimulusPosition, StimulusShape } from '@/types/game'
 
-export default {
-  name: 'Stimulus',
-  props: {
-    color: String,
-    emoji: String,
-    position: String,
-    shape: String,
-  },
-  setup() {
-    const gameStore = useGameStore();
+interface Props {
+  color: StimulusColor
+  emoji: string
+  position: StimulusPosition
+  shape: StimulusShape
+}
 
-    const animationClass = computed(() => {
-      return gameStore.flashBorder ? 'animate-stimulus-appear' : '';
-    });
+const props = defineProps<Props>()
+const gameStore = useGameStore()
 
-    return { gameStore, animationClass };
-  },
-  computed: {
-    colorClass() {
-      switch (this.color) {
-        case 'purple':
-          return 'text-purple-500';
-        case 'green':
-          return 'text-emerald-500';
-        case 'blue':
-          return 'text-blue-500';
-        default:
-          return '';
-      }
-    },
-    shapeClass() {
-      switch (this.shape) {
-        case 'circle':
-          return 'w-20 h-20 rounded-full bg-current shadow-lg shadow-current/30';
-        case 'square':
-          return 'w-20 h-20 bg-current shadow-lg shadow-current/30';
-        default:
-          return '';
-      }
-    },
-    cellClass() {
-      return this.gameStore.flashBorder ? 'ring-2 ring-slate-600/50' : '';
-    },
-  },
-};
+const animationClass = computed(() => gameStore.flashBorder ? 'animate-stimulus-appear' : '')
+
+const colorClass = computed(() => {
+  switch (props.color) {
+    case 'purple': return 'text-purple-500'
+    case 'green': return 'text-emerald-500'
+    case 'blue': return 'text-blue-500'
+    default: return ''
+  }
+})
+
+const shapeClass = computed(() => {
+  switch (props.shape) {
+    case 'circle': return 'w-20 h-20 rounded-full bg-current shadow-lg shadow-current/30'
+    case 'square': return 'w-20 h-20 bg-current shadow-lg shadow-current/30'
+    default: return ''
+  }
+})
+
+const cellClass = computed(() => gameStore.flashBorder ? 'ring-2 ring-slate-600/50' : '')
 </script>
 
 <style>

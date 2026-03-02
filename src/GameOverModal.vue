@@ -84,55 +84,32 @@
   </Transition>
 </template>
 
-<script>
-import { computed } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue'
 
-export default {
-  name: 'GameOverModal',
-  props: {
-    show: {
-      type: Boolean,
-      required: true,
-    },
-    score: {
-      type: Number,
-      required: true,
-    },
-    possiblePoints: {
-      type: Number,
-      required: true,
-    },
-    accuracy: {
-      type: Number,
-      required: true,
-    },
-    nBack: {
-      type: Number,
-      required: true,
-    },
-    timer: {
-      type: Number,
-      required: true,
-    },
-    isNewHighScore: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['close', 'playAgain', 'mainMenu'],
-  setup(props) {
-    const accuracyColorClass = computed(() => {
-      if (props.accuracy >= 80) return 'text-green-400';
-      if (props.accuracy >= 60) return 'text-yellow-400';
-      if (props.accuracy >= 40) return 'text-orange-400';
-      return 'text-red-400';
-    });
+interface Props {
+  show: boolean
+  score: number
+  possiblePoints: number
+  accuracy: number
+  nBack: number
+  timer: number
+  isNewHighScore?: boolean
+}
 
-    return {
-      accuracyColorClass,
-    };
-  },
-};
+const props = defineProps<Props>()
+defineEmits<{
+  close: []
+  playAgain: []
+  mainMenu: []
+}>()
+
+const accuracyColorClass = computed(() => {
+  if (props.accuracy >= 80) return 'text-green-400'
+  if (props.accuracy >= 60) return 'text-yellow-400'
+  if (props.accuracy >= 40) return 'text-orange-400'
+  return 'text-red-400'
+})
 </script>
 
 <style scoped>

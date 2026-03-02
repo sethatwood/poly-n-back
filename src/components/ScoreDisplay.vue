@@ -18,19 +18,15 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'ScoreDisplay',
-  props: {
-    score: { type: Number, required: true },
-    incorrectResponses: { type: Number, required: true },
-    scoreAnimating: { type: Boolean, required: true },
-    strikeAnimating: { type: Boolean, required: true },
-  },
-  setup() {
-    return {};
-  },
-};
+<script setup lang="ts">
+interface Props {
+  score: number
+  incorrectResponses: number
+  scoreAnimating: boolean
+  strikeAnimating: boolean
+}
+
+defineProps<Props>()
 </script>
 
 <style scoped>

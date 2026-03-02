@@ -5,3 +5,7 @@
     Built by Human+AI collaboration with 💜
   </div>
 </template>
+
+<script setup lang="ts">
+// Template-only component
+</script>

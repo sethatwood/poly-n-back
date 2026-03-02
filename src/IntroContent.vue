@@ -19,18 +19,12 @@
   </div>
 </template>
 
-<script>
-import { useGameStore } from './stores/gameStore';
+<script setup lang="ts">
+import { useGameStore } from './stores/gameStore'
 
-export default {
-  name: 'IntroContent',
-  emits: ['showTutorial'],
-  setup() {
-    const gameStore = useGameStore();
+defineEmits<{
+  showTutorial: []
+}>()
 
-    return {
-      gameStore,
-    };
-  },
-};
+const gameStore = useGameStore()
 </script>

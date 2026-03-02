@@ -29,19 +29,15 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'GameTimer',
-  props: {
-    timeLeft: { type: Number, required: true },
-    isPaused: { type: Boolean, required: true },
-    showFeedbackToast: { type: Boolean, required: true },
-    feedbackType: { type: String, default: null },
-  },
-  setup() {
-    return {};
-  },
-};
+<script setup lang="ts">
+interface Props {
+  timeLeft: number
+  isPaused: boolean
+  showFeedbackToast: boolean
+  feedbackType?: string | null
+}
+
+defineProps<Props>()
 </script>
 
 <style scoped>
