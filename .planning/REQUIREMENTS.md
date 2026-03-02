@@ -16,14 +16,14 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 - [x] **DEPS-05**: Tailwind CSS upgraded from 3 to 4.2+ with @tailwindcss/vite replacing PostCSS pipeline
 - [x] **DEPS-06**: Capacitor upgraded from 5 to 8 (sequential 5->6->7->8, native build verified at each step)
 - [x] **DEPS-07**: Dead dependencies removed (postcss, autoprefixer, register-service-worker, @vue/cli-plugin-pwa, registerServiceWorker.js)
-- [ ] **DEPS-08**: ESLint 9 flat config + Prettier configured and passing on all source files
+- [x] **DEPS-08**: ESLint 9 flat config + Prettier configured and passing on all source files
 
 ### Bug Fixes & Resilience
 
-- [ ] **FIX-01**: Accuracy calculations guarded against division by zero (gameStore getters and stopGame action)
-- [ ] **FIX-02**: stimulusHistory access bounds-checked in respondToStimulus() before array lookup
-- [ ] **FIX-03**: Button responses debounced to prevent multiple responses per stimulus turn
-- [ ] **FIX-04**: Stimulus history capped to nBack + 50 entries to prevent unbounded memory growth
+- [x] **FIX-01**: Accuracy calculations guarded against division by zero (gameStore getters and stopGame action)
+- [x] **FIX-02**: stimulusHistory access bounds-checked in respondToStimulus() before array lookup
+- [x] **FIX-03**: Button responses debounced to prevent multiple responses per stimulus turn
+- [x] **FIX-04**: Stimulus history capped to nBack + 50 entries to prevent unbounded memory growth
 - [ ] **FIX-05**: All setTimeout/setInterval calls use managed timeout utility with automatic cleanup on unmount
 - [ ] **FIX-06**: Persistent data migrated from localStorage to @capacitor/preferences (high scores, achievements, audio preference, tutorial state)
 - [ ] **FIX-07**: All storage reads validate data schema and fall back to defaults on corruption
@@ -144,11 +144,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEPS-05 | Phase 2: Tailwind Migration | Complete |
 | DEPS-06 | Phase 3: Capacitor Migration | Complete |
 | DEPS-07 | Phase 1: Core Toolchain Upgrade | Complete |
-| DEPS-08 | Phase 4: Linting & Bug Fixes | Pending |
-| FIX-01 | Phase 4: Linting & Bug Fixes | Pending |
-| FIX-02 | Phase 4: Linting & Bug Fixes | Pending |
-| FIX-03 | Phase 4: Linting & Bug Fixes | Pending |
-| FIX-04 | Phase 4: Linting & Bug Fixes | Pending |
+| DEPS-08 | Phase 4: Linting & Bug Fixes | Complete |
+| FIX-01 | Phase 4: Linting & Bug Fixes | Complete |
+| FIX-02 | Phase 4: Linting & Bug Fixes | Complete |
+| FIX-03 | Phase 4: Linting & Bug Fixes | Complete |
+| FIX-04 | Phase 4: Linting & Bug Fixes | Complete |
 | FIX-05 | Phase 4: Linting & Bug Fixes | Pending |
 | FIX-06 | Phase 4: Linting & Bug Fixes | Pending |
 | FIX-07 | Phase 4: Linting & Bug Fixes | Pending |
