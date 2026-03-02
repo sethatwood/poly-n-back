@@ -67,7 +67,7 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 
 - [x] **PLSH-01**: Game auto-pauses when app is backgrounded via @capacitor/app appStateChange listener
 - [x] **PLSH-02**: Haptic feedback on correct/incorrect/game-over via @capacitor/haptics (opt-in toggle, off by default)
-- [ ] **PLSH-03**: Sentry crash reporting active via @sentry/capacitor with Vue 3 error handler integration
+- [x] **PLSH-03**: Sentry crash reporting active via @sentry/capacitor with Vue 3 error handler integration
 
 ## v2 Requirements
 
@@ -180,7 +180,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-08 | Phase 8: Testing & CI | Complete |
 | PLSH-01 | Phase 9: Platform Polish | Complete |
 | PLSH-02 | Phase 9: Platform Polish | Complete |
-| PLSH-03 | Phase 9: Platform Polish | Pending |
+| PLSH-03 | Phase 9: Platform Polish | Complete |
 
 **Coverage:**
 - v1 requirements: 44 total
