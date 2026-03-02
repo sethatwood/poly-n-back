@@ -74,7 +74,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Rapidly tapping a response button only registers one response per stimulus turn (debounced)
   4. Game data persists across app restarts via Capacitor Preferences (not localStorage) and corrupted data falls back to defaults
   5. Audio failures (blocked AudioContext, missing sound files) do not prevent gameplay -- the game plays silently instead of crashing
-**Plans**: TBD
+**Plans:** 3 plans
+- [ ] 04-01-PLAN.md -- ESLint 10 + Prettier setup, game logic guards (division-by-zero, debounce, bounds check, history cap)
+- [ ] 04-02-PLAN.md -- Storage migration from localStorage to @capacitor/preferences with schema validation
+- [ ] 04-03-PLAN.md -- Audio graceful degradation, useManagedTimeout composable, global error handler
 
 ### Phase 5: Store Extraction
 **Goal**: Game logic is cleanly separated from audio management, data persistence, and UI animation concerns
@@ -145,7 +148,7 @@ Phases execute in numeric order: 1 to 2 to 3 to 4 to 5 to 6 to 7 to 8 to 9
 | 1. Core Toolchain Upgrade | 2/2 | Complete | 2026-03-01 |
 | 2. Tailwind Migration | 1/1 | Complete | 2026-03-01 |
 | 3. Capacitor Migration | 1/1 | Complete | 2026-03-01 |
-| 4. Linting & Bug Fixes | 0/? | Not started | - |
+| 4. Linting & Bug Fixes | 0/3 | Not started | - |
 | 5. Store Extraction | 0/? | Not started | - |
 | 6. Component Extraction | 0/? | Not started | - |
 | 7. TypeScript Migration | 0/? | Not started | - |
