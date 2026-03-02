@@ -14,6 +14,7 @@ import type {
 } from '@/types/game';
 import { useAudioStore } from './audioStore';
 import { usePersistenceStore } from './persistenceStore';
+import { hapticsCorrect, hapticsIncorrect, hapticsGameOver } from '@/utils/haptics';
 
 export const useGameStore = defineStore('game', () => {
   // Cross-store references -- MUST come before any await (Pinia composition rule)
@@ -45,6 +46,7 @@ export const useGameStore = defineStore('game', () => {
   const isNewHighScore = ref(false);
   const showGameOverModal = ref(false);
   const isAudioEnabled = ref(true);
+  const isHapticsEnabled = ref(false);
   const isDeterministic = ref(false);
   const isPaused = ref(false);
   const isStopped = ref(false);
@@ -83,6 +85,10 @@ export const useGameStore = defineStore('game', () => {
     isAudioEnabled.value = await persistenceStore.loadPreference(
       'isAudioEnabled',
       true,
+    );
+    isHapticsEnabled.value = await persistenceStore.loadPreference(
+      'isHapticsEnabled',
+      false,
     );
   }
 
@@ -186,6 +192,11 @@ export const useGameStore = defineStore('game', () => {
   function toggleAudio(): void {
     isAudioEnabled.value = !isAudioEnabled.value;
     persistenceStore.savePreference('isAudioEnabled', isAudioEnabled.value);
+  }
+
+  function toggleHaptics(): void {
+    isHapticsEnabled.value = !isHapticsEnabled.value;
+    persistenceStore.savePreference('isHapticsEnabled', isHapticsEnabled.value);
   }
 
   // Unlock audio on iOS - call this on first user interaction
@@ -296,8 +307,10 @@ export const useGameStore = defineStore('game', () => {
       if (isCorrect) {
         score.value += 1;
         playSound('increment');
+        if (isHapticsEnabled.value) hapticsCorrect();
       } else {
         playSound('strike');
+        if (isHapticsEnabled.value) hapticsIncorrect();
         incorrectResponses.value += 1;
 
         if (incorrectResponses.value >= 3) {
@@ -339,6 +352,7 @@ export const useGameStore = defineStore('game', () => {
           }
 
           stopGame();
+          if (isHapticsEnabled.value) hapticsGameOver();
           showGameOverModal.value = true;
         }
       }
@@ -356,6 +370,7 @@ export const useGameStore = defineStore('game', () => {
     isNewHighScore,
     showGameOverModal,
     isAudioEnabled,
+    isHapticsEnabled,
     isDeterministic,
     isPaused,
     isStopped,
@@ -379,6 +394,7 @@ export const useGameStore = defineStore('game', () => {
     generateRandomStimulus,
     setNewStimulus,
     toggleAudio,
+    toggleHaptics,
     unlockAudio,
     playSound,
     toggleDeterministicMode,
