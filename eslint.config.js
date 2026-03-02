@@ -19,8 +19,6 @@ export default defineConfigWithVueTs(
       'vue/no-reserved-component-names': 'off',
       // Required props without defaults are intentional -- parent always provides them
       'vue/require-default-prop': 'off',
-      // Temporarily off during incremental TS migration (Plans 02-04 add lang="ts" to all .vue files)
-      'vue/block-lang': 'off',
     },
   },
   eslintConfigPrettier,
