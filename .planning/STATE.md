@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-02T14:37:24Z"
+last_updated: "2026-03-02T14:44:57Z"
 progress:
   total_phases: 9
   completed_phases: 7
-  total_plans: 20
-  completed_plans: 17
+  total_plans: 21
+  completed_plans: 20
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** The n-back gameplay loop must feel incredible -- responsive, satisfying, impossible to put down.
-**Current focus:** Phase 8 in progress: Testing and CI. Test infrastructure established with Vitest 4, happy-dom, and Capacitor mocks. Store tests next.
+**Current focus:** Phase 8 in progress: Testing and CI. 58 tests passing (unit + integration) across 5 test files. Store unit tests complete. CI pipeline plan remaining.
 
 ## Current Position
 
 Phase: 8 of 9 (Testing & CI)
-Plan: 1 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In Progress
-Last activity: 2026-03-02 -- Completed 08-01 (Test Infrastructure Setup)
+Last activity: 2026-03-02 -- Completed 08-03 (Store Integration Tests)
 
-Progress: [████████░░] 85%
+Progress: [█████████░] 95%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 20
 - Average duration: 3.1min
-- Total execution time: 1.01 hours
+- Total execution time: 1.07 hours
 
 **By Phase:**
 
@@ -47,10 +47,10 @@ Progress: [████████░░] 85%
 | 05-store-extraction | 3 | 6min | 2min |
 | 06-component-extraction | 2 | 4min | 2min |
 | 07-typescript-migration | 4 | 14min | 3.5min |
-| 08-testing-ci | 1 | 2min | 2min |
+| 08-testing-ci | 3 | 8min | 2.7min |
 
 **Recent Trend:**
-- Last 5 plans: 07-01 (3min), 07-02 (3min), 07-03 (2min), 07-04 (6min), 08-01 (2min)
+- Last 5 plans: 07-03 (2min), 07-04 (6min), 08-01 (2min), 08-02 (2min), 08-03 (2min)
 - Trend: stable/fast
 
 *Updated after each plan completion*
@@ -113,6 +113,8 @@ Recent decisions affecting current work:
 - [Phase 08]: [08-01]: Separate vitest.config.ts instead of merging into vite.config.js to avoid TypeScript/Vite 7 config conflicts
 - [Phase 08]: [08-01]: Class-based AudioContext mock for new AudioCtx() compatibility in audioStore eager init
 - [Phase 08]: [08-01]: Map-based Preferences mock with _reset() for test isolation
+- [Phase 08]: [08-03]: withSetup helper creates minimal Vue app with createPinia for composable lifecycle context in tests
+- [Phase 08]: [08-03]: driveToGameOver helper encapsulates deterministic 3-strike sequence for test reuse
 
 ### Pending Todos
 
@@ -126,5 +128,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 08-01-PLAN.md (Test Infrastructure Setup)
+Stopped at: Completed 08-03-PLAN.md (Store Integration Tests)
 Resume file: None

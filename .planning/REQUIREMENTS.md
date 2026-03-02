@@ -58,8 +58,8 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 - [ ] **TEST-02**: gameStore unit tests covering stimulus generation, response evaluation, score calculation, turn management, and high score logic
 - [ ] **TEST-03**: persistenceStore unit tests covering error handling paths, schema validation, and default fallbacks
 - [ ] **TEST-04**: audioStore unit tests covering initialization failure and graceful degradation
-- [ ] **TEST-05**: Integration tests for full game flow (start -> gameplay -> game over)
-- [ ] **TEST-06**: Integration tests for state transitions (menu -> game -> pause -> resume -> game over)
+- [x] **TEST-05**: Integration tests for full game flow (start -> gameplay -> game over)
+- [x] **TEST-06**: Integration tests for state transitions (menu -> game -> pause -> resume -> game over)
 - [ ] **TEST-07**: Playwright E2E configured with WebKit + Chromium test targets
 - [ ] **TEST-08**: CI pipeline runs type-check, unit tests, and build on every push
 
@@ -174,8 +174,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-02 | Phase 8: Testing & CI | Pending |
 | TEST-03 | Phase 8: Testing & CI | Pending |
 | TEST-04 | Phase 8: Testing & CI | Pending |
-| TEST-05 | Phase 8: Testing & CI | Pending |
-| TEST-06 | Phase 8: Testing & CI | Pending |
+| TEST-05 | Phase 8: Testing & CI | Complete |
+| TEST-06 | Phase 8: Testing & CI | Complete |
 | TEST-07 | Phase 8: Testing & CI | Pending |
 | TEST-08 | Phase 8: Testing & CI | Pending |
 | PLSH-01 | Phase 9: Platform Polish | Pending |
