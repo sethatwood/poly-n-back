@@ -68,7 +68,7 @@ export const useAudioStore = defineStore('audio', () => {
     }
   }
 
-  // Eager initialization -- preserves current behavior (audioManager.init() at module load)
+  // Eager initialization -- preserves current behavior (init at module load)
   init();
 
   return { ready, unlocked, init, unlock, play };

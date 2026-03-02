@@ -31,8 +31,8 @@
 
 <script>
 import { ref, watch, onMounted } from 'vue';
-import { Preferences } from '@capacitor/preferences';
 import { useGameStore } from './stores/gameStore';
+import { usePersistenceStore } from './stores/persistenceStore';
 import { useManagedTimeout } from './composables/useManagedTimeout';
 
 // Achievement definitions
@@ -85,22 +85,17 @@ export default {
   name: 'AchievementToast',
   setup() {
     const gameStore = useGameStore();
+    const persistenceStore = usePersistenceStore();
     const { managedSetTimeout, clearManagedTimeout } = useManagedTimeout();
     const achievement = ref(null);
     const toastTimeout = ref(null);
 
-    // Load unlocked achievements from Capacitor Preferences
+    // Load unlocked achievements from persistenceStore
     const unlockedIds = ref([]);
 
     const getUnlocked = async () => {
-      try {
-        const { value } = await Preferences.get({ key: 'achievements' });
-        if (value === null) return [];
-        const parsed = JSON.parse(value);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
+      const stored = await persistenceStore.loadPreference('achievements', []);
+      return Array.isArray(stored) ? stored : [];
     };
 
     onMounted(async () => {
@@ -116,14 +111,7 @@ export default {
       if (!ach) return;
 
       unlockedIds.value.push(achievementId);
-      try {
-        await Preferences.set({
-          key: 'achievements',
-          value: JSON.stringify(unlockedIds.value),
-        });
-      } catch (e) {
-        console.warn('Failed to save achievements:', e);
-      }
+      await persistenceStore.savePreference('achievements', unlockedIds.value);
 
       // Show toast
       if (toastTimeout.value) clearManagedTimeout(toastTimeout.value);

@@ -238,8 +238,8 @@
 
 <script>
 import { onMounted, onUnmounted, ref, watch, computed } from 'vue';
-import { Preferences } from '@capacitor/preferences';
 import { useGameStore } from './stores/gameStore';
+import { usePersistenceStore } from './stores/persistenceStore';
 import { useManagedTimeout } from './composables/useManagedTimeout';
 import volumeUpIcon from './assets/volume-up-solid.svg';
 import volumeMuteIcon from './assets/volume-mute-solid.svg';
@@ -270,6 +270,7 @@ export default {
   },
   setup() {
     const gameStore = useGameStore();
+    const persistenceStore = usePersistenceStore();
     const { managedSetTimeout, clearManagedTimeout } = useManagedTimeout();
     const nBackInput = ref(gameStore.nBack);
     const timeLeftInput = ref(gameStore.timeLeft);
@@ -282,8 +283,8 @@ export default {
 
     onMounted(async () => {
       await gameStore.loadPersistedState();
-      const { value } = await Preferences.get({ key: 'tutorialCompleted' });
-      if (!value) {
+      const tutorialCompleted = await persistenceStore.loadPreference('tutorialCompleted', false);
+      if (!tutorialCompleted) {
         showTutorial.value = true;
       }
     });

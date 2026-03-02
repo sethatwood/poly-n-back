@@ -93,7 +93,7 @@
 
 <script>
 import { ref } from 'vue';
-import { Preferences } from '@capacitor/preferences';
+import { usePersistenceStore } from './stores/persistenceStore';
 
 export default {
   name: 'TutorialOverlay',
@@ -105,6 +105,7 @@ export default {
   },
   emits: ['complete'],
   setup(props, { emit }) {
+    const persistenceStore = usePersistenceStore();
     const currentStep = ref(0);
 
     const steps = [
@@ -169,11 +170,7 @@ export default {
     };
 
     const complete = async () => {
-      try {
-        await Preferences.set({ key: 'tutorialCompleted', value: 'true' });
-      } catch (e) {
-        console.warn('Failed to save tutorial state:', e);
-      }
+      await persistenceStore.savePreference('tutorialCompleted', true);
       emit('complete');
     };
 
