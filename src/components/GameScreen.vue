@@ -79,51 +79,45 @@
   </div>
 </template>
 
-<script>
-import GameTimer from './GameTimer.vue';
-import ResponseButtons from './ResponseButtons.vue';
-import ScoreDisplay from './ScoreDisplay.vue';
-import GameOverDisplay from './GameOverDisplay.vue';
-import Stimulus from '../Stimulus.vue';
-import ConfigStart from '../ConfigStart.vue';
-import Footer from '../Footer.vue';
-import volumeUpIcon from '../assets/volume-up-solid.svg';
-import volumeMuteIcon from '../assets/volume-mute-solid.svg';
+<script setup lang="ts">
+import type { useGameStore } from '@/stores/gameStore'
+import type { StimulusAttribute, ResponseButton } from '@/types/game'
+import GameTimer from './GameTimer.vue'
+import ResponseButtons from './ResponseButtons.vue'
+import ScoreDisplay from './ScoreDisplay.vue'
+import GameOverDisplay from './GameOverDisplay.vue'
+import Stimulus from '../Stimulus.vue'
+import ConfigStart from '../ConfigStart.vue'
+import Footer from '../Footer.vue'
+import volumeUpIcon from '../assets/volume-up-solid.svg'
+import volumeMuteIcon from '../assets/volume-mute-solid.svg'
 
-export default {
-  name: 'GameScreen',
-  components: {
-    GameTimer,
-    ResponseButtons,
-    ScoreDisplay,
-    GameOverDisplay,
-    Stimulus,
-    ConfigStart,
-    Footer,
-  },
-  props: {
-    gameStore: { type: Object, required: true },
-    nBackInput: { type: Number, required: true },
-    timeLeftInput: { type: Number, required: true },
-    scoreAnimating: { type: Boolean, required: true },
-    strikeAnimating: { type: Boolean, required: true },
-    showFeedbackToast: { type: Boolean, required: true },
-    feedbackClass: { type: Function, required: true },
-  },
-  emits: ['respond', 'update:nBackInput', 'update:timeLeftInput', 'start-game', 'toggle-audio', 'reset-high-score'],
-  setup() {
-    const responseButtons = [
-      { type: 'color', label: 'Color' },
-      { type: 'emoji', label: 'Emoji' },
-      { type: 'position', label: 'Position' },
-      { type: 'shape', label: 'Shape' },
-    ];
+type GameStore = ReturnType<typeof useGameStore>
 
-    return {
-      responseButtons,
-      volumeUpIcon,
-      volumeMuteIcon,
-    };
-  },
-};
+interface Props {
+  gameStore: GameStore
+  nBackInput: number
+  timeLeftInput: number
+  scoreAnimating: boolean
+  strikeAnimating: boolean
+  showFeedbackToast: boolean
+  feedbackClass: (buttonType: StimulusAttribute) => string
+}
+
+defineProps<Props>()
+defineEmits<{
+  respond: [type: StimulusAttribute]
+  'update:nBackInput': [value: number]
+  'update:timeLeftInput': [value: number]
+  'start-game': []
+  'toggle-audio': []
+  'reset-high-score': []
+}>()
+
+const responseButtons: ResponseButton[] = [
+  { type: 'color', label: 'Color' },
+  { type: 'emoji', label: 'Emoji' },
+  { type: 'position', label: 'Position' },
+  { type: 'shape', label: 'Shape' },
+]
 </script>

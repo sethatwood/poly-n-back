@@ -29,14 +29,15 @@
   </Transition>
 </template>
 
-<script>
-import { ref, watch, onMounted } from 'vue';
-import { useGameStore } from './stores/gameStore';
-import { usePersistenceStore } from './stores/persistenceStore';
-import { useManagedTimeout } from './composables/useManagedTimeout';
+<script setup lang="ts">
+import { ref, watch, onMounted } from 'vue'
+import { useGameStore } from './stores/gameStore'
+import { usePersistenceStore } from './stores/persistenceStore'
+import { useManagedTimeout } from './composables/useManagedTimeout'
+import type { Achievement } from '@/types/game'
 
 // Achievement definitions
-const ACHIEVEMENTS = {
+const ACHIEVEMENTS: Record<string, Achievement> = {
   firstGame: {
     id: 'firstGame',
     icon: '🎮',
@@ -79,127 +80,118 @@ const ACHIEVEMENTS = {
     title: 'Speed Demon',
     description: 'Score a point with 2-second timer',
   },
-};
+}
 
-export default {
-  name: 'AchievementToast',
-  setup() {
-    const gameStore = useGameStore();
-    const persistenceStore = usePersistenceStore();
-    const { managedSetTimeout, clearManagedTimeout } = useManagedTimeout();
-    const achievement = ref(null);
-    const toastTimeout = ref(null);
+const gameStore = useGameStore()
+const persistenceStore = usePersistenceStore()
+const { managedSetTimeout, clearManagedTimeout } = useManagedTimeout()
+const achievement = ref<Achievement | null>(null)
+const toastTimeout = ref<ReturnType<typeof setTimeout> | null>(null)
 
-    // Load unlocked achievements from persistenceStore
-    const unlockedIds = ref([]);
+// Load unlocked achievements from persistenceStore
+const unlockedIds = ref<string[]>([])
 
-    const getUnlocked = async () => {
-      const stored = await persistenceStore.loadPreference('achievements', []);
-      return Array.isArray(stored) ? stored : [];
-    };
+const getUnlocked = async (): Promise<string[]> => {
+  const stored = await persistenceStore.loadPreference<string[]>('achievements', [])
+  return Array.isArray(stored) ? stored : []
+}
 
-    onMounted(async () => {
-      unlockedIds.value = await getUnlocked();
-    });
+onMounted(async () => {
+  unlockedIds.value = await getUnlocked()
+})
 
-    const isUnlocked = (id) => unlockedIds.value.includes(id);
+const isUnlocked = (id: string): boolean => unlockedIds.value.includes(id)
 
-    const unlock = async (achievementId) => {
-      if (isUnlocked(achievementId)) return;
+const unlock = async (achievementId: string): Promise<void> => {
+  if (isUnlocked(achievementId)) return
 
-      const ach = ACHIEVEMENTS[achievementId];
-      if (!ach) return;
+  const ach = ACHIEVEMENTS[achievementId]
+  if (!ach) return
 
-      unlockedIds.value.push(achievementId);
-      await persistenceStore.savePreference('achievements', unlockedIds.value);
+  unlockedIds.value.push(achievementId)
+  await persistenceStore.savePreference('achievements', unlockedIds.value)
 
-      // Show toast
-      if (toastTimeout.value) clearManagedTimeout(toastTimeout.value);
-      achievement.value = ach;
+  // Show toast
+  if (toastTimeout.value) clearManagedTimeout(toastTimeout.value)
+  achievement.value = ach
 
-      // Auto-hide after 4 seconds
-      toastTimeout.value = managedSetTimeout(() => {
-        achievement.value = null;
-      }, 4000);
-    };
+  // Auto-hide after 4 seconds
+  toastTimeout.value = managedSetTimeout(() => {
+    achievement.value = null
+  }, 4000)
+}
 
-    // Track streaks
-    let currentStreak = 0;
+// Track streaks
+let currentStreak = 0
 
-    // Watch for first game (when game starts)
-    watch(
-      () => gameStore.isStopped,
-      (stopped, wasStopped) => {
-        if (wasStopped && !stopped) {
-          // Game just started
-          unlock('firstGame');
-          currentStreak = 0;
+// Watch for first game (when game starts)
+watch(
+  () => gameStore.isStopped,
+  (stopped, wasStopped) => {
+    if (wasStopped && !stopped) {
+      // Game just started
+      unlock('firstGame')
+      currentStreak = 0
 
-          // Check for N-Back 3
-          if (gameStore.nBack >= 3) {
-            unlock('nBack3');
-          }
-        }
-      },
-    );
-
-    // Watch for first point
-    watch(
-      () => gameStore.score,
-      (newScore, oldScore) => {
-        if (newScore === 1 && oldScore === 0) {
-          unlock('firstPoint');
-        }
-
-        if (newScore > oldScore) {
-          currentStreak++;
-
-          // Check for 5 streak
-          if (currentStreak >= 5) {
-            unlock('fiveStreak');
-          }
-
-          // Check for speed demon (2 second timer)
-          if (gameStore.timerInterval <= 2) {
-            unlock('speedDemon');
-          }
-        }
-
-        // Check for 10 points
-        if (newScore >= 10) {
-          unlock('tenPoints');
-        }
-      },
-    );
-
-    // Reset streak on strike
-    watch(
-      () => gameStore.incorrectResponses,
-      (strikes, oldStrikes) => {
-        if (strikes > oldStrikes) {
-          currentStreak = 0;
-        }
-      },
-    );
-
-    // Watch for game over (check perfect round)
-    watch(
-      () => gameStore.showGameOverModal,
-      (showing) => {
-        if (showing) {
-          const accuracy = gameStore.finalScoreAccuracy;
-          if (accuracy === 100 && gameStore.score > 0) {
-            unlock('perfectRound');
-          }
-        }
-      },
-    );
-
-    return {
-      achievement,
-    };
+      // Check for N-Back 3
+      if (gameStore.nBack >= 3) {
+        unlock('nBack3')
+      }
+    }
   },
-};
+)
+
+// Watch for first point
+watch(
+  () => gameStore.score,
+  (newScore, oldScore) => {
+    if (newScore === 1 && oldScore === 0) {
+      unlock('firstPoint')
+    }
+
+    if (newScore > oldScore) {
+      currentStreak++
+
+      // Check for 5 streak
+      if (currentStreak >= 5) {
+        unlock('fiveStreak')
+      }
+
+      // Check for speed demon (2 second timer)
+      if (gameStore.timerInterval <= 2) {
+        unlock('speedDemon')
+      }
+    }
+
+    // Check for 10 points
+    if (newScore >= 10) {
+      unlock('tenPoints')
+    }
+  },
+)
+
+// Reset streak on strike
+watch(
+  () => gameStore.incorrectResponses,
+  (strikes, oldStrikes) => {
+    if (strikes > oldStrikes) {
+      currentStreak = 0
+    }
+  },
+)
+
+// Watch for game over (check perfect round)
+watch(
+  () => gameStore.showGameOverModal,
+  (showing) => {
+    if (showing) {
+      const accuracy = gameStore.finalScoreAccuracy
+      if (accuracy === 100 && gameStore.score > 0) {
+        unlock('perfectRound')
+      }
+    }
+  },
+)
 </script>
 
 <style scoped>

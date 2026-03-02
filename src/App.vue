@@ -81,121 +81,85 @@
   </div>
 </template>
 
-<script>
-import { onMounted, ref, watch } from 'vue';
-import { useGameStore } from './stores/gameStore';
-import { usePersistenceStore } from './stores/persistenceStore';
-import { useAnimations } from './composables/useAnimations';
-import { useFeedback } from './composables/useFeedback';
-import { useGameLifecycle } from './composables/useGameLifecycle';
-import MenuScreen from './components/MenuScreen.vue';
-import GameScreen from './components/GameScreen.vue';
-import GameOverModal from './GameOverModal.vue';
-import PauseModal from './PauseModal.vue';
-import TutorialOverlay from './TutorialOverlay.vue';
-import GameHint from './GameHint.vue';
-import AchievementToast from './AchievementToast.vue';
+<script setup lang="ts">
+import { onMounted, ref, watch } from 'vue'
+import { useGameStore } from './stores/gameStore'
+import { usePersistenceStore } from './stores/persistenceStore'
+import { useAnimations } from './composables/useAnimations'
+import { useFeedback } from './composables/useFeedback'
+import { useGameLifecycle } from './composables/useGameLifecycle'
+import type { StimulusAttribute } from '@/types/game'
+import MenuScreen from './components/MenuScreen.vue'
+import GameScreen from './components/GameScreen.vue'
+import GameOverModal from './GameOverModal.vue'
+import PauseModal from './PauseModal.vue'
+import TutorialOverlay from './TutorialOverlay.vue'
+import GameHint from './GameHint.vue'
+import AchievementToast from './AchievementToast.vue'
 
-export default {
-  name: 'App',
-  components: {
-    MenuScreen,
-    GameScreen,
-    GameOverModal,
-    PauseModal,
-    TutorialOverlay,
-    GameHint,
-    AchievementToast,
-  },
-  setup() {
-    const gameStore = useGameStore();
-    const persistenceStore = usePersistenceStore();
+const gameStore = useGameStore()
+const persistenceStore = usePersistenceStore()
 
-    // Composables
-    const { scoreAnimating, strikeAnimating } = useAnimations(gameStore);
-    const { showFeedbackToast, feedbackClass } = useFeedback(gameStore);
-    const {
-      showModal,
-      startGame: startGameLifecycle,
-      handlePause,
-      handleResume,
-      handleQuit,
-      handleGameOverClose,
-      handlePlayAgain: playAgainLifecycle,
-      handleMainMenu,
-    } = useGameLifecycle(gameStore);
+// Composables
+const { scoreAnimating, strikeAnimating } = useAnimations(gameStore)
+const { showFeedbackToast, feedbackClass } = useFeedback(gameStore)
+const {
+  showModal,
+  startGame: startGameLifecycle,
+  handlePause,
+  handleResume,
+  handleQuit,
+  handleGameOverClose,
+  handlePlayAgain: playAgainLifecycle,
+  handleMainMenu,
+} = useGameLifecycle(gameStore)
 
-    // Local input state
-    const nBackInput = ref(gameStore.nBack);
-    const timeLeftInput = ref(gameStore.timeLeft);
+// Local input state
+const nBackInput = ref(gameStore.nBack)
+const timeLeftInput = ref(gameStore.timeLeft)
 
-    // Tutorial state - safe default (don't show until we know)
-    const showTutorial = ref(false);
+// Tutorial state - safe default (don't show until we know)
+const showTutorial = ref(false)
 
-    onMounted(async () => {
-      await gameStore.loadPersistedState();
-      const tutorialCompleted = await persistenceStore.loadPreference('tutorialCompleted', false);
-      if (!tutorialCompleted) {
-        showTutorial.value = true;
-      }
-    });
+onMounted(async () => {
+  await gameStore.loadPersistedState()
+  const tutorialCompleted = await persistenceStore.loadPreference('tutorialCompleted', false)
+  if (!tutorialCompleted) {
+    showTutorial.value = true
+  }
+})
 
-    const handleTutorialComplete = () => {
-      showTutorial.value = false;
-      gameStore.unlockAudio();
-    };
+function handleTutorialComplete(): void {
+  showTutorial.value = false
+  gameStore.unlockAudio()
+}
 
-    // Sync input refs to store
-    watch(nBackInput, (newNBack) => {
-      gameStore.nBack = newNBack;
-    });
+// Sync input refs to store
+watch(nBackInput, (newNBack: number) => {
+  gameStore.nBack = newNBack
+})
 
-    watch(timeLeftInput, (newTimeLeft) => {
-      gameStore.timeLeft = newTimeLeft;
-    });
+watch(timeLeftInput, (newTimeLeft: number) => {
+  gameStore.timeLeft = newTimeLeft
+})
 
-    // Wrap lifecycle calls that need timeLeftInput
-    const startGame = () => startGameLifecycle(timeLeftInput.value);
-    const handlePlayAgain = () => playAgainLifecycle(timeLeftInput.value);
+// Wrap lifecycle calls that need timeLeftInput
+const startGame = (): void => startGameLifecycle(timeLeftInput.value)
+const handlePlayAgain = (): void => playAgainLifecycle(timeLeftInput.value)
 
-    const respond = (stimulusType) => {
-      if (!gameStore.isPaused) {
-        gameStore.respondToStimulus(stimulusType);
-      }
-    };
+function respond(stimulusType: StimulusAttribute): void {
+  if (!gameStore.isPaused) {
+    gameStore.respondToStimulus(stimulusType)
+  }
+}
 
-    const toggleAudio = () => {
-      gameStore.toggleAudio();
-    };
+function toggleAudio(): void {
+  gameStore.toggleAudio()
+}
 
-    const resetHighScore = () => {
-      gameStore.resetHighScore();
-    };
-
-    return {
-      feedbackClass,
-      gameStore,
-      handleGameOverClose,
-      handleMainMenu,
-      handlePause,
-      handlePlayAgain,
-      handleQuit,
-      handleResume,
-      handleTutorialComplete,
-      nBackInput,
-      resetHighScore,
-      respond,
-      scoreAnimating,
-      showFeedbackToast,
-      showModal,
-      showTutorial,
-      startGame,
-      strikeAnimating,
-      timeLeftInput,
-      toggleAudio,
-    };
-  },
-};
+function resetHighScore(): void {
+  gameStore.resetHighScore()
+}
 </script>
 
 <style scoped>

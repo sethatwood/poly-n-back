@@ -91,98 +91,88 @@
   </Transition>
 </template>
 
-<script>
-import { ref } from 'vue';
-import { usePersistenceStore } from './stores/persistenceStore';
+<script setup lang="ts">
+import { ref } from 'vue'
+import { usePersistenceStore } from './stores/persistenceStore'
+import type { TutorialStep } from '@/types/game'
 
-export default {
-  name: 'TutorialOverlay',
-  props: {
-    show: {
-      type: Boolean,
-      required: true,
-    },
+interface Props {
+  show: boolean
+}
+
+defineProps<Props>()
+const emit = defineEmits<{
+  complete: []
+}>()
+
+const persistenceStore = usePersistenceStore()
+const currentStep = ref(0)
+
+const steps: TutorialStep[] = [
+  {
+    icon: '🧠',
+    title: 'Train Your Working Memory',
+    description:
+      'Poly N-Back is a scientifically-backed brain training game that challenges your working memory — the mental workspace you use every day.',
   },
-  emits: ['complete'],
-  setup(props, { emit }) {
-    const persistenceStore = usePersistenceStore();
-    const currentStep = ref(0);
-
-    const steps = [
-      {
-        icon: '🧠',
-        title: 'Train Your Working Memory',
-        description:
-          'Poly N-Back is a scientifically-backed brain training game that challenges your working memory — the mental workspace you use every day.',
-      },
-      {
-        icon: '👀',
-        title: 'Watch & Remember',
-        description:
-          "Each round, you'll see a stimulus with 4 attributes: Color, Emoji, Position, and Shape. Your job is to remember what you saw N steps ago.",
-        example: [
-          { emoji: '🟣', label: 'Color' },
-          { emoji: '🔥', label: 'Emoji' },
-          { emoji: '📍', label: 'Position' },
-          { emoji: '⬛', label: 'Shape' },
-        ],
-      },
-      {
-        icon: '🔙',
-        title: 'N-Back Matching',
-        description:
-          'If any attribute matches what appeared N turns ago (default is 2), tap that button! For example, if the color now matches the color from 2 turns back, tap "Color".',
-      },
-      {
-        icon: '✅',
-        title: 'Score Points, Avoid Strikes',
-        description:
-          'Correct matches earn points. Wrong taps give you strikes. Three strikes and the game ends. Try to build the highest score!',
-        example: [
-          { emoji: '✓', label: '+1 Point', color: 'text-green-500' },
-          { emoji: '✗', label: '+1 Strike', color: 'text-red-500' },
-        ],
-      },
-      {
-        icon: '🚀',
-        title: 'Ready to Begin?',
-        description:
-          "Start with the default settings and work your way up. The first few turns won't have matches — that's normal! The game needs to build history first.",
-      },
-    ];
-
-    const nextStep = () => {
-      if (currentStep.value < steps.length - 1) {
-        currentStep.value++;
-      } else {
-        complete();
-      }
-    };
-
-    const prevStep = () => {
-      if (currentStep.value > 0) {
-        currentStep.value--;
-      }
-    };
-
-    const skip = () => {
-      complete();
-    };
-
-    const complete = async () => {
-      await persistenceStore.savePreference('tutorialCompleted', true);
-      emit('complete');
-    };
-
-    return {
-      currentStep,
-      steps,
-      nextStep,
-      prevStep,
-      skip,
-    };
+  {
+    icon: '👀',
+    title: 'Watch & Remember',
+    description:
+      "Each round, you'll see a stimulus with 4 attributes: Color, Emoji, Position, and Shape. Your job is to remember what you saw N steps ago.",
+    example: [
+      { emoji: '🟣', label: 'Color' },
+      { emoji: '🔥', label: 'Emoji' },
+      { emoji: '📍', label: 'Position' },
+      { emoji: '⬛', label: 'Shape' },
+    ],
   },
-};
+  {
+    icon: '🔙',
+    title: 'N-Back Matching',
+    description:
+      'If any attribute matches what appeared N turns ago (default is 2), tap that button! For example, if the color now matches the color from 2 turns back, tap "Color".',
+  },
+  {
+    icon: '✅',
+    title: 'Score Points, Avoid Strikes',
+    description:
+      'Correct matches earn points. Wrong taps give you strikes. Three strikes and the game ends. Try to build the highest score!',
+    example: [
+      { emoji: '✓', label: '+1 Point', color: 'text-green-500' },
+      { emoji: '✗', label: '+1 Strike', color: 'text-red-500' },
+    ],
+  },
+  {
+    icon: '🚀',
+    title: 'Ready to Begin?',
+    description:
+      "Start with the default settings and work your way up. The first few turns won't have matches — that's normal! The game needs to build history first.",
+  },
+]
+
+const nextStep = (): void => {
+  if (currentStep.value < steps.length - 1) {
+    currentStep.value++
+  } else {
+    complete()
+  }
+}
+
+const prevStep = (): void => {
+  if (currentStep.value > 0) {
+    currentStep.value--
+  }
+}
+
+const skip = (): void => {
+  complete()
+}
+
+const complete = async (): Promise<void> => {
+  await persistenceStore.savePreference('tutorialCompleted', true)
+  emit('complete')
+}
 </script>
 
 <style scoped>

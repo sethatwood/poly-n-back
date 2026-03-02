@@ -21,28 +21,23 @@
   </div>
 </template>
 
-<script>
-import IntroHead from '../IntroHead.vue';
-import IntroContent from '../IntroContent.vue';
-import ConfigStart from '../ConfigStart.vue';
-import Footer from '../Footer.vue';
+<script setup lang="ts">
+import IntroHead from '../IntroHead.vue'
+import IntroContent from '../IntroContent.vue'
+import ConfigStart from '../ConfigStart.vue'
+import Footer from '../Footer.vue'
 
-export default {
-  name: 'MenuScreen',
-  components: {
-    IntroHead,
-    IntroContent,
-    ConfigStart,
-    Footer,
-  },
-  props: {
-    nBackInput: { type: Number, required: true },
-    timeLeftInput: { type: Number, required: true },
-    nBack: { type: Number, required: true },
-  },
-  emits: ['update:nBackInput', 'update:timeLeftInput', 'start-game', 'show-tutorial'],
-  setup() {
-    return {};
-  },
-};
+interface Props {
+  nBackInput: number
+  timeLeftInput: number
+  nBack: number
+}
+
+defineProps<Props>()
+defineEmits<{
+  'update:nBackInput': [value: number]
+  'update:timeLeftInput': [value: number]
+  'start-game': []
+  'show-tutorial': []
+}>()
 </script>

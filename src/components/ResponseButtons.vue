@@ -24,32 +24,29 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'ResponseButtons',
-  props: {
-    buttons: { type: Array, required: true },
-    respondedThisTurn: { type: Object, required: true },
-    isEarlyInGame: { type: Boolean, required: true },
-    isPaused: { type: Boolean, required: true },
-    feedbackClass: { type: Function, required: true },
-  },
-  emits: ['respond'],
-  setup() {
-    const buttonClass = (isResponded, isEarlyInGame, isPaused) => {
-      const base = 'p-4 rounded-lg text-lg font-medium shadow-lg';
-      if (isResponded || isEarlyInGame || isPaused) {
-        return `${base} bg-slate-700/40 text-slate-500 cursor-not-allowed`;
-      } else {
-        return `${base} bg-blue-600 hover:bg-blue-500 active:scale-95 active:bg-blue-700 shadow-blue-600/25 hover:shadow-blue-500/40`;
-      }
-    };
+<script setup lang="ts">
+import type { StimulusAttribute, ResponseButton, RespondedThisTurn } from '@/types/game'
 
-    return {
-      buttonClass,
-    };
-  },
-};
+interface Props {
+  buttons: ResponseButton[]
+  respondedThisTurn: RespondedThisTurn
+  isEarlyInGame: boolean
+  isPaused: boolean
+  feedbackClass: (buttonType: StimulusAttribute) => string
+}
+
+defineProps<Props>()
+defineEmits<{
+  respond: [type: StimulusAttribute]
+}>()
+
+function buttonClass(isResponded: boolean, isEarlyInGame: boolean, isPaused: boolean): string {
+  const base = 'p-4 rounded-lg text-lg font-medium shadow-lg'
+  if (isResponded || isEarlyInGame || isPaused) {
+    return `${base} bg-slate-700/40 text-slate-500 cursor-not-allowed`
+  }
+  return `${base} bg-blue-600 hover:bg-blue-500 active:scale-95 active:bg-blue-700 shadow-blue-600/25 hover:shadow-blue-500/40`
+}
 </script>
 
 <style scoped>
