@@ -149,7 +149,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. Game automatically pauses when the user switches to another app or locks their phone
   2. Haptic feedback fires on correct, incorrect, and game-over events when the user has opted in (toggle exists in settings, off by default)
   3. Sentry receives crash reports with Vue component context when an unhandled error occurs
-**Plans**: TBD
+**Plans:** 2 plans
+- [ ] 09-01-PLAN.md -- Install @capacitor/app + @capacitor/haptics, wire auto-pause and haptic feedback
+- [ ] 09-02-PLAN.md -- Wire @sentry/capacitor + @sentry/vue crash reporting with environment config
 
 ## Progress
 
