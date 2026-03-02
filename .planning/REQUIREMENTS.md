@@ -54,7 +54,7 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 
 ### Testing
 
-- [ ] **TEST-01**: Vitest + @vue/test-utils configured and running
+- [x] **TEST-01**: Vitest + @vue/test-utils configured and running
 - [ ] **TEST-02**: gameStore unit tests covering stimulus generation, response evaluation, score calculation, turn management, and high score logic
 - [ ] **TEST-03**: persistenceStore unit tests covering error handling paths, schema validation, and default fallbacks
 - [ ] **TEST-04**: audioStore unit tests covering initialization failure and graceful degradation
@@ -170,7 +170,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TS-05 | Phase 7: TypeScript Migration | Complete |
 | TS-06 | Phase 7: TypeScript Migration | Complete |
 | TS-07 | Phase 7: TypeScript Migration | Complete |
-| TEST-01 | Phase 8: Testing & CI | Pending |
+| TEST-01 | Phase 8: Testing & CI | Complete |
 | TEST-02 | Phase 8: Testing & CI | Pending |
 | TEST-03 | Phase 8: Testing & CI | Pending |
 | TEST-04 | Phase 8: Testing & CI | Pending |

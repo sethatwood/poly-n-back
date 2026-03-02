@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-02T05:13:37.951Z"
+status: in-progress
+last_updated: "2026-03-02T14:37:24Z"
 progress:
-  total_phases: 7
+  total_phases: 9
   completed_phases: 7
-  total_plans: 16
-  completed_plans: 16
+  total_plans: 20
+  completed_plans: 17
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** The n-back gameplay loop must feel incredible -- responsive, satisfying, impossible to put down.
-**Current focus:** Phase 7 complete: TypeScript Migration done. All 17 Vue components use script setup lang="ts", vue-tsc passes clean, allowJs removed. Ready for Phase 8.
+**Current focus:** Phase 8 in progress: Testing and CI. Test infrastructure established with Vitest 4, happy-dom, and Capacitor mocks. Store tests next.
 
 ## Current Position
 
-Phase: 7 of 9 (TypeScript Migration)
-Plan: 4 of 4 in current phase
-Status: Phase Complete
-Last activity: 2026-03-02 -- Completed 07-04 (Complex Component TypeScript Migration)
+Phase: 8 of 9 (Testing & CI)
+Plan: 1 of 4 in current phase
+Status: In Progress
+Last activity: 2026-03-02 -- Completed 08-01 (Test Infrastructure Setup)
 
-Progress: [██████████] 100%
+Progress: [████████░░] 85%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
-- Average duration: 3.2min
-- Total execution time: 0.97 hours
+- Total plans completed: 19
+- Average duration: 3.1min
+- Total execution time: 1.01 hours
 
 **By Phase:**
 
@@ -47,9 +47,10 @@ Progress: [██████████] 100%
 | 05-store-extraction | 3 | 6min | 2min |
 | 06-component-extraction | 2 | 4min | 2min |
 | 07-typescript-migration | 4 | 14min | 3.5min |
+| 08-testing-ci | 1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 06-02 (2min), 07-01 (3min), 07-02 (3min), 07-03 (2min), 07-04 (6min)
+- Last 5 plans: 07-01 (3min), 07-02 (3min), 07-03 (2min), 07-04 (6min), 08-01 (2min)
 - Trend: stable/fast
 
 *Updated after each plan completion*
@@ -109,6 +110,9 @@ Recent decisions affecting current work:
 - [Phase 07]: [07-04]: Non-null assertions for guarded array index access in gameStore (bounds already checked)
 - [Phase 07]: [07-04]: Computed activeStep wrapper in TutorialOverlay for strict-mode template safety
 - [Phase 07]: [07-04]: Pre-existing eslint any in audioStore.ts left out-of-scope (not caused by migration)
+- [Phase 08]: [08-01]: Separate vitest.config.ts instead of merging into vite.config.js to avoid TypeScript/Vite 7 config conflicts
+- [Phase 08]: [08-01]: Class-based AudioContext mock for new AudioCtx() compatibility in audioStore eager init
+- [Phase 08]: [08-01]: Map-based Preferences mock with _reset() for test isolation
 
 ### Pending Todos
 
@@ -122,5 +126,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 07-04-PLAN.md (Complex Component TypeScript Migration) -- Phase 07 complete
+Stopped at: Completed 08-01-PLAN.md (Test Infrastructure Setup)
 Resume file: None
