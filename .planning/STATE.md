@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-02T02:41:22.622Z"
+status: in-progress
+last_updated: "2026-03-02T03:35:00Z"
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 5
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 12
+  completed_plans: 11
 ---
 
 # Project State
@@ -18,22 +18,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** The n-back gameplay loop must feel incredible -- responsive, satisfying, impossible to put down.
-**Current focus:** Phase 5 complete: Store Extraction (3 of 3 plans done). Stores extracted (audioStore, persistenceStore), gameStore delegates, App.vue composables extracted.
+**Current focus:** Phase 6 in progress: Component Extraction (1 of 2 plans done). Leaf components created (GameTimer, ResponseButtons, ScoreDisplay, GameOverDisplay, MenuScreen).
 
 ## Current Position
 
-Phase: 5 of 9 (Store Extraction) -- COMPLETE
-Plan: 3 of 3 in current phase
-Status: Phase Complete
-Last activity: 2026-03-02 -- Completed 05-03 (App.vue Composable Extraction)
+Phase: 6 of 9 (Component Extraction)
+Plan: 1 of 2 in current phase
+Status: In Progress
+Last activity: 2026-03-02 -- Completed 06-01 (Leaf Component Extraction)
 
-Progress: [██████░░░░] 63%
+Progress: [███████░░░] 69%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 4min
+- Total plans completed: 13
+- Average duration: 3min
 - Total execution time: 0.7 hours
 
 **By Phase:**
@@ -45,9 +45,10 @@ Progress: [██████░░░░] 63%
 | 03-capacitor-migration | 1 | 9min | 9min |
 | 04-linting-bug-fixes | 3 | 8min | 2.7min |
 | 05-store-extraction | 3 | 6min | 2min |
+| 06-component-extraction | 1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (3min), 04-03 (3min), 05-01 (2min), 05-02 (2min), 05-03 (2min)
+- Last 5 plans: 04-03 (3min), 05-01 (2min), 05-02 (2min), 05-03 (2min), 06-01 (2min)
 - Trend: stable/fast
 
 *Updated after each plan completion*
@@ -90,6 +91,9 @@ Recent decisions affecting current work:
 - [05-03]: Composables accept gameStore as parameter (dependency injection) rather than importing useGameStore internally -- keeps them testable.
 - [05-03]: showModal ref owned by useGameLifecycle since lifecycle handlers toggle it.
 - [05-03]: startGame and handlePlayAgain wrapped in App.vue to pass timeLeftInput.value since composable does not own input state.
+- [06-01]: MenuScreen forwards ConfigStart events via explicit emit re-dispatch, not v-model passthrough.
+- [06-01]: buttonClass helper moved into ResponseButtons setup() -- presentational logic belongs with the button component.
+- [06-01]: GameOverDisplay includes high score section per plan -- Plan 02 will add standalone high score line for active play.
 
 ### Pending Todos
 
@@ -103,5 +107,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 05-03-PLAN.md (App.vue Composable Extraction) -- Phase 05 complete
+Stopped at: Completed 06-01-PLAN.md (Leaf Component Extraction)
 Resume file: None
