@@ -10,17 +10,27 @@ const audioManager = {
   context: null,
   buffers: {},
   unlocked: false,
+  ready: false,
 
   async init() {
-    // Create audio context (will be suspended on iOS until user gesture)
-    this.context = new (window.AudioContext || window.webkitAudioContext)();
-
-    // Load all sound buffers
-    await Promise.all([
-      this.loadSound('stimulus', stimulusSoundUrl),
-      this.loadSound('increment', incrementSoundUrl),
-      this.loadSound('strike', strikeSoundUrl),
-    ]);
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) {
+        console.warn('AudioContext not available. Game will run silently.');
+        return;
+      }
+      this.context = new AudioCtx();
+      await Promise.allSettled([
+        this.loadSound('stimulus', stimulusSoundUrl),
+        this.loadSound('increment', incrementSoundUrl),
+        this.loadSound('strike', strikeSoundUrl),
+      ]);
+      this.ready = true;
+    } catch (e) {
+      console.warn('Audio initialization failed. Game will run silently.', e);
+      this.context = null;
+      this.ready = false;
+    }
   },
 
   async loadSound(name, url) {
@@ -35,29 +45,26 @@ const audioManager = {
 
   // Call this on first user interaction to unlock audio on iOS
   unlock() {
-    if (this.unlocked || !this.context) return;
-
-    // Resume the audio context (required on iOS after user gesture)
+    if (this.unlocked || !this.ready || !this.context) return;
     if (this.context.state === 'suspended') {
       this.context.resume();
     }
-
     this.unlocked = true;
   },
 
   play(soundName) {
-    if (!this.context || !this.buffers[soundName]) return;
-
-    // Make sure context is running
-    if (this.context.state === 'suspended') {
-      this.context.resume();
+    if (!this.ready || !this.context || !this.buffers[soundName]) return;
+    try {
+      if (this.context.state === 'suspended') {
+        this.context.resume();
+      }
+      const source = this.context.createBufferSource();
+      source.buffer = this.buffers[soundName];
+      source.connect(this.context.destination);
+      source.start(0);
+    } catch (e) {
+      console.warn(`Audio playback failed for "${soundName}":`, e);
     }
-
-    // Create a new buffer source for each play (they're one-shot)
-    const source = this.context.createBufferSource();
-    source.buffer = this.buffers[soundName];
-    source.connect(this.context.destination);
-    source.start(0);
   },
 };
 
