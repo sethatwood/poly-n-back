@@ -15,9 +15,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Core Toolchain Upgrade** - Node 22, Vue 3.5, Pinia 3, Vite 7, dead dependency removal
 - [x] **Phase 2: Tailwind Migration** - Tailwind 3 to 4 with visual regression audit
 - [x] **Phase 3: Capacitor Migration** - Direct 5 to 8 with fresh native project regeneration and verified builds
-- [ ] **Phase 4: Linting & Bug Fixes** - ESLint 9 setup and all documented defect resolutions
-- [ ] **Phase 5: Store Extraction** - audioStore, persistenceStore, composables extracted from monolith
-- [ ] **Phase 6: Component Extraction** - App.vue decomposed into focused screen and game components
+- [x] **Phase 4: Linting & Bug Fixes** - ESLint 9 setup and all documented defect resolutions
+- [x] **Phase 5: Store Extraction** - audioStore, persistenceStore, composables extracted from monolith
+- [x] **Phase 6: Component Extraction** - App.vue decomposed into focused screen and game components
 - [ ] **Phase 7: TypeScript Migration** - Full type safety with incremental strict mode adoption
 - [ ] **Phase 8: Testing & CI** - Vitest unit/integration tests, Playwright E2E, CI pipeline
 - [ ] **Phase 9: Platform Polish** - Auto-pause, haptic feedback, Sentry crash reporting
@@ -105,8 +105,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. All animations (score pulse, strike flash, feedback fade) work identically to before extraction
   5. Game flow (menu to game to pause to resume to game over to menu) works without state leaks or broken transitions
 **Plans:** 2 plans
-- [ ] 06-01-PLAN.md -- Create sub-components (GameTimer, ResponseButtons, ScoreDisplay, GameOverDisplay) and MenuScreen
-- [ ] 06-02-PLAN.md -- Create GameScreen, reduce App.vue to thin shell, visual verification
+- [x] 06-01-PLAN.md -- Create sub-components (GameTimer, ResponseButtons, ScoreDisplay, GameOverDisplay) and MenuScreen
+- [x] 06-02-PLAN.md -- Create GameScreen, reduce App.vue to thin shell, visual verification
 
 ### Phase 7: TypeScript Migration
 **Goal**: The entire codebase has full type safety with TypeScript strict mode, catching bugs at compile time
@@ -153,9 +153,9 @@ Phases execute in numeric order: 1 to 2 to 3 to 4 to 5 to 6 to 7 to 8 to 9
 | 1. Core Toolchain Upgrade | 2/2 | Complete | 2026-03-01 |
 | 2. Tailwind Migration | 1/1 | Complete | 2026-03-01 |
 | 3. Capacitor Migration | 1/1 | Complete | 2026-03-01 |
-| 4. Linting & Bug Fixes | 0/3 | Not started | - |
-| 5. Store Extraction | 0/? | Not started | - |
-| 6. Component Extraction | 0/? | Not started | - |
+| 4. Linting & Bug Fixes | 3/3 | Complete | 2026-03-01 |
+| 5. Store Extraction | 3/3 | Complete | 2026-03-01 |
+| 6. Component Extraction | 2/2 | Complete | 2026-03-02 |
 | 7. TypeScript Migration | 0/? | Not started | - |
 | 8. Testing & CI | 0/? | Not started | - |
 | 9. Platform Polish | 0/? | Not started | - |

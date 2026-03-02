@@ -33,8 +33,8 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 
 ### Architecture
 
-- [ ] **ARCH-01**: App.vue reduced to ~80 lines (thin shell: screen routing and overlay mounting only)
-- [ ] **ARCH-02**: GameScreen component extracted (composes game timer, stimulus, response buttons, score display, game over)
+- [x] **ARCH-01**: App.vue reduced to ~80 lines (thin shell: screen routing and overlay mounting only)
+- [x] **ARCH-02**: GameScreen component extracted (composes game timer, stimulus, response buttons, score display, game over)
 - [x] **ARCH-03**: MenuScreen component extracted (composes config, intro content, footer)
 - [x] **ARCH-04**: Game sub-components extracted: GameTimer, ResponseButtons, ScoreDisplay, GameOverDisplay
 - [x] **ARCH-05**: audioStore extracted from gameStore (singleton AudioContext, buffer loading, iOS unlock flow)
@@ -155,8 +155,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FIX-08 | Phase 4: Linting & Bug Fixes | Complete |
 | FIX-09 | Phase 4: Linting & Bug Fixes | Complete |
 | FIX-10 | Phase 4: Linting & Bug Fixes | Complete |
-| ARCH-01 | Phase 6: Component Extraction | Pending |
-| ARCH-02 | Phase 6: Component Extraction | Pending |
+| ARCH-01 | Phase 6: Component Extraction | Complete |
+| ARCH-02 | Phase 6: Component Extraction | Complete |
 | ARCH-03 | Phase 6: Component Extraction | Complete |
 | ARCH-04 | Phase 6: Component Extraction | Complete |
 | ARCH-05 | Phase 5: Store Extraction | Complete |
