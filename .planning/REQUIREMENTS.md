@@ -24,11 +24,11 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 - [x] **FIX-02**: stimulusHistory access bounds-checked in respondToStimulus() before array lookup
 - [x] **FIX-03**: Button responses debounced to prevent multiple responses per stimulus turn
 - [x] **FIX-04**: Stimulus history capped to nBack + 50 entries to prevent unbounded memory growth
-- [ ] **FIX-05**: All setTimeout/setInterval calls use managed timeout utility with automatic cleanup on unmount
+- [x] **FIX-05**: All setTimeout/setInterval calls use managed timeout utility with automatic cleanup on unmount
 - [x] **FIX-06**: Persistent data migrated from localStorage to @capacitor/preferences (high scores, achievements, audio preference, tutorial state)
 - [x] **FIX-07**: All storage reads validate data schema and fall back to defaults on corruption
-- [ ] **FIX-08**: Global error handler installed (app.config.errorHandler + window.onerror + window.onunhandledrejection)
-- [ ] **FIX-09**: Audio system tracks readiness state and degrades gracefully when AudioContext unavailable or sounds fail to load
+- [x] **FIX-08**: Global error handler installed (app.config.errorHandler + window.onerror + window.onunhandledrejection)
+- [x] **FIX-09**: Audio system tracks readiness state and degrades gracefully when AudioContext unavailable or sounds fail to load
 - [x] **FIX-10**: All storage writes wrapped in try-catch to handle quota exceeded errors
 
 ### Architecture
@@ -149,11 +149,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FIX-02 | Phase 4: Linting & Bug Fixes | Complete |
 | FIX-03 | Phase 4: Linting & Bug Fixes | Complete |
 | FIX-04 | Phase 4: Linting & Bug Fixes | Complete |
-| FIX-05 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-05 | Phase 4: Linting & Bug Fixes | Complete |
 | FIX-06 | Phase 4: Linting & Bug Fixes | Complete |
 | FIX-07 | Phase 4: Linting & Bug Fixes | Complete |
-| FIX-08 | Phase 4: Linting & Bug Fixes | Pending |
-| FIX-09 | Phase 4: Linting & Bug Fixes | Pending |
+| FIX-08 | Phase 4: Linting & Bug Fixes | Complete |
+| FIX-09 | Phase 4: Linting & Bug Fixes | Complete |
 | FIX-10 | Phase 4: Linting & Bug Fixes | Complete |
 | ARCH-01 | Phase 6: Component Extraction | Pending |
 | ARCH-02 | Phase 6: Component Extraction | Pending |
