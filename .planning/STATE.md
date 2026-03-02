@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-02T02:32:00Z"
+last_updated: "2026-03-02T02:36:36Z"
 progress:
   total_phases: 9
-  completed_phases: 4
-  total_plans: 9
-  completed_plans: 9
+  completed_phases: 5
+  total_plans: 12
+  completed_plans: 12
 ---
 
 # Project State
@@ -18,21 +18,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** The n-back gameplay loop must feel incredible -- responsive, satisfying, impossible to put down.
-**Current focus:** Phase 5 in progress: Store Extraction (2 of 3 plans done). gameStore refactored to delegate to audioStore/persistenceStore.
+**Current focus:** Phase 5 complete: Store Extraction (3 of 3 plans done). Stores extracted (audioStore, persistenceStore), gameStore delegates, App.vue composables extracted.
 
 ## Current Position
 
-Phase: 5 of 9 (Store Extraction)
-Plan: 2 of 3 in current phase
-Status: In Progress
-Last activity: 2026-03-02 -- Completed 05-02 (Store Delegation)
+Phase: 5 of 9 (Store Extraction) -- COMPLETE
+Plan: 3 of 3 in current phase
+Status: Phase Complete
+Last activity: 2026-03-02 -- Completed 05-03 (App.vue Composable Extraction)
 
-Progress: [██████░░░░] 59%
+Progress: [██████░░░░] 63%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 12
 - Average duration: 4min
 - Total execution time: 0.7 hours
 
@@ -44,10 +44,10 @@ Progress: [██████░░░░] 59%
 | 02-tailwind-migration | 1 | 5min | 5min |
 | 03-capacitor-migration | 1 | 9min | 9min |
 | 04-linting-bug-fixes | 3 | 8min | 2.7min |
-| 05-store-extraction | 2 | 4min | 2min |
+| 05-store-extraction | 3 | 6min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (2min), 04-02 (3min), 04-03 (3min), 05-01 (2min), 05-02 (2min)
+- Last 5 plans: 04-02 (3min), 04-03 (3min), 05-01 (2min), 05-02 (2min), 05-03 (2min)
 - Trend: stable/fast
 
 *Updated after each plan completion*
@@ -87,6 +87,9 @@ Recent decisions affecting current work:
 - [05-01]: persistenceStore checks Preferences for _migrated flag before checking its own migrated ref, matching exact current gameStore behavior.
 - [05-02]: Cross-store refs (useAudioStore/usePersistenceStore) placed before any await in gameStore setup -- Pinia composition rule.
 - [05-02]: persistenceStore is the single gateway for @capacitor/preferences -- no component imports Preferences directly.
+- [05-03]: Composables accept gameStore as parameter (dependency injection) rather than importing useGameStore internally -- keeps them testable.
+- [05-03]: showModal ref owned by useGameLifecycle since lifecycle handlers toggle it.
+- [05-03]: startGame and handlePlayAgain wrapped in App.vue to pass timeLeftInput.value since composable does not own input state.
 
 ### Pending Todos
 
@@ -100,5 +103,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 05-02-PLAN.md (Store Delegation)
+Stopped at: Completed 05-03-PLAN.md (App.vue Composable Extraction) -- Phase 05 complete
 Resume file: None

@@ -39,7 +39,7 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 - [ ] **ARCH-04**: Game sub-components extracted: GameTimer, ResponseButtons, ScoreDisplay, GameOverDisplay
 - [x] **ARCH-05**: audioStore extracted from gameStore (singleton AudioContext, buffer loading, iOS unlock flow)
 - [x] **ARCH-06**: persistenceStore extracted from gameStore (validated read/write wrapper for @capacitor/preferences)
-- [ ] **ARCH-07**: Composables extracted: useAnimations, useFeedback, useGameLifecycle, useManagedTimeout
+- [x] **ARCH-07**: Composables extracted: useAnimations, useFeedback, useGameLifecycle, useManagedTimeout
 - [x] **ARCH-08**: gameStore refined to use audioStore and persistenceStore (contains pure game logic only)
 
 ### TypeScript
@@ -161,7 +161,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ARCH-04 | Phase 6: Component Extraction | Pending |
 | ARCH-05 | Phase 5: Store Extraction | Complete |
 | ARCH-06 | Phase 5: Store Extraction | Complete |
-| ARCH-07 | Phase 5: Store Extraction | Pending |
+| ARCH-07 | Phase 5: Store Extraction | Complete |
 | ARCH-08 | Phase 5: Store Extraction | Complete |
 | TS-01 | Phase 7: TypeScript Migration | Pending |
 | TS-02 | Phase 7: TypeScript Migration | Pending |
