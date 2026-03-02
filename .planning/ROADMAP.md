@@ -89,7 +89,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Composables (useAnimations, useFeedback, useGameLifecycle, useManagedTimeout) are extracted to src/composables/ with explicit APIs
   4. gameStore contains only pure game logic (stimulus generation, response evaluation, score tracking, turn management) and delegates to audioStore and persistenceStore
   5. All gameplay behavior is identical to before extraction -- no animation, audio, or state regressions
-**Plans**: TBD
+**Plans:** 3 plans
+- [ ] 05-01-PLAN.md -- Create audioStore + persistenceStore, rename store/ to stores/, update all imports
+- [ ] 05-02-PLAN.md -- Refactor gameStore to delegate to new stores, migrate all direct Preferences access to persistenceStore
+- [ ] 05-03-PLAN.md -- Extract useAnimations, useFeedback, useGameLifecycle composables from App.vue
 
 ### Phase 6: Component Extraction
 **Goal**: The monolithic App.vue is decomposed into focused screen and game components that each own their rendering and local state
