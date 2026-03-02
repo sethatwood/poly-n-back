@@ -104,7 +104,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. MenuScreen component exists and composes configuration, intro content, and footer
   4. All animations (score pulse, strike flash, feedback fade) work identically to before extraction
   5. Game flow (menu to game to pause to resume to game over to menu) works without state leaks or broken transitions
-**Plans**: TBD
+**Plans:** 2 plans
+- [ ] 06-01-PLAN.md -- Create sub-components (GameTimer, ResponseButtons, ScoreDisplay, GameOverDisplay) and MenuScreen
+- [ ] 06-02-PLAN.md -- Create GameScreen, reduce App.vue to thin shell, visual verification
 
 ### Phase 7: TypeScript Migration
 **Goal**: The entire codebase has full type safety with TypeScript strict mode, catching bugs at compile time
