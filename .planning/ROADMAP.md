@@ -18,10 +18,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Linting & Bug Fixes** - ESLint 9 setup and all documented defect resolutions
 - [x] **Phase 5: Store Extraction** - audioStore, persistenceStore, composables extracted from monolith
 - [x] **Phase 6: Component Extraction** - App.vue decomposed into focused screen and game components
-- [ ] **Phase 7: TypeScript Migration** - Full type safety with incremental strict mode adoption
-- [ ] **Phase 8: Testing & CI** - Vitest unit/integration tests, Playwright E2E, CI pipeline
-- [ ] **Phase 9: Platform Polish** - Auto-pause, haptic feedback, Sentry crash reporting
-- [ ] **Phase 10: Tech Debt Cleanup** - Fix lint errors, add lint to CI, re-enable vue/block-lang, fix docs
+- [x] **Phase 7: TypeScript Migration** - Full type safety with incremental strict mode adoption
+- [x] **Phase 8: Testing & CI** - Vitest unit/integration tests, Playwright E2E, CI pipeline
+- [x] **Phase 9: Platform Polish** - Auto-pause, haptic feedback, Sentry crash reporting
+- [x] **Phase 10: Tech Debt Cleanup** - Fix lint errors, add lint to CI, re-enable vue/block-lang, fix docs
 
 ## Phase Details
 
@@ -76,9 +76,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Game data persists across app restarts via Capacitor Preferences (not localStorage) and corrupted data falls back to defaults
   5. Audio failures (blocked AudioContext, missing sound files) do not prevent gameplay -- the game plays silently instead of crashing
 **Plans:** 3 plans
-- [ ] 04-01-PLAN.md -- ESLint 10 + Prettier setup, game logic guards (division-by-zero, debounce, bounds check, history cap)
-- [ ] 04-02-PLAN.md -- Storage migration from localStorage to @capacitor/preferences with schema validation
-- [ ] 04-03-PLAN.md -- Audio graceful degradation, useManagedTimeout composable, global error handler
+- [x] 04-01-PLAN.md -- ESLint 10 + Prettier setup, game logic guards (division-by-zero, debounce, bounds check, history cap)
+- [x] 04-02-PLAN.md -- Storage migration from localStorage to @capacitor/preferences with schema validation
+- [x] 04-03-PLAN.md -- Audio graceful degradation, useManagedTimeout composable, global error handler
 
 ### Phase 5: Store Extraction
 **Goal**: Game logic is cleanly separated from audio management, data persistence, and UI animation concerns
@@ -91,9 +91,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. gameStore contains only pure game logic (stimulus generation, response evaluation, score tracking, turn management) and delegates to audioStore and persistenceStore
   5. All gameplay behavior is identical to before extraction -- no animation, audio, or state regressions
 **Plans:** 3 plans
-- [ ] 05-01-PLAN.md -- Create audioStore + persistenceStore, rename store/ to stores/, update all imports
-- [ ] 05-02-PLAN.md -- Refactor gameStore to delegate to new stores, migrate all direct Preferences access to persistenceStore
-- [ ] 05-03-PLAN.md -- Extract useAnimations, useFeedback, useGameLifecycle composables from App.vue
+- [x] 05-01-PLAN.md -- Create audioStore + persistenceStore, rename store/ to stores/, update all imports
+- [x] 05-02-PLAN.md -- Refactor gameStore to delegate to new stores, migrate all direct Preferences access to persistenceStore
+- [x] 05-03-PLAN.md -- Extract useAnimations, useFeedback, useGameLifecycle composables from App.vue
 
 ### Phase 6: Component Extraction
 **Goal**: The monolithic App.vue is decomposed into focused screen and game components that each own their rendering and local state
@@ -151,8 +151,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Haptic feedback fires on correct, incorrect, and game-over events when the user has opted in (toggle exists in settings, off by default)
   3. Sentry receives crash reports with Vue component context when an unhandled error occurs
 **Plans:** 2 plans
-- [ ] 09-01-PLAN.md -- Install @capacitor/app + @capacitor/haptics, wire auto-pause and haptic feedback
-- [ ] 09-02-PLAN.md -- Wire @sentry/capacitor + @sentry/vue crash reporting with environment config
+- [x] 09-01-PLAN.md -- Install @capacitor/app + @capacitor/haptics, wire auto-pause and haptic feedback
+- [x] 09-02-PLAN.md -- Wire @sentry/capacitor + @sentry/vue crash reporting with environment config
 
 ### Phase 10: Tech Debt Cleanup
 **Goal**: All addressable tech debt from the milestone audit is resolved so M2 builds on a clean foundation
@@ -166,7 +166,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. DEPS-06 description in REQUIREMENTS.md matches actual migration path (direct 5→8)
   5. No `any` casts without explicit `eslint-disable-next-line` justification comments
   6. Android build compiles and runs in Android Studio without errors
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 ## Progress
 
@@ -184,4 +184,4 @@ Phases execute in numeric order: 1 to 2 to 3 to 4 to 5 to 6 to 7 to 8 to 9 to 10
 | 7. TypeScript Migration | 4/4 | Complete | 2026-03-02 |
 | 8. Testing & CI | 4/4 | Complete | 2026-03-02 |
 | 9. Platform Polish | 2/2 | Complete | 2026-03-02 |
-| 10. Tech Debt Cleanup | 1/2 | In Progress|  |
+| 10. Tech Debt Cleanup | 2/2 | Complete | 2026-03-02 |
