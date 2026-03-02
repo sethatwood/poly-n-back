@@ -1,5 +1,17 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
+import type {
+  Stimulus,
+  HighScoreData,
+  RespondedThisTurn,
+  FeedbackState,
+  StimulusAttribute,
+  StimulusColor,
+  StimulusEmoji,
+  StimulusPosition,
+  StimulusShape,
+  SoundName,
+} from '@/types/game';
 import { useAudioStore } from './audioStore';
 import { usePersistenceStore } from './persistenceStore';
 
@@ -8,9 +20,9 @@ export const useGameStore = defineStore('game', () => {
   const audioStore = useAudioStore();
   const persistenceStore = usePersistenceStore();
   // ---- State (refs) ----
-  const currentStimulus = ref({});
+  const currentStimulus = ref<Stimulus>({ color: 'purple', emoji: 'fire', position: 'left', shape: 'circle' });
   const deterministicIndex = ref(0);
-  const deterministicStimuli = ref([
+  const deterministicStimuli = ref<Stimulus[]>([
     { color: 'blue', emoji: 'flower', position: 'center', shape: 'square' },
     { color: 'green', emoji: 'ice', position: 'left', shape: 'triangle' },
     { color: 'blue', emoji: 'fire', position: 'right', shape: 'circle' },
@@ -19,7 +31,7 @@ export const useGameStore = defineStore('game', () => {
     { color: 'green', emoji: 'flower', position: 'right', shape: 'circle' },
   ]);
   const flashBorder = ref(false);
-  const highScoreData = ref({
+  const highScoreData = ref<HighScoreData>({
     score: 0,
     potentialCorrectAnswers: 0,
     nBack: null,
@@ -36,24 +48,24 @@ export const useGameStore = defineStore('game', () => {
   const nBack = ref(2);
   const potentialCorrectAnswers = ref(0);
   const previousPotentialCorrectAnswers = ref(0);
-  const respondedThisTurn = ref({
+  const respondedThisTurn = ref<RespondedThisTurn>({
     color: false,
     emoji: false,
     position: false,
     shape: false,
   });
-  const lastFeedback = ref({
-    type: null, // 'correct' or 'incorrect'
-    button: null, // which button was pressed
-    timestamp: null, // for animation timing
+  const lastFeedback = ref<FeedbackState>({
+    type: null,
+    button: null,
+    timestamp: null,
   });
   const score = ref(0);
-  const stimulusHistory = ref([]);
+  const stimulusHistory = ref<Stimulus[]>([]);
   const timeLeft = ref(5);
-  const timer = ref(null);
+  const timer = ref<ReturnType<typeof setInterval> | null>(null);
 
   // ---- Persistence ----
-  async function loadPersistedState() {
+  async function loadPersistedState(): Promise<void> {
     await persistenceStore.migrateFromLocalStorage();
     highScoreData.value = await persistenceStore.loadPreference('highScoreData', {
       score: 0,
@@ -83,11 +95,11 @@ export const useGameStore = defineStore('game', () => {
   });
 
   // ---- Actions (functions) ----
-  function generateRandomStimulus() {
-    const colors = ['purple', 'green', 'blue'];
-    const emojis = ['fire', 'ice', 'flower'];
-    const positions = ['left', 'center', 'right'];
-    const shapes = ['circle', 'square', 'triangle'];
+  function generateRandomStimulus(): Stimulus {
+    const colors: StimulusColor[] = ['purple', 'green', 'blue'];
+    const emojis: StimulusEmoji[] = ['fire', 'ice', 'flower'];
+    const positions: StimulusPosition[] = ['left', 'center', 'right'];
+    const shapes: StimulusShape[] = ['circle', 'square', 'triangle'];
 
     return {
       color: colors[Math.floor(Math.random() * colors.length)],
@@ -97,7 +109,7 @@ export const useGameStore = defineStore('game', () => {
     };
   }
 
-  function setNewStimulus() {
+  function setNewStimulus(): void {
     if (isStopped.value || isPaused.value) {
       return;
     }
@@ -160,29 +172,29 @@ export const useGameStore = defineStore('game', () => {
     }, 300);
   }
 
-  function toggleAudio() {
+  function toggleAudio(): void {
     isAudioEnabled.value = !isAudioEnabled.value;
     persistenceStore.savePreference('isAudioEnabled', isAudioEnabled.value);
   }
 
   // Unlock audio on iOS - call this on first user interaction
-  function unlockAudio() {
+  function unlockAudio(): void {
     audioStore.unlock();
   }
 
-  function playSound(soundName) {
+  function playSound(soundName: SoundName): void {
     if (isAudioEnabled.value) {
       audioStore.play(soundName);
     }
   }
 
-  function toggleDeterministicMode() {
+  function toggleDeterministicMode(): void {
     isDeterministic.value = !isDeterministic.value;
     startGame();
   }
 
-  function resetGameState() {
-    clearInterval(timer.value);
+  function resetGameState(): void {
+    clearInterval(timer.value!);
     score.value = 0;
     incorrectResponses.value = 0;
     timeLeft.value = 5;
@@ -203,17 +215,17 @@ export const useGameStore = defineStore('game', () => {
     setNewStimulus();
   }
 
-  function dismissGameOverModal() {
+  function dismissGameOverModal(): void {
     showGameOverModal.value = false;
     isNewHighScore.value = false;
   }
 
-  function resetHighScore() {
-    highScoreData.value = { score: 0, potentialCorrectAnswers: 0 };
+  function resetHighScore(): void {
+    highScoreData.value = { score: 0, potentialCorrectAnswers: 0, nBack: null };
     persistenceStore.savePreference('highScoreData', highScoreData.value);
   }
 
-  function startGame(timeLeftParam = 5) {
+  function startGame(timeLeftParam: number = 5): void {
     // Unlock audio on iOS when user starts game
     unlockAudio();
     resetGameState();
@@ -230,20 +242,20 @@ export const useGameStore = defineStore('game', () => {
     }, 1000);
   }
 
-  function pauseGame() {
+  function pauseGame(): void {
     isPaused.value = true;
   }
 
-  function resumeGame() {
+  function resumeGame(): void {
     isPaused.value = false;
   }
 
-  function stopGame() {
-    clearInterval(timer.value);
+  function stopGame(): void {
+    clearInterval(timer.value!);
     isStopped.value = true;
   }
 
-  function respondToStimulus(stimulusType) {
+  function respondToStimulus(stimulusType: StimulusAttribute): void {
     // FIX-03: Debounce guard -- block rapid taps on the same button per turn
     if (respondedThisTurn.value[stimulusType]) return;
     respondedThisTurn.value[stimulusType] = true;
@@ -297,7 +309,7 @@ export const useGameStore = defineStore('game', () => {
           const isSameScoreButBetterAccuracy =
             score.value === highScoreData.value.score &&
             currentAccuracy > hsAccuracy;
-          const isHigherNBack = nBack.value > highScoreData.value.nBack;
+          const isHigherNBack = nBack.value > highScoreData.value.nBack!;
 
           // Track if this is a new high score before updating
           isNewHighScore.value =

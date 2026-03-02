@@ -5,11 +5,11 @@ import { Preferences } from '@capacitor/preferences';
 export const usePersistenceStore = defineStore('persistence', () => {
   const migrated = ref(false);
 
-  async function loadPreference(key, defaults) {
+  async function loadPreference<T>(key: string, defaults: T): Promise<T> {
     try {
       const { value } = await Preferences.get({ key });
       if (value === null) return defaults;
-      const parsed = JSON.parse(value);
+      const parsed: unknown = JSON.parse(value);
       // Schema validation: type must match defaults type
       if (typeof parsed !== typeof defaults) return defaults;
       // For objects, verify expected keys exist
@@ -18,17 +18,19 @@ export const usePersistenceStore = defineStore('persistence', () => {
         defaults !== null &&
         !Array.isArray(defaults)
       ) {
-        for (const k of Object.keys(defaults)) {
-          if (!(k in parsed)) return defaults;
+        const defaultRecord = defaults as Record<string, unknown>;
+        const parsedRecord = parsed as Record<string, unknown>;
+        for (const k of Object.keys(defaultRecord)) {
+          if (!(k in parsedRecord)) return defaults;
         }
       }
-      return parsed;
+      return parsed as T;
     } catch {
       return defaults;
     }
   }
 
-  async function savePreference(key, data) {
+  async function savePreference<T>(key: string, data: T): Promise<void> {
     try {
       await Preferences.set({ key, value: JSON.stringify(data) });
     } catch (e) {
@@ -36,7 +38,7 @@ export const usePersistenceStore = defineStore('persistence', () => {
     }
   }
 
-  async function migrateFromLocalStorage() {
+  async function migrateFromLocalStorage(): Promise<void> {
     const result = await Preferences.get({ key: '_migrated' });
     if (result.value) {
       migrated.value = true;
@@ -44,7 +46,7 @@ export const usePersistenceStore = defineStore('persistence', () => {
     }
 
     // Migrate each key from localStorage to Capacitor Preferences
-    const keys = [
+    const keys: string[] = [
       'highScoreData',
       'isAudioEnabled',
       'achievements',

@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
+import type { SoundName } from '@/types/game';
 import stimulusSoundUrl from '../assets/stimulus.wav';
 import incrementSoundUrl from '../assets/ting.mp3';
 import strikeSoundUrl from '../assets/whip.mp3';
@@ -7,26 +8,26 @@ import strikeSoundUrl from '../assets/whip.mp3';
 export const useAudioStore = defineStore('audio', () => {
   // Non-serializable browser objects -- plain variables, NOT refs.
   // Do NOT return these from the store.
-  let context = null;
-  let buffers = {};
+  let context: AudioContext | null = null;
+  let buffers: Record<string, AudioBuffer> = {};
 
   // Reactive state exposed to consumers
   const ready = ref(false);
   const unlocked = ref(false);
 
-  async function loadSound(name, url) {
+  async function loadSound(name: string, url: string): Promise<void> {
     try {
       const response = await fetch(url);
       const arrayBuffer = await response.arrayBuffer();
-      buffers[name] = await context.decodeAudioData(arrayBuffer);
+      buffers[name] = await context!.decodeAudioData(arrayBuffer);
     } catch (error) {
       console.warn(`Failed to load sound: ${name}`, error);
     }
   }
 
-  async function init() {
+  async function init(): Promise<void> {
     try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtx) {
         console.warn('AudioContext not available. Game will run silently.');
         return;
@@ -45,7 +46,7 @@ export const useAudioStore = defineStore('audio', () => {
     }
   }
 
-  function unlock() {
+  function unlock(): void {
     if (unlocked.value || !ready.value || !context) return;
     if (context.state === 'suspended') {
       context.resume();
@@ -53,7 +54,7 @@ export const useAudioStore = defineStore('audio', () => {
     unlocked.value = true;
   }
 
-  function play(soundName) {
+  function play(soundName: SoundName): void {
     if (!ready.value || !context || !buffers[soundName]) return;
     try {
       if (context.state === 'suspended') {
