@@ -69,10 +69,10 @@
         @start-game="$emit('start-game')"
       />
     </div>
-    <div class="mt-3 flex items-center justify-center gap-2">
+    <div class="mt-3 relative flex items-center justify-center gap-2">
       <button
         class="text-xs text-gray-600 bg-gray-600 hover:bg-gray-500 p-1 rounded-full focus:outline-hidden"
-        @click="$emit('toggle-audio')"
+        @click="handleToggleAudio"
       >
         <img
           v-if="gameStore.isAudioEnabled"
@@ -80,14 +80,16 @@
           :src="volumeUpIcon"
           alt="Volume Up"
         />
-        <img v-else class="h-5 w-5" :src="volumeMuteIcon" alt="Volume Mute" />
+        <img
+          v-else
+          class="h-5 w-5"
+          :src="volumeMuteIcon"
+          alt="Volume Mute"
+        />
       </button>
       <button
         class="text-xs text-gray-600 bg-gray-600 hover:bg-gray-500 p-1 rounded-full focus:outline-hidden"
-        :title="
-          gameStore.isHapticsEnabled ? 'Disable Haptics' : 'Enable Haptics'
-        "
-        @click="$emit('toggle-haptics')"
+        @click="handleToggleHaptics"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -107,21 +109,30 @@
           />
         </svg>
       </button>
+      <Transition name="toggle-toast">
+        <p
+          v-if="toastMessage"
+          :key="toastMessage"
+          class="absolute top-full left-0 right-0 mt-1 text-xs text-gray-400 normal-case text-center"
+        >
+          {{ toastMessage }}
+        </p>
+      </Transition>
     </div>
-    <Footer />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import type { useGameStore } from '@/stores/gameStore';
 import type { StimulusAttribute, ResponseButton } from '@/types/game';
+import { useManagedTimeout } from '@/composables/useManagedTimeout';
 import GameTimer from './GameTimer.vue';
 import ResponseButtons from './ResponseButtons.vue';
 import ScoreDisplay from './ScoreDisplay.vue';
 import GameOverDisplay from './GameOverDisplay.vue';
 import Stimulus from '../Stimulus.vue';
 import ConfigStart from '../ConfigStart.vue';
-import Footer from '../Footer.vue';
 import volumeUpIcon from '../assets/volume-up-solid.svg';
 import volumeMuteIcon from '../assets/volume-mute-solid.svg';
 
@@ -137,8 +148,8 @@ interface Props {
   feedbackClass: (buttonType: StimulusAttribute) => string;
 }
 
-defineProps<Props>();
-defineEmits<{
+const props = defineProps<Props>();
+const emit = defineEmits<{
   respond: [type: StimulusAttribute];
   'update:nBackInput': [value: number];
   'update:timeLeftInput': [value: number];
@@ -148,6 +159,29 @@ defineEmits<{
   'reset-high-score': [];
 }>();
 
+const toastMessage = ref('');
+let toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
+const { managedSetTimeout, clearManagedTimeout } = useManagedTimeout();
+
+function showToast(message: string) {
+  if (toastTimeoutId) clearManagedTimeout(toastTimeoutId);
+  toastMessage.value = message;
+  toastTimeoutId = managedSetTimeout(() => {
+    toastMessage.value = '';
+    toastTimeoutId = null;
+  }, 1500);
+}
+
+function handleToggleAudio() {
+  emit('toggle-audio');
+  showToast(props.gameStore.isAudioEnabled ? 'Audio On' : 'Audio Off');
+}
+
+function handleToggleHaptics() {
+  emit('toggle-haptics');
+  showToast(props.gameStore.isHapticsEnabled ? 'Haptics On' : 'Haptics Off');
+}
+
 const responseButtons: ResponseButton[] = [
   { type: 'color', label: 'Color' },
   { type: 'emoji', label: 'Emoji' },
@@ -155,3 +189,16 @@ const responseButtons: ResponseButton[] = [
   { type: 'shape', label: 'Shape' },
 ];
 </script>
+
+<style scoped>
+.toggle-toast-enter-active {
+  transition: opacity 0.2s ease;
+}
+.toggle-toast-leave-active {
+  transition: opacity 0.4s ease;
+}
+.toggle-toast-enter-from,
+.toggle-toast-leave-to {
+  opacity: 0;
+}
+</style>

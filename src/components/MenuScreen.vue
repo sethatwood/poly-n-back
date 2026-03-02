@@ -13,7 +13,6 @@
         @start-game="$emit('start-game')"
       />
       <IntroContent :n-back="nBack" @show-tutorial="$emit('show-tutorial')" />
-      <Footer />
     </div>
   </div>
 </template>
@@ -22,8 +21,6 @@
 import IntroHead from '../IntroHead.vue';
 import IntroContent from '../IntroContent.vue';
 import ConfigStart from '../ConfigStart.vue';
-import Footer from '../Footer.vue';
-
 interface Props {
   nBackInput: number;
   timeLeftInput: number;
