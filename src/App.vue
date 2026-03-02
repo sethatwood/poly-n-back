@@ -237,10 +237,12 @@
 </template>
 
 <script>
-import { onMounted, onUnmounted, ref, watch, computed } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useGameStore } from './stores/gameStore';
 import { usePersistenceStore } from './stores/persistenceStore';
-import { useManagedTimeout } from './composables/useManagedTimeout';
+import { useAnimations } from './composables/useAnimations';
+import { useFeedback } from './composables/useFeedback';
+import { useGameLifecycle } from './composables/useGameLifecycle';
 import volumeUpIcon from './assets/volume-up-solid.svg';
 import volumeMuteIcon from './assets/volume-mute-solid.svg';
 import IntroHead from './IntroHead.vue';
@@ -271,12 +273,24 @@ export default {
   setup() {
     const gameStore = useGameStore();
     const persistenceStore = usePersistenceStore();
-    const { managedSetTimeout, clearManagedTimeout } = useManagedTimeout();
+
+    // Composables
+    const { scoreAnimating, strikeAnimating } = useAnimations(gameStore);
+    const { showFeedbackToast, feedbackClass } = useFeedback(gameStore);
+    const {
+      showModal,
+      startGame: startGameLifecycle,
+      handlePause,
+      handleResume,
+      handleQuit,
+      handleGameOverClose,
+      handlePlayAgain: playAgainLifecycle,
+      handleMainMenu,
+    } = useGameLifecycle(gameStore);
+
+    // Local input state
     const nBackInput = ref(gameStore.nBack);
     const timeLeftInput = ref(gameStore.timeLeft);
-    const showModal = ref(true);
-    const scoreAnimating = ref(false);
-    const strikeAnimating = ref(false);
 
     // Tutorial state - safe default (don't show until we know)
     const showTutorial = ref(false);
@@ -291,36 +305,10 @@ export default {
 
     const handleTutorialComplete = () => {
       showTutorial.value = false;
-      // Unlock audio on iOS when user completes/skips tutorial
       gameStore.unlockAudio();
     };
 
-    // Watch for score changes to trigger animation
-    watch(
-      () => gameStore.score,
-      (newScore, oldScore) => {
-        if (newScore > oldScore) {
-          scoreAnimating.value = true;
-          managedSetTimeout(() => {
-            scoreAnimating.value = false;
-          }, 400);
-        }
-      },
-    );
-
-    // Watch for strike changes to trigger animation
-    watch(
-      () => gameStore.incorrectResponses,
-      (newStrikes, oldStrikes) => {
-        if (newStrikes > oldStrikes) {
-          strikeAnimating.value = true;
-          managedSetTimeout(() => {
-            strikeAnimating.value = false;
-          }, 500);
-        }
-      },
-    );
-
+    // Sync input refs to store
     watch(nBackInput, (newNBack) => {
       gameStore.nBack = newNBack;
     });
@@ -329,14 +317,9 @@ export default {
       gameStore.timeLeft = newTimeLeft;
     });
 
-    const startGame = () => {
-      showModal.value = false;
-      gameStore.startGame(timeLeftInput.value);
-    };
-
-    onUnmounted(() => {
-      gameStore.stopGame();
-    });
+    // Wrap lifecycle calls that need timeLeftInput
+    const startGame = () => startGameLifecycle(timeLeftInput.value);
+    const handlePlayAgain = () => playAgainLifecycle(timeLeftInput.value);
 
     const respond = (stimulusType) => {
       if (!gameStore.isPaused) {
@@ -353,37 +336,6 @@ export default {
       }
     };
 
-    // Feedback class for button flash effect
-    const feedbackClass = (buttonType) => {
-      const feedback = gameStore.lastFeedback;
-      if (feedback.button === buttonType && feedback.type) {
-        return feedback.type === 'correct'
-          ? 'animate-correct-flash'
-          : 'animate-incorrect-flash';
-      }
-      return '';
-    };
-
-    // Show feedback indicator briefly after each response
-    const feedbackVisible = ref(false);
-    let feedbackTimeoutId = null;
-
-    // Watch for feedback changes and auto-hide after 1 second
-    watch(
-      () => gameStore.lastFeedback.timestamp,
-      (newTimestamp) => {
-        if (newTimestamp && gameStore.lastFeedback.type) {
-          feedbackVisible.value = true;
-          if (feedbackTimeoutId) clearManagedTimeout(feedbackTimeoutId);
-          feedbackTimeoutId = managedSetTimeout(() => {
-            feedbackVisible.value = false;
-          }, 2000);
-        }
-      },
-    );
-
-    const showFeedbackToast = computed(() => feedbackVisible.value);
-
     const responseButtons = [
       { type: 'color', label: 'Color' },
       { type: 'emoji', label: 'Emoji' },
@@ -397,36 +349,6 @@ export default {
 
     const resetHighScore = () => {
       gameStore.resetHighScore();
-    };
-
-    // Pause handlers
-    const handlePause = () => {
-      gameStore.pauseGame();
-    };
-
-    const handleResume = () => {
-      gameStore.resumeGame();
-    };
-
-    const handleQuit = () => {
-      gameStore.resumeGame();
-      gameStore.stopGame();
-      showModal.value = true;
-    };
-
-    // Game Over handlers
-    const handleGameOverClose = () => {
-      gameStore.dismissGameOverModal();
-    };
-
-    const handlePlayAgain = () => {
-      gameStore.dismissGameOverModal();
-      gameStore.startGame(timeLeftInput.value);
-    };
-
-    const handleMainMenu = () => {
-      gameStore.dismissGameOverModal();
-      showModal.value = true;
     };
 
     return {
