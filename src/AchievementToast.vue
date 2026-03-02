@@ -31,6 +31,7 @@
 
 <script>
 import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { Preferences } from '@capacitor/preferences';
 import { useGameStore } from './store/gameStore';
 
 // Achievement definitions
@@ -86,27 +87,41 @@ export default {
     const achievement = ref(null);
     const toastTimeout = ref(null);
 
-    // Load unlocked achievements from localStorage
-    const getUnlocked = () => {
+    // Load unlocked achievements from Capacitor Preferences
+    const unlockedIds = ref([]);
+
+    const getUnlocked = async () => {
       try {
-        return JSON.parse(localStorage.getItem('achievements') || '[]');
+        const { value } = await Preferences.get({ key: 'achievements' });
+        if (value === null) return [];
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
       } catch {
         return [];
       }
     };
 
-    const isUnlocked = (id) => getUnlocked().includes(id);
+    onMounted(async () => {
+      unlockedIds.value = await getUnlocked();
+    });
 
-    const unlock = (achievementId) => {
+    const isUnlocked = (id) => unlockedIds.value.includes(id);
+
+    const unlock = async (achievementId) => {
       if (isUnlocked(achievementId)) return;
 
       const ach = ACHIEVEMENTS[achievementId];
       if (!ach) return;
 
-      // Save to localStorage
-      const unlocked = getUnlocked();
-      unlocked.push(achievementId);
-      localStorage.setItem('achievements', JSON.stringify(unlocked));
+      unlockedIds.value.push(achievementId);
+      try {
+        await Preferences.set({
+          key: 'achievements',
+          value: JSON.stringify(unlockedIds.value),
+        });
+      } catch (e) {
+        console.warn('Failed to save achievements:', e);
+      }
 
       // Show toast
       if (toastTimeout.value) clearTimeout(toastTimeout.value);

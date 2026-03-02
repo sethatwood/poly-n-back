@@ -93,6 +93,7 @@
 
 <script>
 import { ref } from 'vue';
+import { Preferences } from '@capacitor/preferences';
 
 export default {
   name: 'TutorialOverlay',
@@ -167,8 +168,12 @@ export default {
       complete();
     };
 
-    const complete = () => {
-      localStorage.setItem('tutorialCompleted', 'true');
+    const complete = async () => {
+      try {
+        await Preferences.set({ key: 'tutorialCompleted', value: 'true' });
+      } catch (e) {
+        console.warn('Failed to save tutorial state:', e);
+      }
       emit('complete');
     };
 

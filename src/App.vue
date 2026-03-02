@@ -237,7 +237,8 @@
 </template>
 
 <script>
-import { onUnmounted, ref, watch, computed } from 'vue';
+import { onMounted, onUnmounted, ref, watch, computed } from 'vue';
+import { Preferences } from '@capacitor/preferences';
 import { useGameStore } from './store/gameStore';
 import volumeUpIcon from './assets/volume-up-solid.svg';
 import volumeMuteIcon from './assets/volume-mute-solid.svg';
@@ -274,8 +275,16 @@ export default {
     const scoreAnimating = ref(false);
     const strikeAnimating = ref(false);
 
-    // Tutorial state - show on first visit
-    const showTutorial = ref(!localStorage.getItem('tutorialCompleted'));
+    // Tutorial state - safe default (don't show until we know)
+    const showTutorial = ref(false);
+
+    onMounted(async () => {
+      await gameStore.loadPersistedState();
+      const { value } = await Preferences.get({ key: 'tutorialCompleted' });
+      if (!value) {
+        showTutorial.value = true;
+      }
+    });
 
     const handleTutorialComplete = () => {
       showTutorial.value = false;
