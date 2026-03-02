@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-02T01:47:59Z"
+last_updated: "2026-03-02T01:54:12Z"
 progress:
   total_phases: 9
   completed_phases: 3
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 6
+  completed_plans: 6
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** The n-back gameplay loop must feel incredible -- responsive, satisfying, impossible to put down.
-**Current focus:** Phase 4 in progress: Linting & Bug Fixes (Plan 1 of 3 complete)
+**Current focus:** Phase 4 in progress: Linting & Bug Fixes (Plan 2 of 3 complete)
 
 ## Current Position
 
 Phase: 4 of 9 (Linting & Bug Fixes)
-Plan: 2 of 3 in current phase
+Plan: 3 of 3 in current phase
 Status: In Progress
-Last activity: 2026-03-02 -- Completed 04-01 (ESLint + Prettier Setup and Game Logic Bug Fixes)
+Last activity: 2026-03-02 -- Completed 04-02 (Capacitor Preferences Migration)
 
-Progress: [████░░░░░░] 38%
+Progress: [████░░░░░░] 44%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: 5min
-- Total execution time: 0.5 hours
+- Total execution time: 0.6 hours
 
 **By Phase:**
 
@@ -43,10 +43,10 @@ Progress: [████░░░░░░] 38%
 | 01-core-toolchain-upgrade | 2 | 7min | 3.5min |
 | 02-tailwind-migration | 1 | 5min | 5min |
 | 03-capacitor-migration | 1 | 9min | 9min |
-| 04-linting-bug-fixes | 1 | 2min | 2min |
+| 04-linting-bug-fixes | 2 | 5min | 2.5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (4min), 02-01 (5min), 03-01 (9min), 04-01 (2min)
+- Last 5 plans: 01-02 (4min), 02-01 (5min), 03-01 (9min), 04-01 (2min), 04-02 (3min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -75,6 +75,10 @@ Recent decisions affecting current work:
 - [04-01]: Disabled vue/multi-word-component-names, vue/no-reserved-component-names, and vue/require-default-prop -- intentional project patterns.
 - [04-01]: Debounce guard sets respondedThisTurn BEFORE game logic so button disables immediately regardless of nBackIndex.
 - [04-01]: History cap uses slice(-maxHistory) to keep most recent entries, preserving nBack lookback correctness.
+- [04-02]: localStorage references remain in migrateFromLocalStorage() -- required to read/remove old data during one-time migration.
+- [04-02]: AchievementToast uses local ref cache for unlocked IDs loaded on mount, avoiding async on every achievement check.
+- [04-02]: showTutorial defaults to false to prevent tutorial flash on returning users during async Preferences load.
+- [04-02]: loadPersistedState called before tutorialCompleted check in App.vue onMounted to ensure gameStore data is ready first.
 
 ### Pending Todos
 
@@ -88,5 +92,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 04-01-PLAN.md (ESLint + Prettier Setup and Game Logic Bug Fixes)
+Stopped at: Completed 04-02-PLAN.md (Capacitor Preferences Migration)
 Resume file: None
