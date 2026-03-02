@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-02T02:26:35Z"
+last_updated: "2026-03-02T02:32:00Z"
 progress:
   total_phases: 9
   completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 9
+  completed_plans: 9
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** The n-back gameplay loop must feel incredible -- responsive, satisfying, impossible to put down.
-**Current focus:** Phase 5 in progress: Store Extraction (1 of 3 plans done). audioStore and persistenceStore created.
+**Current focus:** Phase 5 in progress: Store Extraction (2 of 3 plans done). gameStore refactored to delegate to audioStore/persistenceStore.
 
 ## Current Position
 
 Phase: 5 of 9 (Store Extraction)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In Progress
-Last activity: 2026-03-02 -- Completed 05-01 (Store File Creation)
+Last activity: 2026-03-02 -- Completed 05-02 (Store Delegation)
 
-Progress: [█████░░░░░] 53%
+Progress: [██████░░░░] 59%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 5min
-- Total execution time: 0.6 hours
+- Total plans completed: 9
+- Average duration: 4min
+- Total execution time: 0.7 hours
 
 **By Phase:**
 
@@ -44,10 +44,10 @@ Progress: [█████░░░░░] 53%
 | 02-tailwind-migration | 1 | 5min | 5min |
 | 03-capacitor-migration | 1 | 9min | 9min |
 | 04-linting-bug-fixes | 3 | 8min | 2.7min |
-| 05-store-extraction | 1 | 2min | 2min |
+| 05-store-extraction | 2 | 4min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (9min), 04-01 (2min), 04-02 (3min), 04-03 (3min), 05-01 (2min)
+- Last 5 plans: 04-01 (2min), 04-02 (3min), 04-03 (3min), 05-01 (2min), 05-02 (2min)
 - Trend: stable/fast
 
 *Updated after each plan completion*
@@ -85,6 +85,8 @@ Recent decisions affecting current work:
 - [05-01]: Used plain let variables (not refs) for AudioContext and buffers in audioStore to avoid Pinia DevTools serialization warnings.
 - [05-01]: Called init() eagerly inside audioStore setup function to preserve module-load-time initialization behavior.
 - [05-01]: persistenceStore checks Preferences for _migrated flag before checking its own migrated ref, matching exact current gameStore behavior.
+- [05-02]: Cross-store refs (useAudioStore/usePersistenceStore) placed before any await in gameStore setup -- Pinia composition rule.
+- [05-02]: persistenceStore is the single gateway for @capacitor/preferences -- no component imports Preferences directly.
 
 ### Pending Todos
 
@@ -98,5 +100,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 05-01-PLAN.md (Store File Creation)
+Stopped at: Completed 05-02-PLAN.md (Store Delegation)
 Resume file: None
