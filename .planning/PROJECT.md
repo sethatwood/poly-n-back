@@ -43,22 +43,21 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 
 ### Active
 
-<!-- Next milestone: TBD -->
+<!-- Current milestone: v2.0 Monetized Platform -->
 
-(None yet — define with `/gsd:new-milestone`)
+- [ ] App store packaging and submission (iOS + Android)
+- [ ] Laravel API backend on Forge (Sanctum auth, social logins Google/Apple, session sync, subscription webhooks)
+- [ ] RevenueCat subscription integration ($4.99/mo or $29.99/yr)
+- [ ] User accounts and cross-device progress sync
+- [ ] Stats dashboard and progression system
+- [ ] Additional game modes (Zen, Time Attack, Endless, Daily Challenge)
+- [ ] Marketing site at polynback.com + web teaser
+- [ ] polynback.fun → polynback.com cutover
+- [ ] Fresh visual identity / brand refresh
 
 ### Out of Scope
 
-- Laravel API backend on Forge — M2 (auth via Sanctum, social logins Google/Apple, session sync, subscription webhooks)
-- RevenueCat subscription integration — M2 ($4.99/mo or $29.99/yr, handles Apple StoreKit + Google Play Billing)
-- User accounts and cross-device progress sync — M2
-- Stats dashboard and progression system (session history, per-attribute accuracy, streaks) — M2
-- Additional game modes (Zen, Time Attack, Endless, Daily Challenge) — M2
-- New attributes (sound, size, rotation, 2D grid) — M2+
-- App store packaging and submission (iOS + Android) — M2
-- Marketing site at polynback.com + web teaser (limited free play, funnels to app stores) — M2
-- polynback.fun → polynback.com cutover — M2 launch
-- Fresh visual identity / brand refresh — M2
+- New attributes (sound, size, rotation, 2D grid) — future
 - Social features (leaderboards, sharing) — future
 - Ads of any kind — never (focus is sacred in cognitive training)
 - Service worker / PWA — iOS WKWebView doesn't support service workers; Capacitor bundles assets natively
@@ -69,11 +68,11 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 
 ## Context
 
-**Product status:** v1.0 "Harden the Foundation" shipped 2026-03-02. The codebase has been transformed from a working-but-fragile state into a production-ready foundation: modern toolchain, full TypeScript strict mode, 58 automated tests with CI pipeline, clean architecture with separated stores and composables, and native platform features. Live at polynback.fun via GitHub Pages.
+**Product status:** v1.0 "Harden the Foundation" shipped 2026-03-02. v2.0 "Monetized Platform" in progress — adding backend, monetization, app store submission, and game experience features. Live at polynback.fun via GitHub Pages.
 
 **Codebase:** 4,235 LOC TypeScript + Vue. Tech stack: Vue 3.5, Vite 7, Pinia 3, Tailwind 4, Capacitor 8, TypeScript strict mode. 103 commits across 10 phases, 24 plans in v1.0.
 
-**What's next:** The foundation is solid. Next milestone should focus on whatever gets the app into users' hands — likely app store submission, monetization infrastructure, or new game features.
+**Current milestone:** v2.0 Monetized Platform — get the app into users' hands and generating revenue. Backend infrastructure, subscription monetization, app store submission, stats/progression, game modes, and marketing site.
 
 **Market context:** Brain training app market is $10B+ with 19% CAGR. Poly N-Back differentiates by being the only poly (4+ attribute) n-back training app, grounded in the actual science. Competitive landscape documented in `poly-n-back-analysis.md`.
 
@@ -119,4 +118,4 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 | App ID com.polynback | Aligns with future polynback.com domain | ✓ Good |
 
 ---
-*Last updated: 2026-03-02 after v1.0 milestone*
+*Last updated: 2026-03-02 after v2.0 milestone start*
