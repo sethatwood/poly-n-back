@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { useGameStore } from './store/gameStore';
+import { useGameStore } from './stores/gameStore';
 
 export default {
   name: 'IntroContent',

@@ -16,7 +16,7 @@
 
 <script>
 import { ref, watch } from 'vue';
-import { useGameStore } from './store/gameStore';
+import { useGameStore } from './stores/gameStore';
 import { useManagedTimeout } from './composables/useManagedTimeout';
 
 export default {

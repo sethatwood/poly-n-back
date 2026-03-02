@@ -239,7 +239,7 @@
 <script>
 import { onMounted, onUnmounted, ref, watch, computed } from 'vue';
 import { Preferences } from '@capacitor/preferences';
-import { useGameStore } from './store/gameStore';
+import { useGameStore } from './stores/gameStore';
 import { useManagedTimeout } from './composables/useManagedTimeout';
 import volumeUpIcon from './assets/volume-up-solid.svg';
 import volumeMuteIcon from './assets/volume-mute-solid.svg';

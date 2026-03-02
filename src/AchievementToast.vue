@@ -32,7 +32,7 @@
 <script>
 import { ref, watch, onMounted } from 'vue';
 import { Preferences } from '@capacitor/preferences';
-import { useGameStore } from './store/gameStore';
+import { useGameStore } from './stores/gameStore';
 import { useManagedTimeout } from './composables/useManagedTimeout';
 
 // Achievement definitions
