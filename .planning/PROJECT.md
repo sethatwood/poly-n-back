@@ -46,8 +46,8 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 <!-- Current milestone: v2.0 Monetized Platform -->
 
 - [ ] App store packaging and submission (iOS + Android)
-- [ ] Laravel API backend on Forge (Sanctum auth, social logins Google/Apple, session sync, subscription webhooks)
-- [ ] RevenueCat subscription integration ($4.99/mo or $29.99/yr)
+- [ ] Laravel API backend on Forge (Sanctum auth, social logins Google/Apple, session sync)
+- [ ] One-time in-app purchase ($3.99) via App Store / Google Play
 - [ ] User accounts and cross-device progress sync
 - [ ] Stats dashboard and progression system
 - [ ] Additional game modes (Zen, Time Attack, Endless, Daily Challenge)
@@ -59,6 +59,8 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 
 - New attributes (sound, size, rotation, 2D grid) — future
 - Social features (leaderboards, sharing) — future
+- Subscription model — M3 (one-time purchase first, subscription layer later if warranted)
+- RevenueCat — M3 (not needed for one-time IAP; revisit if adding subscription)
 - Ads of any kind — never (focus is sacred in cognitive training)
 - Service worker / PWA — iOS WKWebView doesn't support service workers; Capacitor bundles assets natively
 - Dark mode toggle — app is already dark-themed; toggle adds complexity without value
@@ -72,7 +74,7 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 
 **Codebase:** 4,235 LOC TypeScript + Vue. Tech stack: Vue 3.5, Vite 7, Pinia 3, Tailwind 4, Capacitor 8, TypeScript strict mode. 103 commits across 10 phases, 24 plans in v1.0.
 
-**Current milestone:** v2.0 Monetized Platform — get the app into users' hands and generating revenue. Backend infrastructure, subscription monetization, app store submission, stats/progression, game modes, and marketing site.
+**Current milestone:** v2.0 Monetized Platform — get the app into users' hands and generating revenue. Backend infrastructure, $3.99 one-time IAP, app store submission, stats/progression, game modes, and marketing site.
 
 **Market context:** Brain training app market is $10B+ with 19% CAGR. Poly N-Back differentiates by being the only poly (4+ attribute) n-back training app, grounded in the actual science. Competitive landscape documented in `poly-n-back-analysis.md`.
 
@@ -96,7 +98,7 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 ## Constraints
 
 - **Developer capacity**: Solo developer, evenings and weekends on top of 50hr/week day job — quality over speed
-- **Budget**: Bootstrapped. Apple Developer $99/yr, Google Play $25, RevenueCat free tier
+- **Budget**: Bootstrapped. Apple Developer $99/yr, Google Play $25
 - **Stack**: Vue 3 + Vite + Pinia + Tailwind + Capacitor (decided — no framework switches)
 - **Deployment**: polynback.fun via GitHub Pages stays live; feat/gsd branch not yet merged to main
 - **Charm preservation**: The game feels good to play. Changes must protect or enhance this, never regress it
@@ -106,7 +108,7 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Stay with Vue 3 + Capacitor (not React Native/Expo) | Tried rebuild — lost the charm. Existing codebase works, dev has Laravel+Vue expertise | ✓ Good |
-| Freemium + subscription, no ads | Focus is sacred in cognitive training. $4.99/mo or $29.99/yr via RevenueCat | — Pending (M2) |
+| Freemium + one-time purchase, no ads | $3.99 one-time unlock. Free = core quad capped at 2-back. Paid = all levels, modes, stats. Subscription deferred to M3 | — Pending (M2) |
 | polynback.com as production domain | .fun stays as legacy, .com is the brand going forward | — Pending (M2) |
 | Laravel backend for API | Dev's professional stack, hosts other production sites on Forge | — Pending (M2) |
 | Dependency updates first in M1 | All subsequent work should build on current foundation, not stale deps | ✓ Good — clean foundation enabled fast execution |
