@@ -118,10 +118,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. All Pinia stores and composables have explicit type annotations with no implicit any
   4. TypeScript strict mode is fully enabled (strict: true in tsconfig.json)
   5. vue-tsc --noEmit passes with zero errors
-**Plans:** 3 plans
-- [ ] 07-01-PLAN.md -- TypeScript infrastructure, domain types, entry point migration, ESLint TS config
-- [ ] 07-02-PLAN.md -- Convert stores and composables to TypeScript with full type annotations
-- [ ] 07-03-PLAN.md -- Convert all Vue components to script setup lang="ts", finalize strict mode
+**Plans:** 4 plans
+- [x] 07-01-PLAN.md -- TypeScript infrastructure, domain types, entry point migration, ESLint TS config
+- [x] 07-02-PLAN.md -- Convert stores and composables to TypeScript with full type annotations
+- [x] 07-03-PLAN.md -- Convert all Vue components to script setup lang="ts", finalize strict mode
+- [x] 07-04-PLAN.md -- Complex component TypeScript migration and tsconfig finalization
 
 ### Phase 8: Testing & CI
 **Goal**: The codebase has comprehensive automated test coverage and a CI pipeline that catches regressions on every push
@@ -134,7 +135,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Integration tests verify full game flows (start to game over, menu to game to pause to resume to game over)
   5. Playwright E2E tests run against WebKit and Chromium targets
   6. CI pipeline runs type-check, unit tests, and build on every push to the repository
-**Plans**: TBD
+**Plans:** 4 plans
+- [x] 08-01-PLAN.md -- Vitest infrastructure, test mocks, npm scripts
+- [x] 08-02-PLAN.md -- Store unit tests (gameStore, audioStore, persistenceStore)
+- [x] 08-03-PLAN.md -- Store integration tests (game flows, composables)
+- [x] 08-04-PLAN.md -- Playwright E2E smoke tests and GitHub Actions CI pipeline
 
 ### Phase 9: Platform Polish
 **Goal**: The app behaves like a native mobile application with crash visibility and platform-appropriate feedback
@@ -159,6 +164,6 @@ Phases execute in numeric order: 1 to 2 to 3 to 4 to 5 to 6 to 7 to 8 to 9
 | 4. Linting & Bug Fixes | 3/3 | Complete | 2026-03-01 |
 | 5. Store Extraction | 3/3 | Complete | 2026-03-01 |
 | 6. Component Extraction | 2/2 | Complete | 2026-03-02 |
-| 7. TypeScript Migration | 0/? | Not started | - |
-| 8. Testing & CI | 0/? | Not started | - |
+| 7. TypeScript Migration | 4/4 | Complete | 2026-03-02 |
+| 8. Testing & CI | 4/4 | Complete | 2026-03-02 |
 | 9. Platform Polish | 0/? | Not started | - |

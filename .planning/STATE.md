@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-02T14:48:50Z"
+last_updated: "2026-03-02T14:55:21Z"
 progress:
   total_phases: 9
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 21
-  completed_plans: 20
+  completed_plans: 21
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** The n-back gameplay loop must feel incredible -- responsive, satisfying, impossible to put down.
-**Current focus:** Phase 8 in progress: Testing and CI. 58 tests passing (unit + integration) across 5 test files. Store unit tests complete. CI pipeline plan remaining.
+**Current focus:** Phase 8 complete: Testing and CI. 58 unit/integration tests + 4 E2E smoke tests across 6 test files. CI pipeline with type-check, unit, build, and E2E jobs. Phase 9 (Platform Polish) next.
 
 ## Current Position
 
-Phase: 8 of 9 (Testing & CI)
-Plan: 3 of 4 in current phase
-Status: In Progress
-Last activity: 2026-03-02 -- Completed 08-03 (Store Integration Tests)
+Phase: 8 of 9 (Testing & CI) -- COMPLETE
+Plan: 4 of 4 in current phase
+Status: Phase 8 Complete
+Last activity: 2026-03-02 -- Completed 08-04 (E2E & CI Pipeline)
 
-Progress: [█████████░] 95%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 21
 - Average duration: 3.1min
-- Total execution time: 1.07 hours
+- Total execution time: 1.13 hours
 
 **By Phase:**
 
@@ -47,14 +47,14 @@ Progress: [█████████░] 95%
 | 05-store-extraction | 3 | 6min | 2min |
 | 06-component-extraction | 2 | 4min | 2min |
 | 07-typescript-migration | 4 | 14min | 3.5min |
-| 08-testing-ci | 3 | 8min | 2.7min |
+| 08-testing-ci | 4 | 12min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 07-03 (2min), 07-04 (6min), 08-01 (2min), 08-02 (2min), 08-03 (2min)
+- Last 5 plans: 07-04 (6min), 08-01 (2min), 08-02 (2min), 08-03 (2min), 08-04 (4min)
 - Trend: stable/fast
 
 *Updated after each plan completion*
-| Phase 08 P02 | 4min | 3 tasks | 4 files |
+| Phase 08 P04 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -119,6 +119,9 @@ Recent decisions affecting current work:
 - [Phase 08]: [08-02]: Removed smoke.test.ts from Plan 01 -- infrastructure verification superseded by real tests
 - [Phase 08]: [08-03]: withSetup helper creates minimal Vue app with createPinia for composable lifecycle context in tests
 - [Phase 08]: [08-03]: driveToGameOver helper encapsulates deterministic 3-strike sequence for test reuse
+- [Phase 08]: [08-04]: E2E tests use text content and ARIA role selectors for resilience, not CSS class selectors
+- [Phase 08]: [08-04]: webServer command runs build && preview so E2E tests always run against fresh build
+- [Phase 08]: [08-04]: CI check and e2e jobs run independently (not sequentially) for faster feedback
 
 ### Pending Todos
 
@@ -132,5 +135,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 08-02-PLAN.md (Store Unit Tests)
+Stopped at: Completed 08-04-PLAN.md (E2E & CI Pipeline)
 Resume file: None
