@@ -118,7 +118,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. All Pinia stores and composables have explicit type annotations with no implicit any
   4. TypeScript strict mode is fully enabled (strict: true in tsconfig.json)
   5. vue-tsc --noEmit passes with zero errors
-**Plans**: TBD
+**Plans:** 3 plans
+- [ ] 07-01-PLAN.md -- TypeScript infrastructure, domain types, entry point migration, ESLint TS config
+- [ ] 07-02-PLAN.md -- Convert stores and composables to TypeScript with full type annotations
+- [ ] 07-03-PLAN.md -- Convert all Vue components to script setup lang="ts", finalize strict mode
 
 ### Phase 8: Testing & CI
 **Goal**: The codebase has comprehensive automated test coverage and a CI pipeline that catches regressions on every push
