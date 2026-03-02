@@ -1,17 +1,20 @@
 <template>
   <Transition name="modal">
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div
+      v-if="show"
+      class="fixed inset-0 z-50 flex items-center justify-center"
+    >
       <!-- Backdrop -->
       <div class="absolute inset-0 bg-[#0c1222]/95 backdrop-blur-xs"></div>
 
       <!-- Modal Content -->
-      <div class="relative z-10 w-full max-w-sm mx-4 p-6 bg-slate-800 rounded-2xl shadow-2xl border border-slate-700">
+      <div
+        class="relative z-10 w-full max-w-sm mx-4 p-6 bg-slate-800 rounded-2xl shadow-2xl border border-slate-700"
+      >
         <!-- Paused Header -->
         <div class="text-center mb-6">
           <div class="text-4xl mb-3">⏸️</div>
-          <h2 class="text-2xl font-bold text-white">
-            Paused
-          </h2>
+          <h2 class="text-2xl font-bold text-white">Paused</h2>
         </div>
 
         <!-- Current Progress -->
@@ -29,14 +32,14 @@
         <!-- Action Buttons -->
         <div class="space-y-3">
           <button
-            @click="$emit('resume')"
             class="w-full py-4 px-6 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-600/25"
+            @click="$emit('resume')"
           >
             Resume
           </button>
           <button
-            @click="$emit('quit')"
             class="w-full py-3 px-6 bg-slate-700 hover:bg-slate-600 text-gray-300 font-medium rounded-xl transition-all duration-200"
+            @click="$emit('quit')"
           >
             Quit to Menu
           </button>
@@ -52,18 +55,18 @@ export default {
   props: {
     show: {
       type: Boolean,
-      required: true
+      required: true,
     },
     score: {
       type: Number,
-      required: true
+      required: true,
     },
     strikes: {
       type: Number,
-      required: true
-    }
+      required: true,
+    },
   },
-  emits: ['resume', 'quit']
+  emits: ['resume', 'quit'],
 };
 </script>
 
@@ -89,4 +92,3 @@ export default {
   transition: transform 0.2s ease;
 }
 </style>
-

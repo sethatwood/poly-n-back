@@ -4,7 +4,9 @@
       v-if="currentHint"
       class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-40 pointer-events-none"
     >
-      <div class="bg-slate-800/95 backdrop-blur-xs text-white px-4 py-2 rounded-full shadow-lg text-sm flex items-center gap-2 max-w-xs">
+      <div
+        class="bg-slate-800/95 backdrop-blur-xs text-white px-4 py-2 rounded-full shadow-lg text-sm flex items-center gap-2 max-w-xs"
+      >
         <span class="text-lg">{{ currentHint.icon }}</span>
         <span class="text-gray-200">{{ currentHint.text }}</span>
       </div>
@@ -28,23 +30,23 @@ export default {
       firstMatch: {
         icon: '👀',
         text: 'Now watch for matches!',
-        priority: 2
+        priority: 2,
       },
       twoStrikes: {
         icon: '⚠️',
         text: 'One strike left — be careful!',
-        priority: 3
+        priority: 3,
       },
       goodStreak: {
         icon: '🔥',
-        text: 'You\'re on fire! Keep it up!',
-        priority: 2
+        text: "You're on fire! Keep it up!",
+        priority: 2,
       },
       lowTime: {
         icon: '⚡',
         text: 'Decide quickly!',
-        priority: 2
-      }
+        priority: 2,
+      },
     };
 
     const showHint = (hintKey, force = false) => {
@@ -69,49 +71,72 @@ export default {
     };
 
     // Watch for when game becomes "ready" (no longer early)
-    watch(() => gameStore.isEarlyInGame, (isEarly, wasEarly) => {
-      if (wasEarly && !isEarly && !gameStore.isStopped) {
-        showHint('firstMatch');
-      }
-    });
+    watch(
+      () => gameStore.isEarlyInGame,
+      (isEarly, wasEarly) => {
+        if (wasEarly && !isEarly && !gameStore.isStopped) {
+          showHint('firstMatch');
+        }
+      },
+    );
 
     // Watch for two strikes
-    watch(() => gameStore.incorrectResponses, (strikes) => {
-      if (strikes === 2 && !gameStore.isStopped) {
-        showHint('twoStrikes');
-      }
-    });
+    watch(
+      () => gameStore.incorrectResponses,
+      (strikes) => {
+        if (strikes === 2 && !gameStore.isStopped) {
+          showHint('twoStrikes');
+        }
+      },
+    );
 
     // Watch for good scoring streaks (3+ in a row without strike)
     const lastStrikeCount = ref(0);
-    watch(() => gameStore.score, (newScore, oldScore) => {
-      if (newScore > oldScore) {
-        const scoreSinceLastStrike = newScore - lastStrikeCount.value;
-        if (scoreSinceLastStrike >= 3 && scoreSinceLastStrike % 3 === 0) {
-          showHint('goodStreak', true);
+    watch(
+      () => gameStore.score,
+      (newScore, oldScore) => {
+        if (newScore > oldScore) {
+          const scoreSinceLastStrike = newScore - lastStrikeCount.value;
+          if (scoreSinceLastStrike >= 3 && scoreSinceLastStrike % 3 === 0) {
+            showHint('goodStreak', true);
+          }
         }
-      }
-    });
+      },
+    );
 
-    watch(() => gameStore.incorrectResponses, (strikes) => {
-      lastStrikeCount.value = gameStore.score;
-    });
+    watch(
+      () => gameStore.incorrectResponses,
+      (strikes) => {
+        lastStrikeCount.value = gameStore.score;
+      },
+    );
 
     // Watch for low time
-    watch(() => gameStore.timeLeft, (time) => {
-      if (time === 1 && !gameStore.isEarlyInGame && !gameStore.isPaused && !shownHints.value.has('lowTime')) {
-        showHint('lowTime');
-      }
-    });
+    watch(
+      () => gameStore.timeLeft,
+      (time) => {
+        if (
+          time === 1 &&
+          !gameStore.isEarlyInGame &&
+          !gameStore.isPaused &&
+          !shownHints.value.has('lowTime')
+        ) {
+          showHint('lowTime');
+        }
+      },
+    );
 
     // Reset hints when game restarts
-    watch(() => gameStore.isStopped, (stopped, wasStopped) => {
-      if (wasStopped && !stopped) {
-        // Game restarted - reset shown hints
-        shownHints.value.clear();
-        lastStrikeCount.value = 0;
-      }
-    });
+    watch(
+      () => gameStore.isStopped,
+      (stopped, wasStopped) => {
+        if (wasStopped && !stopped) {
+          // Game restarted - reset shown hints
+          shownHints.value.clear();
+          lastStrikeCount.value = 0;
+        }
+      },
+    );
 
     // Cleanup
     onUnmounted(() => {
@@ -121,9 +146,9 @@ export default {
     });
 
     return {
-      currentHint
+      currentHint,
     };
-  }
+  },
 };
 </script>
 
@@ -143,4 +168,3 @@ export default {
   transform: translate(-50%, -10px);
 }
 </style>
-

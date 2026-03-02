@@ -1,136 +1,204 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center overflow-hidden game-background">
+  <div
+    class="min-h-screen flex items-center justify-center overflow-hidden game-background"
+  >
     <Transition name="screen-fade" mode="out-in">
-      <div v-if="showModal" key="menu" class="max-w-xl mx-auto flex items-center text-white" id="howToPlayModal">
+      <div
+        v-if="showModal"
+        id="howToPlayModal"
+        key="menu"
+        class="max-w-xl mx-auto flex items-center text-white"
+      >
         <div class="relative mx-auto p-5 container">
-        <IntroHead />
-        <ConfigStart
-          :nBack="Number(nBackInput)"
-          :timeLeft="Number(timeLeftInput)"
-          @update:nBack="nBackInput = $event"
-          @update:timeLeft="timeLeftInput = $event"
-          @startGame="startGame"
+          <IntroHead />
+          <ConfigStart
+            :n-back="Number(nBackInput)"
+            :time-left="Number(timeLeftInput)"
+            @update:n-back="nBackInput = $event"
+            @update:time-left="timeLeftInput = $event"
+            @start-game="startGame"
+          />
+          <IntroContent
+            :n-back="gameStore.nBack"
+            @show-tutorial="showTutorial = true"
+          />
+          <Footer />
+        </div>
+      </div>
+      <div
+        v-else
+        key="game"
+        class="w-screen max-w-md mx-auto px-4 text-center uppercase text-white relative"
+      >
+        <div class="mt-4">
+          <p
+            class="countdown-text transition-all duration-200"
+            :class="{
+              'text-amber-500 animate-pulse-urgent':
+                gameStore.timeLeft <= 2 && !gameStore.isPaused,
+              'scale-110': gameStore.timeLeft <= 1 && !gameStore.isPaused,
+            }"
+          >
+            {{ gameStore.timeLeft }}
+          </p>
+        </div>
+        <!-- Feedback Indicator (centered below timer) -->
+        <div class="h-4 flex items-center justify-center mb-2">
+          <Transition name="feedback-subtle">
+            <div
+              v-if="showFeedbackToast"
+              :class="[
+                'text-xs font-medium',
+                gameStore.lastFeedback.type === 'correct'
+                  ? 'text-emerald-400'
+                  : 'text-red-400',
+              ]"
+            >
+              {{ gameStore.lastFeedback.type === 'correct' ? '✓' : '✗' }}
+            </div>
+          </Transition>
+        </div>
+        <Stimulus
+          class="mb-3"
+          :color="gameStore.currentStimulus.color"
+          :emoji="gameStore.currentStimulus.emoji"
+          :position="gameStore.currentStimulus.position"
+          :shape="gameStore.currentStimulus.shape"
+          :flash-border="gameStore.flashBorder"
         />
-        <IntroContent :n-back="gameStore.nBack" @showTutorial="showTutorial = true" />
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            v-for="button in responseButtons"
+            :key="button.type"
+            class="w-full transform transition-all duration-150"
+            :disabled="
+              gameStore.respondedThisTurn[button.type] ||
+              gameStore.isEarlyInGame ||
+              gameStore.isPaused
+            "
+            :class="[
+              buttonClass(
+                gameStore.respondedThisTurn[button.type],
+                gameStore.isEarlyInGame,
+                gameStore.isPaused,
+              ),
+              feedbackClass(button.type),
+            ]"
+            @click="respond(button.type)"
+          >
+            {{ button.label }}
+          </button>
+        </div>
+
+        <div class="text-center">
+          <div v-if="!gameStore.isStopped" class="strikes-score">
+            <div
+              class="mt-4 text-sm uppercase text-red-500 flex items-center justify-center transition-transform"
+              :class="{ 'animate-strike-shake': strikeAnimating }"
+            >
+              <span class="text-2xl font-bold">{{
+                gameStore.incorrectResponses
+              }}</span
+              >&nbsp;Strikes
+            </div>
+            <div
+              class="text-sm uppercase text-emerald-400 flex items-center justify-center"
+              :class="{ 'animate-score-pulse': scoreAnimating }"
+            >
+              <span class="text-3xl font-bold">{{ gameStore.score }}</span>
+            </div>
+          </div>
+          <div v-else class="text-sm uppercase">
+            <p
+              class="mt-4 text-sm uppercase text-red-500 flex items-center justify-center"
+            >
+              Game Over
+            </p>
+            <p
+              class="mt-1 text-sm uppercase text-gray-500 flex items-center justify-center"
+            >
+              Final Score:
+            </p>
+            <div
+              class="text-xs uppercase text-green-500 flex items-center justify-center"
+            >
+              <span class="text-3xl font-bold">{{ gameStore.score }}</span>
+              &nbsp;of&nbsp;
+              <span class="text-xl font-bold">{{
+                gameStore.previousPotentialCorrectAnswers
+              }}</span>
+              &nbsp;Possible Points
+              <span class="ml-1 text-lg font-bold"
+                >({{ gameStore.finalScoreAccuracy }}%)</span
+              >
+            </div>
+          </div>
+          <p class="mt-2 text-sm uppercase text-gray-500">
+            High Score: {{ gameStore.highScoreData.score }}/{{
+              gameStore.highScoreData.potentialCorrectAnswers
+            }}
+            ({{ gameStore.highScoreAccuracy }}%)
+            <span v-if="gameStore.highScoreData.nBack"
+              >N={{ gameStore.highScoreData.nBack }}</span
+            >
+            <span class="p-1 cursor-pointer" @click="resetHighScore">
+              &#x24E7;</span
+            >
+          </p>
+        </div>
+        <div v-if="gameStore.isStopped || gameStore.incorrectResponses >= 3">
+          <ConfigStart
+            :n-back="Number(nBackInput)"
+            :time-left="Number(timeLeftInput)"
+            @update:n-back="nBackInput = $event"
+            @update:time-left="timeLeftInput = $event"
+            @start-game="startGame"
+          />
+        </div>
+        <div class="mt-3">
+          <button
+            class="text-xs text-gray-600 bg-gray-600 hover:bg-gray-500 p-1 rounded-full focus:outline-hidden"
+            @click="toggleAudio"
+          >
+            <img
+              v-if="gameStore.isAudioEnabled"
+              class="h-5 w-5"
+              :src="volumeUpIcon"
+              alt="Volume Up"
+            />
+            <img
+              v-else
+              class="h-5 w-5"
+              :src="volumeMuteIcon"
+              alt="Volume Mute"
+            />
+          </button>
+        </div>
         <Footer />
       </div>
-    </div>
-    <div v-else key="game" class="w-screen max-w-md mx-auto px-4 text-center uppercase text-white relative">
-      <div class="mt-4">
-        <p
-          class="countdown-text transition-all duration-200"
-          :class="{
-            'text-amber-500 animate-pulse-urgent': gameStore.timeLeft <= 2 && !gameStore.isPaused,
-            'scale-110': gameStore.timeLeft <= 1 && !gameStore.isPaused
-          }"
-        >{{ gameStore.timeLeft }}</p>
-      </div>
-      <!-- Feedback Indicator (centered below timer) -->
-      <div class="h-4 flex items-center justify-center mb-2">
-        <Transition name="feedback-subtle">
-          <div
-            v-if="showFeedbackToast"
-            :class="[
-              'text-xs font-medium',
-              gameStore.lastFeedback.type === 'correct'
-                ? 'text-emerald-400'
-                : 'text-red-400'
-            ]"
-          >
-            {{ gameStore.lastFeedback.type === 'correct' ? '✓' : '✗' }}
-          </div>
-        </Transition>
-      </div>
-      <Stimulus
-        class="mb-3"
-        :color="gameStore.currentStimulus.color"
-        :emoji="gameStore.currentStimulus.emoji"
-        :position="gameStore.currentStimulus.position"
-        :shape="gameStore.currentStimulus.shape"
-        :flashBorder="gameStore.flashBorder"
-      />
-      <div class="grid grid-cols-2 gap-3">
-        <button
-          v-for="button in responseButtons"
-          :key="button.type"
-          class="w-full transform transition-all duration-150"
-          :disabled="gameStore.respondedThisTurn[button.type] || gameStore.isEarlyInGame || gameStore.isPaused"
-          :class="[
-            buttonClass(gameStore.respondedThisTurn[button.type], gameStore.isEarlyInGame, gameStore.isPaused),
-            feedbackClass(button.type)
-          ]"
-          @click="respond(button.type)"
-        >
-          {{ button.label }}
-        </button>
-      </div>
-
-      <div class="text-center">
-        <div v-if="!gameStore.isStopped" class="strikes-score">
-          <div
-            class="mt-4 text-sm uppercase text-red-500 flex items-center justify-center transition-transform"
-            :class="{ 'animate-strike-shake': strikeAnimating }"
-          >
-            <span class="text-2xl font-bold">{{ gameStore.incorrectResponses }}</span>&nbsp;Strikes
-          </div>
-          <div
-            class="text-sm uppercase text-emerald-400 flex items-center justify-center"
-            :class="{ 'animate-score-pulse': scoreAnimating }"
-          >
-            <span class="text-3xl font-bold">{{ gameStore.score }}</span>
-          </div>
-        </div>
-        <div v-else class="text-sm uppercase">
-          <p class="mt-4 text-sm uppercase text-red-500 flex items-center justify-center">
-            Game Over
-          </p>
-          <p class="mt-1 text-sm uppercase text-gray-500 flex items-center justify-center">
-            Final Score:
-          </p>
-          <div class="text-xs uppercase text-green-500 flex items-center justify-center">
-            <span class="text-3xl font-bold">{{ gameStore.score }}</span>
-            &nbsp;of&nbsp;
-            <span class="text-xl font-bold">{{ gameStore.previousPotentialCorrectAnswers }}</span>
-            &nbsp;Possible Points
-            <span class="ml-1 text-lg font-bold">({{ gameStore.finalScoreAccuracy }}%)</span>
-          </div>
-        </div>
-        <p class="mt-2 text-sm uppercase text-gray-500">
-          High Score: {{ gameStore.highScoreData.score }}/{{ gameStore.highScoreData.potentialCorrectAnswers }}
-          ({{ gameStore.highScoreAccuracy }}%)
-          <span v-if="gameStore.highScoreData.nBack">N={{ gameStore.highScoreData.nBack }}</span>
-          <span class="p-1 cursor-pointer" @click="resetHighScore"> &#x24E7;</span>
-        </p>
-      </div>
-      <div v-if="gameStore.isStopped || gameStore.incorrectResponses >= 3">
-        <ConfigStart
-          :nBack="Number(nBackInput)"
-          :timeLeft="Number(timeLeftInput)"
-          @update:nBack="nBackInput = $event"
-          @update:timeLeft="timeLeftInput = $event"
-          @startGame="startGame"
-        />
-      </div>
-      <div class="mt-3">
-        <button class="text-xs text-gray-600 bg-gray-600 hover:bg-gray-500 p-1 rounded-full focus:outline-hidden" @click="toggleAudio">
-          <img v-if="gameStore.isAudioEnabled" class="h-5 w-5" :src="volumeUpIcon" alt="Volume Up" />
-          <img v-else class="h-5 w-5" :src="volumeMuteIcon" alt="Volume Mute" />
-        </button>
-      </div>
-      <Footer />
-    </div>
     </Transition>
 
     <!-- Pause Button (outside transition, viewport top right) -->
     <button
       v-if="!showModal && !gameStore.isStopped"
-      @click="handlePause"
       class="fixed right-4 p-2 text-gray-500 hover:text-white transition-colors z-30"
       style="top: calc(env(safe-area-inset-top, 0px) + 1rem)"
       title="Pause"
+      @click="handlePause"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
     </button>
 
@@ -153,21 +221,18 @@
     <GameOverModal
       :show="gameStore.showGameOverModal"
       :score="gameStore.score"
-      :possiblePoints="gameStore.previousPotentialCorrectAnswers"
+      :possible-points="gameStore.previousPotentialCorrectAnswers"
       :accuracy="gameStore.finalScoreAccuracy"
-      :nBack="gameStore.nBack"
+      :n-back="gameStore.nBack"
       :timer="Number(timeLeftInput)"
-      :isNewHighScore="gameStore.isNewHighScore"
+      :is-new-high-score="gameStore.isNewHighScore"
       @close="handleGameOverClose"
-      @playAgain="handlePlayAgain"
-      @mainMenu="handleMainMenu"
+      @play-again="handlePlayAgain"
+      @main-menu="handleMainMenu"
     />
 
     <!-- First-time Tutorial -->
-    <TutorialOverlay
-      :show="showTutorial"
-      @complete="handleTutorialComplete"
-    />
+    <TutorialOverlay :show="showTutorial" @complete="handleTutorialComplete" />
   </div>
 </template>
 
@@ -219,20 +284,30 @@ export default {
     };
 
     // Watch for score changes to trigger animation
-    watch(() => gameStore.score, (newScore, oldScore) => {
-      if (newScore > oldScore) {
-        scoreAnimating.value = true;
-        setTimeout(() => { scoreAnimating.value = false; }, 400);
-      }
-    });
+    watch(
+      () => gameStore.score,
+      (newScore, oldScore) => {
+        if (newScore > oldScore) {
+          scoreAnimating.value = true;
+          setTimeout(() => {
+            scoreAnimating.value = false;
+          }, 400);
+        }
+      },
+    );
 
     // Watch for strike changes to trigger animation
-    watch(() => gameStore.incorrectResponses, (newStrikes, oldStrikes) => {
-      if (newStrikes > oldStrikes) {
-        strikeAnimating.value = true;
-        setTimeout(() => { strikeAnimating.value = false; }, 500);
-      }
-    });
+    watch(
+      () => gameStore.incorrectResponses,
+      (newStrikes, oldStrikes) => {
+        if (newStrikes > oldStrikes) {
+          strikeAnimating.value = true;
+          setTimeout(() => {
+            strikeAnimating.value = false;
+          }, 500);
+        }
+      },
+    );
 
     watch(nBackInput, (newNBack) => {
       gameStore.nBack = newNBack;
@@ -282,15 +357,18 @@ export default {
     let feedbackTimeout = null;
 
     // Watch for feedback changes and auto-hide after 1 second
-    watch(() => gameStore.lastFeedback.timestamp, (newTimestamp) => {
-      if (newTimestamp && gameStore.lastFeedback.type) {
-        feedbackVisible.value = true;
-        if (feedbackTimeout) clearTimeout(feedbackTimeout);
-        feedbackTimeout = setTimeout(() => {
-          feedbackVisible.value = false;
-        }, 2000);
-      }
-    });
+    watch(
+      () => gameStore.lastFeedback.timestamp,
+      (newTimestamp) => {
+        if (newTimestamp && gameStore.lastFeedback.type) {
+          feedbackVisible.value = true;
+          if (feedbackTimeout) clearTimeout(feedbackTimeout);
+          feedbackTimeout = setTimeout(() => {
+            feedbackVisible.value = false;
+          }, 2000);
+        }
+      },
+    );
 
     const showFeedbackToast = computed(() => feedbackVisible.value);
 
@@ -396,13 +474,21 @@ export default {
 
 /* Strike shake animation */
 @keyframes strike-shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
-  10%, 30%, 50%, 70%, 90% {
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
     transform: translateX(-4px);
   }
-  20%, 40%, 60%, 80% {
+  20%,
+  40%,
+  60%,
+  80% {
     transform: translateX(4px);
   }
 }
@@ -415,7 +501,8 @@ export default {
 
 /* Timer urgency pulse */
 @keyframes pulse-urgent {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -432,7 +519,9 @@ export default {
 /* Screen transitions */
 .screen-fade-enter-active,
 .screen-fade-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
 }
 
 .screen-fade-enter-from {

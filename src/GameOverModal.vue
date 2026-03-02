@@ -1,6 +1,9 @@
 <template>
   <Transition name="modal">
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div
+      v-if="show"
+      class="fixed inset-0 z-50 flex items-center justify-center"
+    >
       <!-- Backdrop -->
       <div
         class="absolute inset-0 bg-[#0c1222]/95 backdrop-blur-xs"
@@ -8,7 +11,9 @@
       ></div>
 
       <!-- Modal Content -->
-      <div class="relative z-10 w-full max-w-sm mx-4 p-6 bg-slate-800 rounded-2xl shadow-2xl border border-slate-700">
+      <div
+        class="relative z-10 w-full max-w-sm mx-4 p-6 bg-slate-800 rounded-2xl shadow-2xl border border-slate-700"
+      >
         <!-- Game Over Header -->
         <div class="text-center mb-6">
           <h2 class="text-2xl font-bold text-red-400 mb-1 animate-pulse-once">
@@ -19,7 +24,9 @@
 
         <!-- New High Score Celebration -->
         <div v-if="isNewHighScore" class="mb-6 text-center">
-          <div class="inline-block px-4 py-2 bg-linear-to-r from-yellow-500/20 to-orange-500/20 rounded-full border border-yellow-500/50">
+          <div
+            class="inline-block px-4 py-2 bg-linear-to-r from-yellow-500/20 to-orange-500/20 rounded-full border border-yellow-500/50"
+          >
             <span class="text-yellow-400 font-bold animate-bounce-subtle">
               🏆 New High Score! 🏆
             </span>
@@ -28,7 +35,9 @@
 
         <!-- Score Display -->
         <div class="text-center mb-6">
-          <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">Final Score</div>
+          <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">
+            Final Score
+          </div>
           <div class="flex items-baseline justify-center gap-2">
             <span class="text-5xl font-bold text-green-400 animate-score-pop">
               {{ score }}
@@ -37,10 +46,7 @@
             <span class="text-2xl text-gray-400">{{ possiblePoints }}</span>
           </div>
           <div class="mt-2 text-lg">
-            <span
-              class="font-semibold"
-              :class="accuracyColorClass"
-            >
+            <span class="font-semibold" :class="accuracyColorClass">
               {{ accuracy }}% Accuracy
             </span>
           </div>
@@ -61,14 +67,14 @@
         <!-- Action Buttons -->
         <div class="space-y-3">
           <button
-            @click="$emit('playAgain')"
             class="w-full py-4 px-6 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-600/25"
+            @click="$emit('playAgain')"
           >
             Play Again
           </button>
           <button
-            @click="$emit('mainMenu')"
             class="w-full py-3 px-6 bg-slate-700 hover:bg-slate-600 text-gray-300 font-medium rounded-xl transition-all duration-200"
+            @click="$emit('mainMenu')"
           >
             Main Menu
           </button>
@@ -86,32 +92,32 @@ export default {
   props: {
     show: {
       type: Boolean,
-      required: true
+      required: true,
     },
     score: {
       type: Number,
-      required: true
+      required: true,
     },
     possiblePoints: {
       type: Number,
-      required: true
+      required: true,
     },
     accuracy: {
       type: Number,
-      required: true
+      required: true,
     },
     nBack: {
       type: Number,
-      required: true
+      required: true,
     },
     timer: {
       type: Number,
-      required: true
+      required: true,
     },
     isNewHighScore: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   emits: ['close', 'playAgain', 'mainMenu'],
   setup(props) {
@@ -123,9 +129,9 @@ export default {
     });
 
     return {
-      accuracyColorClass
+      accuracyColorClass,
     };
-  }
+  },
 };
 </script>
 
@@ -172,7 +178,8 @@ export default {
 
 /* Pulse once animation */
 @keyframes pulse-once {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -186,7 +193,8 @@ export default {
 
 /* Subtle bounce for high score */
 @keyframes bounce-subtle {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -198,4 +206,3 @@ export default {
   animation: bounce-subtle 1s ease-in-out infinite;
 }
 </style>
-

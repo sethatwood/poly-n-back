@@ -5,9 +5,14 @@
       <div class="absolute inset-0 bg-[#0c1222]"></div>
 
       <!-- Tutorial Content -->
-      <div class="relative h-full flex flex-col items-center justify-center text-white p-6 safe-area-padding">
+      <div
+        class="relative h-full flex flex-col items-center justify-center text-white p-6 safe-area-padding"
+      >
         <!-- Progress dots -->
-        <div class="absolute flex gap-2" style="top: calc(env(safe-area-inset-top, 0px) + 1.5rem)">
+        <div
+          class="absolute flex gap-2"
+          style="top: calc(env(safe-area-inset-top, 0px) + 1.5rem)"
+        >
           <div
             v-for="(_, index) in steps"
             :key="index"
@@ -23,7 +28,9 @@
             <div class="text-6xl mb-6">{{ steps[currentStep].icon }}</div>
 
             <!-- Title -->
-            <h2 class="text-2xl font-bold mb-4">{{ steps[currentStep].title }}</h2>
+            <h2 class="text-2xl font-bold mb-4">
+              {{ steps[currentStep].title }}
+            </h2>
 
             <!-- Description -->
             <p class="text-gray-300 text-lg mb-8 leading-relaxed">
@@ -32,13 +39,17 @@
 
             <!-- Visual example if present -->
             <div v-if="steps[currentStep].example" class="mb-8">
-              <div class="inline-flex items-center gap-4 bg-slate-800/50 px-6 py-4 rounded-xl">
+              <div
+                class="inline-flex items-center gap-4 bg-slate-800/50 px-6 py-4 rounded-xl"
+              >
                 <div
                   v-for="(item, i) in steps[currentStep].example"
                   :key="i"
                   class="flex flex-col items-center gap-2"
                 >
-                  <div class="text-3xl" :class="item.color">{{ item.emoji }}</div>
+                  <div class="text-3xl" :class="item.color">
+                    {{ item.emoji }}
+                  </div>
                   <div class="text-xs text-gray-400">{{ item.label }}</div>
                 </div>
               </div>
@@ -47,18 +58,21 @@
         </Transition>
 
         <!-- Navigation -->
-        <div class="absolute flex items-center gap-4" style="bottom: calc(env(safe-area-inset-bottom, 0px) + 2rem)">
+        <div
+          class="absolute flex items-center gap-4"
+          style="bottom: calc(env(safe-area-inset-bottom, 0px) + 2rem)"
+        >
           <button
             v-if="currentStep > 0"
-            @click="prevStep"
             class="px-6 py-3 text-gray-400 hover:text-white transition-colors"
+            @click="prevStep"
           >
             ← Back
           </button>
 
           <button
-            @click="nextStep"
             class="px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-semibold transition-all transform hover:scale-105"
+            @click="nextStep"
           >
             {{ currentStep === steps.length - 1 ? "Let's Play!" : 'Next →' }}
           </button>
@@ -66,9 +80,9 @@
 
         <!-- Skip button -->
         <button
-          @click="skip"
           class="absolute right-6 text-gray-500 hover:text-white text-sm transition-colors"
           style="top: calc(env(safe-area-inset-top, 0px) + 1.5rem)"
+          @click="skip"
         >
           Skip Tutorial
         </button>
@@ -85,8 +99,8 @@ export default {
   props: {
     show: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   emits: ['complete'],
   setup(props, { emit }) {
@@ -96,37 +110,42 @@ export default {
       {
         icon: '🧠',
         title: 'Train Your Working Memory',
-        description: 'Poly N-Back is a scientifically-backed brain training game that challenges your working memory — the mental workspace you use every day.',
+        description:
+          'Poly N-Back is a scientifically-backed brain training game that challenges your working memory — the mental workspace you use every day.',
       },
       {
         icon: '👀',
         title: 'Watch & Remember',
-        description: 'Each round, you\'ll see a stimulus with 4 attributes: Color, Emoji, Position, and Shape. Your job is to remember what you saw N steps ago.',
+        description:
+          "Each round, you'll see a stimulus with 4 attributes: Color, Emoji, Position, and Shape. Your job is to remember what you saw N steps ago.",
         example: [
           { emoji: '🟣', label: 'Color' },
           { emoji: '🔥', label: 'Emoji' },
           { emoji: '📍', label: 'Position' },
           { emoji: '⬛', label: 'Shape' },
-        ]
+        ],
       },
       {
         icon: '🔙',
         title: 'N-Back Matching',
-        description: 'If any attribute matches what appeared N turns ago (default is 2), tap that button! For example, if the color now matches the color from 2 turns back, tap "Color".',
+        description:
+          'If any attribute matches what appeared N turns ago (default is 2), tap that button! For example, if the color now matches the color from 2 turns back, tap "Color".',
       },
       {
         icon: '✅',
         title: 'Score Points, Avoid Strikes',
-        description: 'Correct matches earn points. Wrong taps give you strikes. Three strikes and the game ends. Try to build the highest score!',
+        description:
+          'Correct matches earn points. Wrong taps give you strikes. Three strikes and the game ends. Try to build the highest score!',
         example: [
           { emoji: '✓', label: '+1 Point', color: 'text-green-500' },
           { emoji: '✗', label: '+1 Strike', color: 'text-red-500' },
-        ]
+        ],
       },
       {
         icon: '🚀',
         title: 'Ready to Begin?',
-        description: 'Start with the default settings and work your way up. The first few turns won\'t have matches — that\'s normal! The game needs to build history first.',
+        description:
+          "Start with the default settings and work your way up. The first few turns won't have matches — that's normal! The game needs to build history first.",
       },
     ];
 
@@ -160,7 +179,7 @@ export default {
       prevStep,
       skip,
     };
-  }
+  },
 };
 </script>
 
@@ -192,4 +211,3 @@ export default {
   transform: translateX(-20px);
 }
 </style>
-

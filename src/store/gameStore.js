@@ -57,7 +57,7 @@ const audioManager = {
     source.buffer = this.buffers[soundName];
     source.connect(this.context.destination);
     source.start(0);
-  }
+  },
 };
 
 // Initialize audio manager
@@ -76,11 +76,19 @@ export const useGameStore = defineStore('game', () => {
     { color: 'green', emoji: 'flower', position: 'right', shape: 'circle' },
   ]);
   const flashBorder = ref(false);
-  const highScoreData = ref(JSON.parse(localStorage.getItem('highScoreData')) || { score: 0, potentialCorrectAnswers: 0, nBack: null });
+  const highScoreData = ref(
+    JSON.parse(localStorage.getItem('highScoreData')) || {
+      score: 0,
+      potentialCorrectAnswers: 0,
+      nBack: null,
+    },
+  );
   const incorrectResponses = ref(0);
   const isNewHighScore = ref(false);
   const showGameOverModal = ref(false);
-  const isAudioEnabled = ref(JSON.parse(localStorage.getItem('isAudioEnabled')) ?? true);
+  const isAudioEnabled = ref(
+    JSON.parse(localStorage.getItem('isAudioEnabled')) ?? true,
+  );
   const isDeterministic = ref(false);
   const isPaused = ref(false);
   const isStopped = ref(false);
@@ -96,8 +104,8 @@ export const useGameStore = defineStore('game', () => {
     shape: false,
   });
   const lastFeedback = ref({
-    type: null,      // 'correct' or 'incorrect'
-    button: null,    // which button was pressed
+    type: null, // 'correct' or 'incorrect'
+    button: null, // which button was pressed
     timestamp: null, // for animation timing
   });
   const score = ref(0);
@@ -113,7 +121,9 @@ export const useGameStore = defineStore('game', () => {
 
   const finalScoreAccuracy = computed(() => {
     if (potentialCorrectAnswers.value === 0) return 0;
-    return Math.round((score.value / previousPotentialCorrectAnswers.value) * 100);
+    return Math.round(
+      (score.value / previousPotentialCorrectAnswers.value) * 100,
+    );
   });
 
   const highScoreAccuracy = computed(() => {
@@ -159,21 +169,28 @@ export const useGameStore = defineStore('game', () => {
     potentialCorrectAnswers.value = previousPotentialCorrectAnswers.value;
 
     if (isDeterministic.value) {
-      currentStimulus.value = deterministicStimuli.value[deterministicIndex.value];
-      deterministicIndex.value = (deterministicIndex.value + 1) % deterministicStimuli.value.length;
+      currentStimulus.value =
+        deterministicStimuli.value[deterministicIndex.value];
+      deterministicIndex.value =
+        (deterministicIndex.value + 1) % deterministicStimuli.value.length;
     } else {
       currentStimulus.value = generateRandomStimulus();
     }
 
     // Increase potential correct answers after enough history is available
     if (stimulusHistory.value.length >= nBack.value) {
-      const nBackStimulus = stimulusHistory.value[stimulusHistory.value.length - nBack.value];
+      const nBackStimulus =
+        stimulusHistory.value[stimulusHistory.value.length - nBack.value];
       let potentialMatches = 0;
 
-      if (nBackStimulus.color === currentStimulus.value.color) potentialMatches++;
-      if (nBackStimulus.emoji === currentStimulus.value.emoji) potentialMatches++;
-      if (nBackStimulus.position === currentStimulus.value.position) potentialMatches++;
-      if (nBackStimulus.shape === currentStimulus.value.shape) potentialMatches++;
+      if (nBackStimulus.color === currentStimulus.value.color)
+        potentialMatches++;
+      if (nBackStimulus.emoji === currentStimulus.value.emoji)
+        potentialMatches++;
+      if (nBackStimulus.position === currentStimulus.value.position)
+        potentialMatches++;
+      if (nBackStimulus.shape === currentStimulus.value.shape)
+        potentialMatches++;
 
       previousPotentialCorrectAnswers.value += potentialMatches;
     }
@@ -188,7 +205,10 @@ export const useGameStore = defineStore('game', () => {
 
   function toggleAudio() {
     isAudioEnabled.value = !isAudioEnabled.value;
-    localStorage.setItem('isAudioEnabled', JSON.stringify(isAudioEnabled.value));
+    localStorage.setItem(
+      'isAudioEnabled',
+      JSON.stringify(isAudioEnabled.value),
+    );
   }
 
   // Unlock audio on iOS - call this on first user interaction
@@ -275,12 +295,15 @@ export const useGameStore = defineStore('game', () => {
     if (nBackIndex >= 0) {
       const nBackStimulus = stimulusHistory.value[nBackIndex];
 
-      const isCorrect = (
-        stimulusType === 'color' && currentStimulus.value.color === nBackStimulus.color ||
-        stimulusType === 'emoji' && currentStimulus.value.emoji === nBackStimulus.emoji ||
-        stimulusType === 'position' && currentStimulus.value.position === nBackStimulus.position ||
-        stimulusType === 'shape' && currentStimulus.value.shape === nBackStimulus.shape
-      );
+      const isCorrect =
+        (stimulusType === 'color' &&
+          currentStimulus.value.color === nBackStimulus.color) ||
+        (stimulusType === 'emoji' &&
+          currentStimulus.value.emoji === nBackStimulus.emoji) ||
+        (stimulusType === 'position' &&
+          currentStimulus.value.position === nBackStimulus.position) ||
+        (stimulusType === 'shape' &&
+          currentStimulus.value.shape === nBackStimulus.shape);
 
       // Set feedback state for visual effects
       lastFeedback.value = {
@@ -297,23 +320,35 @@ export const useGameStore = defineStore('game', () => {
         incorrectResponses.value += 1;
 
         if (incorrectResponses.value >= 3) {
-          const currentAccuracy = Math.round((score.value / previousPotentialCorrectAnswers.value) * 100);
-          const hsAccuracy = Math.round((highScoreData.value.score / highScoreData.value.potentialCorrectAnswers) * 100);
+          const currentAccuracy = Math.round(
+            (score.value / previousPotentialCorrectAnswers.value) * 100,
+          );
+          const hsAccuracy = Math.round(
+            (highScoreData.value.score /
+              highScoreData.value.potentialCorrectAnswers) *
+              100,
+          );
 
           const isNewHS = score.value > highScoreData.value.score;
-          const isSameScoreButBetterAccuracy = score.value === highScoreData.value.score && currentAccuracy > hsAccuracy;
+          const isSameScoreButBetterAccuracy =
+            score.value === highScoreData.value.score &&
+            currentAccuracy > hsAccuracy;
           const isHigherNBack = nBack.value > highScoreData.value.nBack;
 
           // Track if this is a new high score before updating
-          isNewHighScore.value = isNewHS || isSameScoreButBetterAccuracy || isHigherNBack;
+          isNewHighScore.value =
+            isNewHS || isSameScoreButBetterAccuracy || isHigherNBack;
 
           if (isNewHighScore.value) {
             highScoreData.value = {
               score: score.value,
               potentialCorrectAnswers: previousPotentialCorrectAnswers.value,
-              nBack: nBack.value
+              nBack: nBack.value,
             };
-            localStorage.setItem('highScoreData', JSON.stringify(highScoreData.value));
+            localStorage.setItem(
+              'highScoreData',
+              JSON.stringify(highScoreData.value),
+            );
           }
 
           stopGame();

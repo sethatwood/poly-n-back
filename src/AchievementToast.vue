@@ -5,7 +5,9 @@
       class="fixed left-1/2 transform -translate-x-1/2 z-50"
       style="top: calc(env(safe-area-inset-top, 0px) + 2rem)"
     >
-      <div class="bg-linear-to-r from-amber-600 to-yellow-500 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-amber-500/30 flex items-center gap-4 min-w-[280px]">
+      <div
+        class="bg-linear-to-r from-amber-600 to-yellow-500 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-amber-500/30 flex items-center gap-4 min-w-[280px]"
+      >
         <!-- Trophy icon with animation -->
         <div class="text-4xl animate-bounce-gentle">
           {{ achievement.icon }}
@@ -37,44 +39,44 @@ const ACHIEVEMENTS = {
     id: 'firstGame',
     icon: '🎮',
     title: 'Getting Started',
-    description: 'Play your first game'
+    description: 'Play your first game',
   },
   firstPoint: {
     id: 'firstPoint',
     icon: '⭐',
     title: 'First Match',
-    description: 'Score your first point'
+    description: 'Score your first point',
   },
   perfectRound: {
     id: 'perfectRound',
     icon: '💎',
     title: 'Perfect Memory',
-    description: 'Complete a game with 100% accuracy'
+    description: 'Complete a game with 100% accuracy',
   },
   fiveStreak: {
     id: 'fiveStreak',
     icon: '🔥',
     title: 'On Fire',
-    description: 'Get 5 correct answers in a row'
+    description: 'Get 5 correct answers in a row',
   },
   tenPoints: {
     id: 'tenPoints',
     icon: '🎯',
     title: 'Double Digits',
-    description: 'Score 10 or more points in a single game'
+    description: 'Score 10 or more points in a single game',
   },
   nBack3: {
     id: 'nBack3',
     icon: '🧠',
     title: 'Brain Upgrade',
-    description: 'Play a game at N-Back level 3'
+    description: 'Play a game at N-Back level 3',
   },
   speedDemon: {
     id: 'speedDemon',
     icon: '⚡',
     title: 'Speed Demon',
-    description: 'Score a point with 2-second timer'
-  }
+    description: 'Score a point with 2-second timer',
+  },
 };
 
 export default {
@@ -120,70 +122,82 @@ export default {
     let currentStreak = 0;
 
     // Watch for first game (when game starts)
-    watch(() => gameStore.isStopped, (stopped, wasStopped) => {
-      if (wasStopped && !stopped) {
-        // Game just started
-        unlock('firstGame');
-        currentStreak = 0;
+    watch(
+      () => gameStore.isStopped,
+      (stopped, wasStopped) => {
+        if (wasStopped && !stopped) {
+          // Game just started
+          unlock('firstGame');
+          currentStreak = 0;
 
-        // Check for N-Back 3
-        if (gameStore.nBack >= 3) {
-          unlock('nBack3');
+          // Check for N-Back 3
+          if (gameStore.nBack >= 3) {
+            unlock('nBack3');
+          }
         }
-      }
-    });
+      },
+    );
 
     // Watch for first point
-    watch(() => gameStore.score, (newScore, oldScore) => {
-      if (newScore === 1 && oldScore === 0) {
-        unlock('firstPoint');
-      }
-
-      if (newScore > oldScore) {
-        currentStreak++;
-
-        // Check for 5 streak
-        if (currentStreak >= 5) {
-          unlock('fiveStreak');
+    watch(
+      () => gameStore.score,
+      (newScore, oldScore) => {
+        if (newScore === 1 && oldScore === 0) {
+          unlock('firstPoint');
         }
 
-        // Check for speed demon (2 second timer)
-        if (gameStore.timerInterval <= 2) {
-          unlock('speedDemon');
-        }
-      }
+        if (newScore > oldScore) {
+          currentStreak++;
 
-      // Check for 10 points
-      if (newScore >= 10) {
-        unlock('tenPoints');
-      }
-    });
+          // Check for 5 streak
+          if (currentStreak >= 5) {
+            unlock('fiveStreak');
+          }
+
+          // Check for speed demon (2 second timer)
+          if (gameStore.timerInterval <= 2) {
+            unlock('speedDemon');
+          }
+        }
+
+        // Check for 10 points
+        if (newScore >= 10) {
+          unlock('tenPoints');
+        }
+      },
+    );
 
     // Reset streak on strike
-    watch(() => gameStore.incorrectResponses, (strikes, oldStrikes) => {
-      if (strikes > oldStrikes) {
-        currentStreak = 0;
-      }
-    });
+    watch(
+      () => gameStore.incorrectResponses,
+      (strikes, oldStrikes) => {
+        if (strikes > oldStrikes) {
+          currentStreak = 0;
+        }
+      },
+    );
 
     // Watch for game over (check perfect round)
-    watch(() => gameStore.showGameOverModal, (showing) => {
-      if (showing) {
-        const accuracy = gameStore.finalScoreAccuracy;
-        if (accuracy === 100 && gameStore.score > 0) {
-          unlock('perfectRound');
+    watch(
+      () => gameStore.showGameOverModal,
+      (showing) => {
+        if (showing) {
+          const accuracy = gameStore.finalScoreAccuracy;
+          if (accuracy === 100 && gameStore.score > 0) {
+            unlock('perfectRound');
+          }
         }
-      }
-    });
+      },
+    );
 
     onUnmounted(() => {
       if (toastTimeout.value) clearTimeout(toastTimeout.value);
     });
 
     return {
-      achievement
+      achievement,
     };
-  }
+  },
 };
 </script>
 
@@ -204,7 +218,8 @@ export default {
 }
 
 @keyframes bounce-gentle {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -216,4 +231,3 @@ export default {
   animation: bounce-gentle 0.6s ease-in-out infinite;
 }
 </style>
-

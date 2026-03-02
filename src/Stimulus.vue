@@ -1,7 +1,13 @@
 <template>
   <div class="flex justify-center space-x-2">
-    <div v-for="cellPosition in ['left', 'center', 'right']" :key="cellPosition"
-         :class="[cellClass, 'flex-1 h-32 bg-slate-950 rounded-md flex items-center justify-center relative overflow-hidden']">
+    <div
+      v-for="cellPosition in ['left', 'center', 'right']"
+      :key="cellPosition"
+      :class="[
+        cellClass,
+        'flex-1 h-32 bg-slate-950 rounded-md flex items-center justify-center relative overflow-hidden',
+      ]"
+    >
       <template v-if="position === cellPosition">
         <!-- Shape with animation -->
         <div
@@ -16,15 +22,18 @@
         <span
           v-if="gameStore.currentStimulus.emoji === 'fire'"
           :class="['emoji', animationClass]"
-        >🔥</span>
+          >🔥</span
+        >
         <span
           v-if="gameStore.currentStimulus.emoji === 'ice'"
           :class="['emoji', animationClass]"
-        >🧊</span>
+          >🧊</span
+        >
         <span
           v-if="gameStore.currentStimulus.emoji === 'flower'"
           :class="['emoji', animationClass]"
-        >🌸</span>
+          >🌸</span
+        >
       </template>
     </div>
   </div>
@@ -35,7 +44,7 @@ import { computed } from 'vue';
 import { useGameStore } from './store/gameStore';
 
 export default {
-  name: "Stimulus",
+  name: 'Stimulus',
   props: {
     color: String,
     emoji: String,
@@ -54,17 +63,24 @@ export default {
   computed: {
     colorClass() {
       switch (this.color) {
-        case 'purple': return 'text-purple-500';
-        case 'green': return 'text-emerald-500';
-        case 'blue': return 'text-blue-500';
-        default: return '';
+        case 'purple':
+          return 'text-purple-500';
+        case 'green':
+          return 'text-emerald-500';
+        case 'blue':
+          return 'text-blue-500';
+        default:
+          return '';
       }
     },
     shapeClass() {
       switch (this.shape) {
-        case 'circle': return 'w-20 h-20 rounded-full bg-current shadow-lg shadow-current/30';
-        case 'square': return 'w-20 h-20 bg-current shadow-lg shadow-current/30';
-        default: return '';
+        case 'circle':
+          return 'w-20 h-20 rounded-full bg-current shadow-lg shadow-current/30';
+        case 'square':
+          return 'w-20 h-20 bg-current shadow-lg shadow-current/30';
+        default:
+          return '';
       }
     },
     cellClass() {
