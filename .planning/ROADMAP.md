@@ -21,6 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 7: TypeScript Migration** - Full type safety with incremental strict mode adoption
 - [ ] **Phase 8: Testing & CI** - Vitest unit/integration tests, Playwright E2E, CI pipeline
 - [ ] **Phase 9: Platform Polish** - Auto-pause, haptic feedback, Sentry crash reporting
+- [ ] **Phase 10: Tech Debt Cleanup** - Fix lint errors, add lint to CI, re-enable vue/block-lang, fix docs
 
 ## Phase Details
 
@@ -153,10 +154,23 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] 09-01-PLAN.md -- Install @capacitor/app + @capacitor/haptics, wire auto-pause and haptic feedback
 - [ ] 09-02-PLAN.md -- Wire @sentry/capacitor + @sentry/vue crash reporting with environment config
 
+### Phase 10: Tech Debt Cleanup
+**Goal**: All addressable tech debt from the milestone audit is resolved so M2 builds on a clean foundation
+**Depends on**: Phase 8 (CI pipeline exists), Phase 9 (all phases complete)
+**Requirements**: DEPS-08 (lint regression fix)
+**Gap Closure:** Closes LINT-CI-GAP integration gap and 5 tech debt items from v1.0 audit
+**Success Criteria** (what must be TRUE):
+  1. `npm run lint` passes with zero errors on all source and test files
+  2. CI `check` job includes `npm run lint` step
+  3. `vue/block-lang` ESLint rule is re-enabled and enforces `lang="ts"` on all components
+  4. DEPS-06 description in REQUIREMENTS.md matches actual migration path (direct 5→8)
+  5. No `any` casts without explicit `eslint-disable-next-line` justification comments
+**Plans:** TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 to 2 to 3 to 4 to 5 to 6 to 7 to 8 to 9
+Phases execute in numeric order: 1 to 2 to 3 to 4 to 5 to 6 to 7 to 8 to 9 to 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -168,4 +182,5 @@ Phases execute in numeric order: 1 to 2 to 3 to 4 to 5 to 6 to 7 to 8 to 9
 | 6. Component Extraction | 2/2 | Complete | 2026-03-02 |
 | 7. TypeScript Migration | 4/4 | Complete | 2026-03-02 |
 | 8. Testing & CI | 4/4 | Complete | 2026-03-02 |
-| 9. Platform Polish | 0/? | Not started | - |
+| 9. Platform Polish | 2/2 | Complete | 2026-03-02 |
+| 10. Tech Debt Cleanup | 0/? | Not started | - |
