@@ -1,77 +1,12 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { Preferences } from '@capacitor/preferences';
-import stimulusSoundUrl from '../assets/stimulus.wav';
-import incrementSoundUrl from '../assets/ting.mp3';
-import strikeSoundUrl from '../assets/whip.mp3';
-
-// Web Audio API manager - much better iOS support for concurrent sounds
-const audioManager = {
-  context: null,
-  buffers: {},
-  unlocked: false,
-  ready: false,
-
-  async init() {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) {
-        console.warn('AudioContext not available. Game will run silently.');
-        return;
-      }
-      this.context = new AudioCtx();
-      await Promise.allSettled([
-        this.loadSound('stimulus', stimulusSoundUrl),
-        this.loadSound('increment', incrementSoundUrl),
-        this.loadSound('strike', strikeSoundUrl),
-      ]);
-      this.ready = true;
-    } catch (e) {
-      console.warn('Audio initialization failed. Game will run silently.', e);
-      this.context = null;
-      this.ready = false;
-    }
-  },
-
-  async loadSound(name, url) {
-    try {
-      const response = await fetch(url);
-      const arrayBuffer = await response.arrayBuffer();
-      this.buffers[name] = await this.context.decodeAudioData(arrayBuffer);
-    } catch (error) {
-      console.warn(`Failed to load sound: ${name}`, error);
-    }
-  },
-
-  // Call this on first user interaction to unlock audio on iOS
-  unlock() {
-    if (this.unlocked || !this.ready || !this.context) return;
-    if (this.context.state === 'suspended') {
-      this.context.resume();
-    }
-    this.unlocked = true;
-  },
-
-  play(soundName) {
-    if (!this.ready || !this.context || !this.buffers[soundName]) return;
-    try {
-      if (this.context.state === 'suspended') {
-        this.context.resume();
-      }
-      const source = this.context.createBufferSource();
-      source.buffer = this.buffers[soundName];
-      source.connect(this.context.destination);
-      source.start(0);
-    } catch (e) {
-      console.warn(`Audio playback failed for "${soundName}":`, e);
-    }
-  },
-};
-
-// Initialize audio manager
-audioManager.init();
+import { useAudioStore } from './audioStore';
+import { usePersistenceStore } from './persistenceStore';
 
 export const useGameStore = defineStore('game', () => {
+  // Cross-store references -- MUST come before any await (Pinia composition rule)
+  const audioStore = useAudioStore();
+  const persistenceStore = usePersistenceStore();
   // ---- State (refs) ----
   const currentStimulus = ref({});
   const deterministicIndex = ref(0);
@@ -117,67 +52,15 @@ export const useGameStore = defineStore('game', () => {
   const timeLeft = ref(5);
   const timer = ref(null);
 
-  // ---- Persistence helpers ----
-  async function loadPreference(key, defaults) {
-    try {
-      const { value } = await Preferences.get({ key });
-      if (value === null) return defaults;
-      const parsed = JSON.parse(value);
-      // Schema validation: type must match defaults type
-      if (typeof parsed !== typeof defaults) return defaults;
-      // For objects, verify expected keys exist
-      if (
-        typeof defaults === 'object' &&
-        defaults !== null &&
-        !Array.isArray(defaults)
-      ) {
-        for (const k of Object.keys(defaults)) {
-          if (!(k in parsed)) return defaults;
-        }
-      }
-      return parsed;
-    } catch {
-      return defaults;
-    }
-  }
-
-  async function savePreference(key, data) {
-    try {
-      await Preferences.set({ key, value: JSON.stringify(data) });
-    } catch (e) {
-      console.warn(`Storage write failed for key "${key}":`, e);
-    }
-  }
-
-  async function migrateFromLocalStorage() {
-    const migrated = await Preferences.get({ key: '_migrated' });
-    if (migrated.value) return;
-
-    // Migrate each key
-    const keys = [
-      'highScoreData',
-      'isAudioEnabled',
-      'achievements',
-      'tutorialCompleted',
-    ];
-    for (const key of keys) {
-      const value = localStorage.getItem(key);
-      if (value !== null) {
-        await Preferences.set({ key, value });
-        localStorage.removeItem(key);
-      }
-    }
-    await Preferences.set({ key: '_migrated', value: 'true' });
-  }
-
+  // ---- Persistence ----
   async function loadPersistedState() {
-    await migrateFromLocalStorage();
-    highScoreData.value = await loadPreference('highScoreData', {
+    await persistenceStore.migrateFromLocalStorage();
+    highScoreData.value = await persistenceStore.loadPreference('highScoreData', {
       score: 0,
       potentialCorrectAnswers: 0,
       nBack: null,
     });
-    isAudioEnabled.value = await loadPreference('isAudioEnabled', true);
+    isAudioEnabled.value = await persistenceStore.loadPreference('isAudioEnabled', true);
   }
 
   // ---- Getters (computed) ----
@@ -279,17 +162,17 @@ export const useGameStore = defineStore('game', () => {
 
   function toggleAudio() {
     isAudioEnabled.value = !isAudioEnabled.value;
-    savePreference('isAudioEnabled', isAudioEnabled.value);
+    persistenceStore.savePreference('isAudioEnabled', isAudioEnabled.value);
   }
 
   // Unlock audio on iOS - call this on first user interaction
   function unlockAudio() {
-    audioManager.unlock();
+    audioStore.unlock();
   }
 
   function playSound(soundName) {
     if (isAudioEnabled.value) {
-      audioManager.play(soundName);
+      audioStore.play(soundName);
     }
   }
 
@@ -327,7 +210,7 @@ export const useGameStore = defineStore('game', () => {
 
   function resetHighScore() {
     highScoreData.value = { score: 0, potentialCorrectAnswers: 0 };
-    savePreference('highScoreData', highScoreData.value);
+    persistenceStore.savePreference('highScoreData', highScoreData.value);
   }
 
   function startGame(timeLeftParam = 5) {
@@ -426,7 +309,7 @@ export const useGameStore = defineStore('game', () => {
               potentialCorrectAnswers: previousPotentialCorrectAnswers.value,
               nBack: nBack.value,
             };
-            savePreference('highScoreData', highScoreData.value);
+            persistenceStore.savePreference('highScoreData', highScoreData.value);
           }
 
           stopGame();
