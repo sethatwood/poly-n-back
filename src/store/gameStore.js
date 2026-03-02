@@ -120,7 +120,7 @@ export const useGameStore = defineStore('game', () => {
   });
 
   const finalScoreAccuracy = computed(() => {
-    if (potentialCorrectAnswers.value === 0) return 0;
+    if (previousPotentialCorrectAnswers.value === 0) return 0;
     return Math.round(
       (score.value / previousPotentialCorrectAnswers.value) * 100,
     );
@@ -196,6 +196,13 @@ export const useGameStore = defineStore('game', () => {
     }
 
     stimulusHistory.value.push({ ...currentStimulus.value });
+
+    // FIX-04: Cap stimulus history to prevent unbounded memory growth
+    const maxHistory = nBack.value + 50;
+    if (stimulusHistory.value.length > maxHistory) {
+      stimulusHistory.value = stimulusHistory.value.slice(-maxHistory);
+    }
+
     flashBorder.value = true;
     playSound('stimulus');
     setTimeout(() => {
@@ -290,6 +297,10 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function respondToStimulus(stimulusType) {
+    // FIX-03: Debounce guard -- block rapid taps on the same button per turn
+    if (respondedThisTurn.value[stimulusType]) return;
+    respondedThisTurn.value[stimulusType] = true;
+
     const nBackIndex = stimulusHistory.value.length - nBack.value - 1;
 
     if (nBackIndex >= 0) {
@@ -320,14 +331,20 @@ export const useGameStore = defineStore('game', () => {
         incorrectResponses.value += 1;
 
         if (incorrectResponses.value >= 3) {
-          const currentAccuracy = Math.round(
-            (score.value / previousPotentialCorrectAnswers.value) * 100,
-          );
-          const hsAccuracy = Math.round(
-            (highScoreData.value.score /
-              highScoreData.value.potentialCorrectAnswers) *
-              100,
-          );
+          const currentAccuracy =
+            previousPotentialCorrectAnswers.value === 0
+              ? 0
+              : Math.round(
+                  (score.value / previousPotentialCorrectAnswers.value) * 100,
+                );
+          const hsAccuracy =
+            highScoreData.value.potentialCorrectAnswers === 0
+              ? 0
+              : Math.round(
+                  (highScoreData.value.score /
+                    highScoreData.value.potentialCorrectAnswers) *
+                    100,
+                );
 
           const isNewHS = score.value > highScoreData.value.score;
           const isSameScoreButBetterAccuracy =
@@ -356,7 +373,6 @@ export const useGameStore = defineStore('game', () => {
         }
       }
     }
-    respondedThisTurn.value[stimulusType] = true;
   }
 
   return {
