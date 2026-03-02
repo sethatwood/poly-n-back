@@ -1,10 +1,17 @@
-import { ref, computed, watch } from 'vue';
+import { type ComputedRef, ref, computed, watch } from 'vue';
+import type { StimulusAttribute } from '@/types/game';
+import type { useGameStore } from '@/stores/gameStore';
 import { useManagedTimeout } from './useManagedTimeout';
 
-export function useFeedback(gameStore) {
+type GameStore = ReturnType<typeof useGameStore>;
+
+export function useFeedback(gameStore: GameStore): {
+  showFeedbackToast: ComputedRef<boolean>
+  feedbackClass: (buttonType: StimulusAttribute) => string
+} {
   const { managedSetTimeout, clearManagedTimeout } = useManagedTimeout();
   const feedbackVisible = ref(false);
-  let feedbackTimeoutId = null;
+  let feedbackTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   watch(
     () => gameStore.lastFeedback.timestamp,
@@ -21,7 +28,7 @@ export function useFeedback(gameStore) {
 
   const showFeedbackToast = computed(() => feedbackVisible.value);
 
-  const feedbackClass = (buttonType) => {
+  const feedbackClass = (buttonType: StimulusAttribute): string => {
     const feedback = gameStore.lastFeedback;
     if (feedback.button === buttonType && feedback.type) {
       return feedback.type === 'correct'

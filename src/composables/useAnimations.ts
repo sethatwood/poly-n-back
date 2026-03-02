@@ -1,14 +1,20 @@
-import { ref, watch } from 'vue';
+import { type Ref, ref, watch } from 'vue';
+import type { useGameStore } from '@/stores/gameStore';
 import { useManagedTimeout } from './useManagedTimeout';
 
-export function useAnimations(gameStore) {
+type GameStore = ReturnType<typeof useGameStore>;
+
+export function useAnimations(gameStore: GameStore): {
+  scoreAnimating: Ref<boolean>
+  strikeAnimating: Ref<boolean>
+} {
   const { managedSetTimeout } = useManagedTimeout();
   const scoreAnimating = ref(false);
   const strikeAnimating = ref(false);
 
   watch(
     () => gameStore.score,
-    (newScore, oldScore) => {
+    (newScore: number, oldScore: number) => {
       if (newScore > oldScore) {
         scoreAnimating.value = true;
         managedSetTimeout(() => {
@@ -20,7 +26,7 @@ export function useAnimations(gameStore) {
 
   watch(
     () => gameStore.incorrectResponses,
-    (newStrikes, oldStrikes) => {
+    (newStrikes: number, oldStrikes: number) => {
       if (newStrikes > oldStrikes) {
         strikeAnimating.value = true;
         managedSetTimeout(() => {
