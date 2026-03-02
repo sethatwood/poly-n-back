@@ -37,8 +37,8 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 - [ ] **ARCH-02**: GameScreen component extracted (composes game timer, stimulus, response buttons, score display, game over)
 - [ ] **ARCH-03**: MenuScreen component extracted (composes config, intro content, footer)
 - [ ] **ARCH-04**: Game sub-components extracted: GameTimer, ResponseButtons, ScoreDisplay, GameOverDisplay
-- [ ] **ARCH-05**: audioStore extracted from gameStore (singleton AudioContext, buffer loading, iOS unlock flow)
-- [ ] **ARCH-06**: persistenceStore extracted from gameStore (validated read/write wrapper for @capacitor/preferences)
+- [x] **ARCH-05**: audioStore extracted from gameStore (singleton AudioContext, buffer loading, iOS unlock flow)
+- [x] **ARCH-06**: persistenceStore extracted from gameStore (validated read/write wrapper for @capacitor/preferences)
 - [ ] **ARCH-07**: Composables extracted: useAnimations, useFeedback, useGameLifecycle, useManagedTimeout
 - [ ] **ARCH-08**: gameStore refined to use audioStore and persistenceStore (contains pure game logic only)
 
@@ -159,8 +159,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ARCH-02 | Phase 6: Component Extraction | Pending |
 | ARCH-03 | Phase 6: Component Extraction | Pending |
 | ARCH-04 | Phase 6: Component Extraction | Pending |
-| ARCH-05 | Phase 5: Store Extraction | Pending |
-| ARCH-06 | Phase 5: Store Extraction | Pending |
+| ARCH-05 | Phase 5: Store Extraction | Complete |
+| ARCH-06 | Phase 5: Store Extraction | Complete |
 | ARCH-07 | Phase 5: Store Extraction | Pending |
 | ARCH-08 | Phase 5: Store Extraction | Pending |
 | TS-01 | Phase 7: TypeScript Migration | Pending |
