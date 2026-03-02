@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-02T14:44:57Z"
+last_updated: "2026-03-02T14:48:50Z"
 progress:
   total_phases: 9
   completed_phases: 7
@@ -54,6 +54,7 @@ Progress: [█████████░] 95%
 - Trend: stable/fast
 
 *Updated after each plan completion*
+| Phase 08 P02 | 4min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,9 @@ Recent decisions affecting current work:
 - [Phase 08]: [08-01]: Separate vitest.config.ts instead of merging into vite.config.js to avoid TypeScript/Vite 7 config conflicts
 - [Phase 08]: [08-01]: Class-based AudioContext mock for new AudioCtx() compatibility in audioStore eager init
 - [Phase 08]: [08-01]: Map-based Preferences mock with _reset() for test isolation
+- [Phase 08]: [08-02]: Mocked audioStore/persistenceStore in gameStore tests to isolate game logic from cross-store deps
+- [Phase 08]: [08-02]: vi.resetModules() + dynamic import pattern for audioStore tests (eager init at module scope)
+- [Phase 08]: [08-02]: Removed smoke.test.ts from Plan 01 -- infrastructure verification superseded by real tests
 - [Phase 08]: [08-03]: withSetup helper creates minimal Vue app with createPinia for composable lifecycle context in tests
 - [Phase 08]: [08-03]: driveToGameOver helper encapsulates deterministic 3-strike sequence for test reuse
 
@@ -128,5 +132,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 08-03-PLAN.md (Store Integration Tests)
+Stopped at: Completed 08-02-PLAN.md (Store Unit Tests)
 Resume file: None
