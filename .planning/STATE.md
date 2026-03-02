@@ -5,7 +5,7 @@ milestone_name: milestone
 status: unknown
 last_updated: "2026-03-02T01:19:53.209Z"
 progress:
-  total_phases: 3
+  total_phases: 9
   completed_phases: 3
   total_plans: 4
   completed_plans: 4
