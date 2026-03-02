@@ -15,6 +15,7 @@ describe('full game flow: start -> play -> game over', () => {
     vi.clearAllTimers();
     vi.useRealTimers();
     const { Preferences } = await import('@capacitor/preferences');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: _reset is a test-only method on the Preferences mock
     (Preferences as any)._reset();
   });
 

@@ -28,6 +28,7 @@ export const useAudioStore = defineStore('audio', () => {
   async function init(): Promise<void> {
     try {
       const AudioCtx =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Safari compat: webkitAudioContext is not in the standard Window type definition
         window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtx) {
         console.warn('AudioContext not available. Game will run silently.');

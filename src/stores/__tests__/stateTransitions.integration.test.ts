@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createApp, type App } from 'vue';
+import { createApp } from 'vue';
 import { createPinia, setActivePinia } from 'pinia';
 import { useGameStore } from '@/stores/gameStore';
 import { useGameLifecycle } from '@/composables/useGameLifecycle';
@@ -51,7 +51,6 @@ function driveToGameOver(gameStore: ReturnType<typeof useGameStore>) {
 describe('state transitions: menu -> game -> pause -> resume -> game over -> menu', () => {
   let gameStore: ReturnType<typeof useGameStore>;
   let lifecycle: ReturnType<typeof useGameLifecycle>;
-  let app: App;
 
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -62,7 +61,6 @@ describe('state transitions: menu -> game -> pause -> resume -> game over -> men
 
     const setup = withSetup(gameStore);
     lifecycle = setup.result;
-    app = setup.app;
   });
 
   afterEach(async () => {
@@ -73,6 +71,7 @@ describe('state transitions: menu -> game -> pause -> resume -> game over -> men
     vi.clearAllTimers();
     vi.useRealTimers();
     const { Preferences } = await import('@capacitor/preferences');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: _reset is a test-only method on the Preferences mock
     (Preferences as any)._reset();
   });
 
@@ -223,6 +222,7 @@ describe('cleanup', () => {
     vi.clearAllTimers();
     vi.useRealTimers();
     const { Preferences } = await import('@capacitor/preferences');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: _reset is a test-only method on the Preferences mock
     (Preferences as any)._reset();
   });
 

@@ -89,8 +89,11 @@ describe('audioStore', () => {
 
     it('sets ready=false when AudioContext is not available', async () => {
       // Remove AudioContext and webkitAudioContext from window
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (globalThis as any).AudioContext = undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (window as any).AudioContext = undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (window as any).webkitAudioContext = undefined;
 
       setActivePinia(createPinia());
@@ -151,8 +154,11 @@ describe('audioStore', () => {
     });
 
     it('play is a no-op when ready is false', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (globalThis as any).AudioContext = undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (window as any).AudioContext = undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (window as any).webkitAudioContext = undefined;
       globalThis.fetch = vi.fn() as unknown as typeof fetch;
 
@@ -168,8 +174,11 @@ describe('audioStore', () => {
     });
 
     it('play is a no-op when context is null', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (globalThis as any).AudioContext = undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (window as any).AudioContext = undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (window as any).webkitAudioContext = undefined;
       globalThis.fetch = vi.fn() as unknown as typeof fetch;
 
@@ -268,8 +277,11 @@ describe('audioStore', () => {
     });
 
     it('unlock is a no-op when not ready', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (globalThis as any).AudioContext = undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (window as any).AudioContext = undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: remove browser API to simulate unsupported environment
       (window as any).webkitAudioContext = undefined;
       globalThis.fetch = vi.fn() as unknown as typeof fetch;
 

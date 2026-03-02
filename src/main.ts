@@ -30,6 +30,6 @@ app.mount('#app');
 
 // For debugging: Bind gameStore to the window object
 if (import.meta.env.DEV) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dev-only: expose store on window for console debugging
   (window as any).gameStore = useGameStore();
 }

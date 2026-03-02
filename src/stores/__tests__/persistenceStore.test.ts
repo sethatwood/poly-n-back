@@ -8,6 +8,7 @@ vi.mock('@capacitor/preferences');
 describe('persistenceStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: _reset is a test-only method on the Preferences mock
     (Preferences as any)._reset();
   });
 
@@ -83,11 +84,13 @@ describe('persistenceStore', () => {
     it('handles save failure gracefully', async () => {
       const store = usePersistenceStore();
       const originalSet = Preferences.set;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: override set to simulate disk full error
       (Preferences as any).set = vi.fn().mockRejectedValue(new Error('disk full'));
 
       // Should NOT throw
       await expect(store.savePreference('key', 'data')).resolves.toBeUndefined();
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock: restore original set method after test
       (Preferences as any).set = originalSet;
     });
   });
