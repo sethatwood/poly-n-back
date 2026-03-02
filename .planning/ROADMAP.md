@@ -158,13 +158,14 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Goal**: All addressable tech debt from the milestone audit is resolved so M2 builds on a clean foundation
 **Depends on**: Phase 8 (CI pipeline exists), Phase 9 (all phases complete)
 **Requirements**: DEPS-08 (lint regression fix)
-**Gap Closure:** Closes LINT-CI-GAP integration gap and 5 tech debt items from v1.0 audit
+**Gap Closure:** Closes LINT-CI-GAP integration gap and 6 tech debt items from v1.0 audit
 **Success Criteria** (what must be TRUE):
   1. `npm run lint` passes with zero errors on all source and test files
   2. CI `check` job includes `npm run lint` step
   3. `vue/block-lang` ESLint rule is re-enabled and enforces `lang="ts"` on all components
   4. DEPS-06 description in REQUIREMENTS.md matches actual migration path (direct 5→8)
   5. No `any` casts without explicit `eslint-disable-next-line` justification comments
+  6. Android build compiles and runs in Android Studio without errors
 **Plans:** TBD
 
 ## Progress
