@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
+import { Preferences } from '@capacitor/preferences';
 import stimulusSoundUrl from '../assets/stimulus.wav';
 import incrementSoundUrl from '../assets/ting.mp3';
 import strikeSoundUrl from '../assets/whip.mp3';
@@ -76,19 +77,15 @@ export const useGameStore = defineStore('game', () => {
     { color: 'green', emoji: 'flower', position: 'right', shape: 'circle' },
   ]);
   const flashBorder = ref(false);
-  const highScoreData = ref(
-    JSON.parse(localStorage.getItem('highScoreData')) || {
-      score: 0,
-      potentialCorrectAnswers: 0,
-      nBack: null,
-    },
-  );
+  const highScoreData = ref({
+    score: 0,
+    potentialCorrectAnswers: 0,
+    nBack: null,
+  });
   const incorrectResponses = ref(0);
   const isNewHighScore = ref(false);
   const showGameOverModal = ref(false);
-  const isAudioEnabled = ref(
-    JSON.parse(localStorage.getItem('isAudioEnabled')) ?? true,
-  );
+  const isAudioEnabled = ref(true);
   const isDeterministic = ref(false);
   const isPaused = ref(false);
   const isStopped = ref(false);
@@ -112,6 +109,69 @@ export const useGameStore = defineStore('game', () => {
   const stimulusHistory = ref([]);
   const timeLeft = ref(5);
   const timer = ref(null);
+
+  // ---- Persistence helpers ----
+  async function loadPreference(key, defaults) {
+    try {
+      const { value } = await Preferences.get({ key });
+      if (value === null) return defaults;
+      const parsed = JSON.parse(value);
+      // Schema validation: type must match defaults type
+      if (typeof parsed !== typeof defaults) return defaults;
+      // For objects, verify expected keys exist
+      if (
+        typeof defaults === 'object' &&
+        defaults !== null &&
+        !Array.isArray(defaults)
+      ) {
+        for (const k of Object.keys(defaults)) {
+          if (!(k in parsed)) return defaults;
+        }
+      }
+      return parsed;
+    } catch {
+      return defaults;
+    }
+  }
+
+  async function savePreference(key, data) {
+    try {
+      await Preferences.set({ key, value: JSON.stringify(data) });
+    } catch (e) {
+      console.warn(`Storage write failed for key "${key}":`, e);
+    }
+  }
+
+  async function migrateFromLocalStorage() {
+    const migrated = await Preferences.get({ key: '_migrated' });
+    if (migrated.value) return;
+
+    // Migrate each key
+    const keys = [
+      'highScoreData',
+      'isAudioEnabled',
+      'achievements',
+      'tutorialCompleted',
+    ];
+    for (const key of keys) {
+      const value = localStorage.getItem(key);
+      if (value !== null) {
+        await Preferences.set({ key, value });
+        localStorage.removeItem(key);
+      }
+    }
+    await Preferences.set({ key: '_migrated', value: 'true' });
+  }
+
+  async function loadPersistedState() {
+    await migrateFromLocalStorage();
+    highScoreData.value = await loadPreference('highScoreData', {
+      score: 0,
+      potentialCorrectAnswers: 0,
+      nBack: null,
+    });
+    isAudioEnabled.value = await loadPreference('isAudioEnabled', true);
+  }
 
   // ---- Getters (computed) ----
   const isEarlyInGame = computed(() => {
@@ -212,10 +272,7 @@ export const useGameStore = defineStore('game', () => {
 
   function toggleAudio() {
     isAudioEnabled.value = !isAudioEnabled.value;
-    localStorage.setItem(
-      'isAudioEnabled',
-      JSON.stringify(isAudioEnabled.value),
-    );
+    savePreference('isAudioEnabled', isAudioEnabled.value);
   }
 
   // Unlock audio on iOS - call this on first user interaction
@@ -263,7 +320,7 @@ export const useGameStore = defineStore('game', () => {
 
   function resetHighScore() {
     highScoreData.value = { score: 0, potentialCorrectAnswers: 0 };
-    localStorage.setItem('highScoreData', JSON.stringify(highScoreData.value));
+    savePreference('highScoreData', highScoreData.value);
   }
 
   function startGame(timeLeftParam = 5) {
@@ -362,10 +419,7 @@ export const useGameStore = defineStore('game', () => {
               potentialCorrectAnswers: previousPotentialCorrectAnswers.value,
               nBack: nBack.value,
             };
-            localStorage.setItem(
-              'highScoreData',
-              JSON.stringify(highScoreData.value),
-            );
+            savePreference('highScoreData', highScoreData.value);
           }
 
           stopGame();
@@ -405,6 +459,7 @@ export const useGameStore = defineStore('game', () => {
     finalScoreAccuracy,
     highScoreAccuracy,
     // actions (functions)
+    loadPersistedState,
     generateRandomStimulus,
     setNewStimulus,
     toggleAudio,
