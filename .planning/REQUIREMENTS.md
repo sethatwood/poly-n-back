@@ -48,7 +48,7 @@ Requirements for Milestone 1. Each maps to roadmap phases.
 - [x] **TS-02**: Game domain types defined (Stimulus, HighScoreData, FeedbackState, StimulusAttribute, GameState)
 - [x] **TS-03**: All Pinia stores fully typed with setup syntax
 - [x] **TS-04**: All composables fully typed with explicit return types
-- [ ] **TS-05**: All Vue components migrated to `<script setup lang="ts">`
+- [x] **TS-05**: All Vue components migrated to `<script setup lang="ts">`
 - [x] **TS-06**: Strict mode enabled incrementally (noImplicitAny -> strictNullChecks -> strict: true)
 - [ ] **TS-07**: vue-tsc --noEmit type checking passing with zero errors
 
@@ -167,7 +167,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TS-02 | Phase 7: TypeScript Migration | Complete |
 | TS-03 | Phase 7: TypeScript Migration | Complete |
 | TS-04 | Phase 7: TypeScript Migration | Complete |
-| TS-05 | Phase 7: TypeScript Migration | Pending |
+| TS-05 | Phase 7: TypeScript Migration | Complete |
 | TS-06 | Phase 7: TypeScript Migration | Complete |
 | TS-07 | Phase 7: TypeScript Migration | Pending |
 | TEST-01 | Phase 8: Testing & CI | Pending |
