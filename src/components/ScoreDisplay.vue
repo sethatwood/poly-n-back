@@ -4,9 +4,7 @@
       class="mt-4 text-sm uppercase text-red-500 flex items-center justify-center transition-transform"
       :class="{ 'animate-strike-shake': strikeAnimating }"
     >
-      <span class="text-2xl font-bold">{{
-        incorrectResponses
-      }}</span
+      <span class="text-2xl font-bold">{{ incorrectResponses }}</span
       >&nbsp;Strikes
     </div>
     <div
@@ -20,13 +18,13 @@
 
 <script setup lang="ts">
 interface Props {
-  score: number
-  incorrectResponses: number
-  scoreAnimating: boolean
-  strikeAnimating: boolean
+  score: number;
+  incorrectResponses: number;
+  scoreAnimating: boolean;
+  strikeAnimating: boolean;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 </script>
 
 <style scoped>

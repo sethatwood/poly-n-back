@@ -4,14 +4,14 @@ import type { useGameStore } from '@/stores/gameStore';
 type GameStore = ReturnType<typeof useGameStore>;
 
 export function useGameLifecycle(gameStore: GameStore): {
-  showModal: Ref<boolean>
-  startGame: (timeLeftInput: number) => void
-  handlePause: () => void
-  handleResume: () => void
-  handleQuit: () => void
-  handleGameOverClose: () => void
-  handlePlayAgain: (timeLeftInput: number) => void
-  handleMainMenu: () => void
+  showModal: Ref<boolean>;
+  startGame: (timeLeftInput: number) => void;
+  handlePause: () => void;
+  handleResume: () => void;
+  handleQuit: () => void;
+  handleGameOverClose: () => void;
+  handlePlayAgain: (timeLeftInput: number) => void;
+  handleMainMenu: () => void;
 } {
   const showModal = ref(true);
 

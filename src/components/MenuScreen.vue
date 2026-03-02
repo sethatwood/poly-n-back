@@ -12,32 +12,29 @@
         @update:time-left="$emit('update:timeLeftInput', $event)"
         @start-game="$emit('start-game')"
       />
-      <IntroContent
-        :n-back="nBack"
-        @show-tutorial="$emit('show-tutorial')"
-      />
+      <IntroContent :n-back="nBack" @show-tutorial="$emit('show-tutorial')" />
       <Footer />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import IntroHead from '../IntroHead.vue'
-import IntroContent from '../IntroContent.vue'
-import ConfigStart from '../ConfigStart.vue'
-import Footer from '../Footer.vue'
+import IntroHead from '../IntroHead.vue';
+import IntroContent from '../IntroContent.vue';
+import ConfigStart from '../ConfigStart.vue';
+import Footer from '../Footer.vue';
 
 interface Props {
-  nBackInput: number
-  timeLeftInput: number
-  nBack: number
+  nBackInput: number;
+  timeLeftInput: number;
+  nBack: number;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 defineEmits<{
-  'update:nBackInput': [value: number]
-  'update:timeLeftInput': [value: number]
-  'start-game': []
-  'show-tutorial': []
-}>()
+  'update:nBackInput': [value: number];
+  'update:timeLeftInput': [value: number];
+  'start-game': [];
+  'show-tutorial': [];
+}>();
 </script>

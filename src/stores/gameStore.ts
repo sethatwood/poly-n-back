@@ -20,7 +20,12 @@ export const useGameStore = defineStore('game', () => {
   const audioStore = useAudioStore();
   const persistenceStore = usePersistenceStore();
   // ---- State (refs) ----
-  const currentStimulus = ref<Stimulus>({ color: 'purple', emoji: 'fire', position: 'left', shape: 'circle' });
+  const currentStimulus = ref<Stimulus>({
+    color: 'purple',
+    emoji: 'fire',
+    position: 'left',
+    shape: 'circle',
+  });
   const deterministicIndex = ref(0);
   const deterministicStimuli = ref<Stimulus[]>([
     { color: 'blue', emoji: 'flower', position: 'center', shape: 'square' },
@@ -67,12 +72,18 @@ export const useGameStore = defineStore('game', () => {
   // ---- Persistence ----
   async function loadPersistedState(): Promise<void> {
     await persistenceStore.migrateFromLocalStorage();
-    highScoreData.value = await persistenceStore.loadPreference('highScoreData', {
-      score: 0,
-      potentialCorrectAnswers: 0,
-      nBack: null,
-    });
-    isAudioEnabled.value = await persistenceStore.loadPreference('isAudioEnabled', true);
+    highScoreData.value = await persistenceStore.loadPreference(
+      'highScoreData',
+      {
+        score: 0,
+        potentialCorrectAnswers: 0,
+        nBack: null,
+      },
+    );
+    isAudioEnabled.value = await persistenceStore.loadPreference(
+      'isAudioEnabled',
+      true,
+    );
   }
 
   // ---- Getters (computed) ----
@@ -102,10 +113,10 @@ export const useGameStore = defineStore('game', () => {
     const shapes: StimulusShape[] = ['circle', 'square', 'triangle'];
 
     return {
-      color: colors[Math.floor(Math.random() * colors.length)],
-      emoji: emojis[Math.floor(Math.random() * emojis.length)],
-      position: positions[Math.floor(Math.random() * positions.length)],
-      shape: shapes[Math.floor(Math.random() * shapes.length)],
+      color: colors[Math.floor(Math.random() * colors.length)]!,
+      emoji: emojis[Math.floor(Math.random() * emojis.length)]!,
+      position: positions[Math.floor(Math.random() * positions.length)]!,
+      shape: shapes[Math.floor(Math.random() * shapes.length)]!,
     };
   }
 
@@ -132,7 +143,7 @@ export const useGameStore = defineStore('game', () => {
 
     if (isDeterministic.value) {
       currentStimulus.value =
-        deterministicStimuli.value[deterministicIndex.value];
+        deterministicStimuli.value[deterministicIndex.value]!;
       deterministicIndex.value =
         (deterministicIndex.value + 1) % deterministicStimuli.value.length;
     } else {
@@ -142,7 +153,7 @@ export const useGameStore = defineStore('game', () => {
     // Increase potential correct answers after enough history is available
     if (stimulusHistory.value.length >= nBack.value) {
       const nBackStimulus =
-        stimulusHistory.value[stimulusHistory.value.length - nBack.value];
+        stimulusHistory.value[stimulusHistory.value.length - nBack.value]!;
       let potentialMatches = 0;
 
       if (nBackStimulus.color === currentStimulus.value.color)
@@ -263,7 +274,7 @@ export const useGameStore = defineStore('game', () => {
     const nBackIndex = stimulusHistory.value.length - nBack.value - 1;
 
     if (nBackIndex >= 0) {
-      const nBackStimulus = stimulusHistory.value[nBackIndex];
+      const nBackStimulus = stimulusHistory.value[nBackIndex]!;
 
       const isCorrect =
         (stimulusType === 'color' &&
@@ -321,7 +332,10 @@ export const useGameStore = defineStore('game', () => {
               potentialCorrectAnswers: previousPotentialCorrectAnswers.value,
               nBack: nBack.value,
             };
-            persistenceStore.savePreference('highScoreData', highScoreData.value);
+            persistenceStore.savePreference(
+              'highScoreData',
+              highScoreData.value,
+            );
           }
 
           stopGame();

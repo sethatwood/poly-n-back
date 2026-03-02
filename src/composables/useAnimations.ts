@@ -5,8 +5,8 @@ import { useManagedTimeout } from './useManagedTimeout';
 type GameStore = ReturnType<typeof useGameStore>;
 
 export function useAnimations(gameStore: GameStore): {
-  scoreAnimating: Ref<boolean>
-  strikeAnimating: Ref<boolean>
+  scoreAnimating: Ref<boolean>;
+  strikeAnimating: Ref<boolean>;
 } {
   const { managedSetTimeout } = useManagedTimeout();
   const scoreAnimating = ref(false);

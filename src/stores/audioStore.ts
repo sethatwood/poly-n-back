@@ -9,7 +9,7 @@ export const useAudioStore = defineStore('audio', () => {
   // Non-serializable browser objects -- plain variables, NOT refs.
   // Do NOT return these from the store.
   let context: AudioContext | null = null;
-  let buffers: Record<string, AudioBuffer> = {};
+  const buffers: Record<string, AudioBuffer> = {};
 
   // Reactive state exposed to consumers
   const ready = ref(false);
@@ -27,7 +27,8 @@ export const useAudioStore = defineStore('audio', () => {
 
   async function init(): Promise<void> {
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtx) {
         console.warn('AudioContext not available. Game will run silently.');
         return;

@@ -20,11 +20,11 @@
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from './stores/gameStore'
+import { useGameStore } from './stores/gameStore';
 
 defineEmits<{
-  showTutorial: []
-}>()
+  showTutorial: [];
+}>();
 
-const gameStore = useGameStore()
+const gameStore = useGameStore();
 </script>

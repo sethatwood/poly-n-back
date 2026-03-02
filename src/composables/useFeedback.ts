@@ -6,8 +6,8 @@ import { useManagedTimeout } from './useManagedTimeout';
 type GameStore = ReturnType<typeof useGameStore>;
 
 export function useFeedback(gameStore: GameStore): {
-  showFeedbackToast: ComputedRef<boolean>
-  feedbackClass: (buttonType: StimulusAttribute) => string
+  showFeedbackToast: ComputedRef<boolean>;
+  feedbackClass: (buttonType: StimulusAttribute) => string;
 } {
   const { managedSetTimeout, clearManagedTimeout } = useManagedTimeout();
   const feedbackVisible = ref(false);

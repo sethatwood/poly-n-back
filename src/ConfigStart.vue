@@ -36,46 +36,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch } from 'vue';
 
 interface Props {
-  nBack: number
-  timeLeft: number
+  nBack: number;
+  timeLeft: number;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:nBack': [value: number]
-  'update:timeLeft': [value: number]
-  startGame: []
-}>()
+  'update:nBack': [value: number];
+  'update:timeLeft': [value: number];
+  startGame: [];
+}>();
 
-const localNBack = ref(props.nBack)
-const localTimeLeft = ref(props.timeLeft)
+const localNBack = ref(props.nBack);
+const localTimeLeft = ref(props.timeLeft);
 
-watch(() => props.nBack, (val) => { localNBack.value = val })
-watch(() => props.timeLeft, (val) => { localTimeLeft.value = val })
+watch(
+  () => props.nBack,
+  (val) => {
+    localNBack.value = val;
+  },
+);
+watch(
+  () => props.timeLeft,
+  (val) => {
+    localTimeLeft.value = val;
+  },
+);
 
 function enforceMinNBack(): void {
-  const value = Math.max(1, parseInt(String(localNBack.value)) || 1)
-  localNBack.value = value
-  emit('update:nBack', value)
+  const value = Math.max(1, parseInt(String(localNBack.value)) || 1);
+  localNBack.value = value;
+  emit('update:nBack', value);
 }
 
 function enforceMinTimeLeft(): void {
-  const value = Math.max(1, parseInt(String(localTimeLeft.value)) || 1)
-  localTimeLeft.value = value
-  emit('update:timeLeft', value)
+  const value = Math.max(1, parseInt(String(localTimeLeft.value)) || 1);
+  localTimeLeft.value = value;
+  emit('update:timeLeft', value);
 }
 
 function handleStartGame(): void {
-  const nBack = Math.max(1, parseInt(String(localNBack.value)) || 1)
-  const timeLeft = Math.max(1, parseInt(String(localTimeLeft.value)) || 1)
-  localNBack.value = nBack
-  localTimeLeft.value = timeLeft
-  emit('update:nBack', nBack)
-  emit('update:timeLeft', timeLeft)
-  emit('startGame')
+  const nBack = Math.max(1, parseInt(String(localNBack.value)) || 1);
+  const timeLeft = Math.max(1, parseInt(String(localTimeLeft.value)) || 1);
+  localNBack.value = nBack;
+  localTimeLeft.value = timeLeft;
+  emit('update:nBack', nBack);
+  emit('update:timeLeft', timeLeft);
+  emit('startGame');
 }
 </script>

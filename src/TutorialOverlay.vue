@@ -25,25 +25,25 @@
         <Transition name="step" mode="out-in">
           <div :key="currentStep" class="text-center max-w-md">
             <!-- Icon/Illustration -->
-            <div class="text-6xl mb-6">{{ steps[currentStep].icon }}</div>
+            <div class="text-6xl mb-6">{{ activeStep.icon }}</div>
 
             <!-- Title -->
             <h2 class="text-2xl font-bold mb-4">
-              {{ steps[currentStep].title }}
+              {{ activeStep.title }}
             </h2>
 
             <!-- Description -->
             <p class="text-gray-300 text-lg mb-8 leading-relaxed">
-              {{ steps[currentStep].description }}
+              {{ activeStep.description }}
             </p>
 
             <!-- Visual example if present -->
-            <div v-if="steps[currentStep].example" class="mb-8">
+            <div v-if="activeStep.example" class="mb-8">
               <div
                 class="inline-flex items-center gap-4 bg-slate-800/50 px-6 py-4 rounded-xl"
               >
                 <div
-                  v-for="(item, i) in steps[currentStep].example"
+                  v-for="(item, i) in activeStep.example"
                   :key="i"
                   class="flex flex-col items-center gap-2"
                 >
@@ -92,21 +92,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { usePersistenceStore } from './stores/persistenceStore'
-import type { TutorialStep } from '@/types/game'
+import { ref, computed } from 'vue';
+import { usePersistenceStore } from './stores/persistenceStore';
+import type { TutorialStep } from '@/types/game';
 
 interface Props {
-  show: boolean
+  show: boolean;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 const emit = defineEmits<{
-  complete: []
-}>()
+  complete: [];
+}>();
 
-const persistenceStore = usePersistenceStore()
-const currentStep = ref(0)
+const persistenceStore = usePersistenceStore();
+const currentStep = ref(0);
 
 const steps: TutorialStep[] = [
   {
@@ -149,30 +149,32 @@ const steps: TutorialStep[] = [
     description:
       "Start with the default settings and work your way up. The first few turns won't have matches — that's normal! The game needs to build history first.",
   },
-]
+];
+
+const activeStep = computed((): TutorialStep => steps[currentStep.value]!);
 
 const nextStep = (): void => {
   if (currentStep.value < steps.length - 1) {
-    currentStep.value++
+    currentStep.value++;
   } else {
-    complete()
+    complete();
   }
-}
+};
 
 const prevStep = (): void => {
   if (currentStep.value > 0) {
-    currentStep.value--
+    currentStep.value--;
   }
-}
+};
 
 const skip = (): void => {
-  complete()
-}
+  complete();
+};
 
 const complete = async (): Promise<void> => {
-  await persistenceStore.savePreference('tutorialCompleted', true)
-  emit('complete')
-}
+  await persistenceStore.savePreference('tutorialCompleted', true);
+  emit('complete');
+};
 </script>
 
 <style scoped>

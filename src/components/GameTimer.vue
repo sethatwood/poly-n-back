@@ -3,8 +3,7 @@
     <p
       class="countdown-text transition-all duration-200"
       :class="{
-        'text-amber-500 animate-pulse-urgent':
-          timeLeft <= 2 && !isPaused,
+        'text-amber-500 animate-pulse-urgent': timeLeft <= 2 && !isPaused,
         'scale-110': timeLeft <= 1 && !isPaused,
       }"
     >
@@ -18,9 +17,7 @@
         v-if="showFeedbackToast"
         :class="[
           'text-xs font-medium',
-          feedbackType === 'correct'
-            ? 'text-emerald-400'
-            : 'text-red-400',
+          feedbackType === 'correct' ? 'text-emerald-400' : 'text-red-400',
         ]"
       >
         {{ feedbackType === 'correct' ? '✓' : '✗' }}
@@ -31,13 +28,13 @@
 
 <script setup lang="ts">
 interface Props {
-  timeLeft: number
-  isPaused: boolean
-  showFeedbackToast: boolean
-  feedbackType?: string | null
+  timeLeft: number;
+  isPaused: boolean;
+  showFeedbackToast: boolean;
+  feedbackType?: string | null;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 </script>
 
 <style scoped>

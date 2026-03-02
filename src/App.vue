@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center overflow-hidden game-background">
+  <div
+    class="min-h-screen flex items-center justify-center overflow-hidden game-background"
+  >
     <Transition name="screen-fade" mode="out-in">
       <MenuScreen
         v-if="showModal"
@@ -82,27 +84,27 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-import { useGameStore } from './stores/gameStore'
-import { usePersistenceStore } from './stores/persistenceStore'
-import { useAnimations } from './composables/useAnimations'
-import { useFeedback } from './composables/useFeedback'
-import { useGameLifecycle } from './composables/useGameLifecycle'
-import type { StimulusAttribute } from '@/types/game'
-import MenuScreen from './components/MenuScreen.vue'
-import GameScreen from './components/GameScreen.vue'
-import GameOverModal from './GameOverModal.vue'
-import PauseModal from './PauseModal.vue'
-import TutorialOverlay from './TutorialOverlay.vue'
-import GameHint from './GameHint.vue'
-import AchievementToast from './AchievementToast.vue'
+import { onMounted, ref, watch } from 'vue';
+import { useGameStore } from './stores/gameStore';
+import { usePersistenceStore } from './stores/persistenceStore';
+import { useAnimations } from './composables/useAnimations';
+import { useFeedback } from './composables/useFeedback';
+import { useGameLifecycle } from './composables/useGameLifecycle';
+import type { StimulusAttribute } from '@/types/game';
+import MenuScreen from './components/MenuScreen.vue';
+import GameScreen from './components/GameScreen.vue';
+import GameOverModal from './GameOverModal.vue';
+import PauseModal from './PauseModal.vue';
+import TutorialOverlay from './TutorialOverlay.vue';
+import GameHint from './GameHint.vue';
+import AchievementToast from './AchievementToast.vue';
 
-const gameStore = useGameStore()
-const persistenceStore = usePersistenceStore()
+const gameStore = useGameStore();
+const persistenceStore = usePersistenceStore();
 
 // Composables
-const { scoreAnimating, strikeAnimating } = useAnimations(gameStore)
-const { showFeedbackToast, feedbackClass } = useFeedback(gameStore)
+const { scoreAnimating, strikeAnimating } = useAnimations(gameStore);
+const { showFeedbackToast, feedbackClass } = useFeedback(gameStore);
 const {
   showModal,
   startGame: startGameLifecycle,
@@ -112,53 +114,56 @@ const {
   handleGameOverClose,
   handlePlayAgain: playAgainLifecycle,
   handleMainMenu,
-} = useGameLifecycle(gameStore)
+} = useGameLifecycle(gameStore);
 
 // Local input state
-const nBackInput = ref(gameStore.nBack)
-const timeLeftInput = ref(gameStore.timeLeft)
+const nBackInput = ref(gameStore.nBack);
+const timeLeftInput = ref(gameStore.timeLeft);
 
 // Tutorial state - safe default (don't show until we know)
-const showTutorial = ref(false)
+const showTutorial = ref(false);
 
 onMounted(async () => {
-  await gameStore.loadPersistedState()
-  const tutorialCompleted = await persistenceStore.loadPreference('tutorialCompleted', false)
+  await gameStore.loadPersistedState();
+  const tutorialCompleted = await persistenceStore.loadPreference(
+    'tutorialCompleted',
+    false,
+  );
   if (!tutorialCompleted) {
-    showTutorial.value = true
+    showTutorial.value = true;
   }
-})
+});
 
 function handleTutorialComplete(): void {
-  showTutorial.value = false
-  gameStore.unlockAudio()
+  showTutorial.value = false;
+  gameStore.unlockAudio();
 }
 
 // Sync input refs to store
 watch(nBackInput, (newNBack: number) => {
-  gameStore.nBack = newNBack
-})
+  gameStore.nBack = newNBack;
+});
 
 watch(timeLeftInput, (newTimeLeft: number) => {
-  gameStore.timeLeft = newTimeLeft
-})
+  gameStore.timeLeft = newTimeLeft;
+});
 
 // Wrap lifecycle calls that need timeLeftInput
-const startGame = (): void => startGameLifecycle(timeLeftInput.value)
-const handlePlayAgain = (): void => playAgainLifecycle(timeLeftInput.value)
+const startGame = (): void => startGameLifecycle(timeLeftInput.value);
+const handlePlayAgain = (): void => playAgainLifecycle(timeLeftInput.value);
 
 function respond(stimulusType: StimulusAttribute): void {
   if (!gameStore.isPaused) {
-    gameStore.respondToStimulus(stimulusType)
+    gameStore.respondToStimulus(stimulusType);
   }
 }
 
 function toggleAudio(): void {
-  gameStore.toggleAudio()
+  gameStore.toggleAudio();
 }
 
 function resetHighScore(): void {
-  gameStore.resetHighScore()
+  gameStore.resetHighScore();
 }
 </script>
 

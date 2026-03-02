@@ -19,9 +19,7 @@
         previousPotentialCorrectAnswers
       }}</span>
       &nbsp;Possible Points
-      <span class="ml-1 text-lg font-bold"
-        >({{ finalScoreAccuracy }}%)</span
-      >
+      <span class="ml-1 text-lg font-bold">({{ finalScoreAccuracy }}%)</span>
     </div>
   </div>
   <p class="mt-2 text-sm uppercase text-gray-500">
@@ -29,9 +27,7 @@
       highScoreData.potentialCorrectAnswers
     }}
     ({{ highScoreAccuracy }}%)
-    <span v-if="highScoreData.nBack"
-      >N={{ highScoreData.nBack }}</span
-    >
+    <span v-if="highScoreData.nBack">N={{ highScoreData.nBack }}</span>
     <span class="p-1 cursor-pointer" @click="$emit('reset-high-score')">
       &#x24E7;</span
     >
@@ -39,18 +35,18 @@
 </template>
 
 <script setup lang="ts">
-import type { HighScoreData } from '@/types/game'
+import type { HighScoreData } from '@/types/game';
 
 interface Props {
-  score: number
-  previousPotentialCorrectAnswers: number
-  finalScoreAccuracy: number
-  highScoreData: HighScoreData
-  highScoreAccuracy: number
+  score: number;
+  previousPotentialCorrectAnswers: number;
+  finalScoreAccuracy: number;
+  highScoreData: HighScoreData;
+  highScoreAccuracy: number;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 defineEmits<{
-  'reset-high-score': []
-}>()
+  'reset-high-score': [];
+}>();
 </script>

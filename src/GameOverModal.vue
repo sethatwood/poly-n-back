@@ -85,31 +85,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 interface Props {
-  show: boolean
-  score: number
-  possiblePoints: number
-  accuracy: number
-  nBack: number
-  timer: number
-  isNewHighScore?: boolean
+  show: boolean;
+  score: number;
+  possiblePoints: number;
+  accuracy: number;
+  nBack: number;
+  timer: number;
+  isNewHighScore?: boolean;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 defineEmits<{
-  close: []
-  playAgain: []
-  mainMenu: []
-}>()
+  close: [];
+  playAgain: [];
+  mainMenu: [];
+}>();
 
 const accuracyColorClass = computed(() => {
-  if (props.accuracy >= 80) return 'text-green-400'
-  if (props.accuracy >= 60) return 'text-yellow-400'
-  if (props.accuracy >= 40) return 'text-orange-400'
-  return 'text-red-400'
-})
+  if (props.accuracy >= 80) return 'text-green-400';
+  if (props.accuracy >= 60) return 'text-yellow-400';
+  if (props.accuracy >= 40) return 'text-orange-400';
+  return 'text-red-400';
+});
 </script>
 
 <style scoped>

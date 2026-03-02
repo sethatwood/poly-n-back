@@ -40,40 +40,55 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useGameStore } from './stores/gameStore'
-import type { StimulusColor, StimulusPosition, StimulusShape } from '@/types/game'
+import { computed } from 'vue';
+import { useGameStore } from './stores/gameStore';
+import type {
+  StimulusColor,
+  StimulusPosition,
+  StimulusShape,
+} from '@/types/game';
 
 interface Props {
-  color: StimulusColor
-  emoji: string
-  position: StimulusPosition
-  shape: StimulusShape
+  color: StimulusColor;
+  emoji: string;
+  position: StimulusPosition;
+  shape: StimulusShape;
 }
 
-const props = defineProps<Props>()
-const gameStore = useGameStore()
+const props = defineProps<Props>();
+const gameStore = useGameStore();
 
-const animationClass = computed(() => gameStore.flashBorder ? 'animate-stimulus-appear' : '')
+const animationClass = computed(() =>
+  gameStore.flashBorder ? 'animate-stimulus-appear' : '',
+);
 
 const colorClass = computed(() => {
   switch (props.color) {
-    case 'purple': return 'text-purple-500'
-    case 'green': return 'text-emerald-500'
-    case 'blue': return 'text-blue-500'
-    default: return ''
+    case 'purple':
+      return 'text-purple-500';
+    case 'green':
+      return 'text-emerald-500';
+    case 'blue':
+      return 'text-blue-500';
+    default:
+      return '';
   }
-})
+});
 
 const shapeClass = computed(() => {
   switch (props.shape) {
-    case 'circle': return 'w-20 h-20 rounded-full bg-current shadow-lg shadow-current/30'
-    case 'square': return 'w-20 h-20 bg-current shadow-lg shadow-current/30'
-    default: return ''
+    case 'circle':
+      return 'w-20 h-20 rounded-full bg-current shadow-lg shadow-current/30';
+    case 'square':
+      return 'w-20 h-20 bg-current shadow-lg shadow-current/30';
+    default:
+      return '';
   }
-})
+});
 
-const cellClass = computed(() => gameStore.flashBorder ? 'ring-2 ring-slate-600/50' : '')
+const cellClass = computed(() =>
+  gameStore.flashBorder ? 'ring-2 ring-slate-600/50' : '',
+);
 </script>
 
 <style>

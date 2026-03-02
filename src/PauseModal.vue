@@ -51,16 +51,16 @@
 
 <script setup lang="ts">
 interface Props {
-  show: boolean
-  score: number
-  strikes: number
+  show: boolean;
+  score: number;
+  strikes: number;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 defineEmits<{
-  resume: []
-  quit: []
-}>()
+  resume: [];
+  quit: [];
+}>();
 </script>
 
 <style scoped>

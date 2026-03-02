@@ -1,13 +1,19 @@
 import { onUnmounted } from 'vue';
 
 export function useManagedTimeout(): {
-  managedSetTimeout: (fn: () => void, delay: number) => ReturnType<typeof setTimeout>
-  clearManagedTimeout: (id: ReturnType<typeof setTimeout>) => void
-  clearAll: () => void
+  managedSetTimeout: (
+    fn: () => void,
+    delay: number,
+  ) => ReturnType<typeof setTimeout>;
+  clearManagedTimeout: (id: ReturnType<typeof setTimeout>) => void;
+  clearAll: () => void;
 } {
   const timeouts = new Set<ReturnType<typeof setTimeout>>();
 
-  function managedSetTimeout(fn: () => void, delay: number): ReturnType<typeof setTimeout> {
+  function managedSetTimeout(
+    fn: () => void,
+    delay: number,
+  ): ReturnType<typeof setTimeout> {
     const id = setTimeout(() => {
       timeouts.delete(id);
       fn();
