@@ -69,7 +69,7 @@
         @start-game="$emit('start-game')"
       />
     </div>
-    <div class="mt-3">
+    <div class="mt-3 flex items-center justify-center gap-2">
       <button
         class="text-xs text-gray-600 bg-gray-600 hover:bg-gray-500 p-1 rounded-full focus:outline-hidden"
         @click="$emit('toggle-audio')"
@@ -81,6 +81,31 @@
           alt="Volume Up"
         />
         <img v-else class="h-5 w-5" :src="volumeMuteIcon" alt="Volume Mute" />
+      </button>
+      <button
+        class="text-xs text-gray-600 bg-gray-600 hover:bg-gray-500 p-1 rounded-full focus:outline-hidden"
+        :title="
+          gameStore.isHapticsEnabled ? 'Disable Haptics' : 'Enable Haptics'
+        "
+        @click="$emit('toggle-haptics')"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          :class="
+            gameStore.isHapticsEnabled ? 'text-white' : 'text-gray-400'
+          "
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 18h.01M8 21h8a1 1 0 001-1v-1a1 1 0 00-1-1H8a1 1 0 00-1 1v1a1 1 0 001 1zM10 3h4a5 5 0 015 5v3a5 5 0 01-5 5h-4a5 5 0 01-5-5V8a5 5 0 015-5z"
+          />
+        </svg>
       </button>
     </div>
     <Footer />
@@ -119,6 +144,7 @@ defineEmits<{
   'update:timeLeftInput': [value: number];
   'start-game': [];
   'toggle-audio': [];
+  'toggle-haptics': [];
   'reset-high-score': [];
 }>();
 

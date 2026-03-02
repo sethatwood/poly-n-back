@@ -29,6 +29,7 @@
         @update:time-left-input="timeLeftInput = $event"
         @start-game="startGame"
         @toggle-audio="toggleAudio"
+        @toggle-haptics="toggleHaptics"
         @reset-high-score="resetHighScore"
       />
     </Transition>
@@ -160,6 +161,10 @@ function respond(stimulusType: StimulusAttribute): void {
 
 function toggleAudio(): void {
   gameStore.toggleAudio();
+}
+
+function toggleHaptics(): void {
+  gameStore.toggleHaptics();
 }
 
 function resetHighScore(): void {
