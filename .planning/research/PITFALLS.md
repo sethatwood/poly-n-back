@@ -1,457 +1,409 @@
-# Domain Pitfalls
+# Pitfalls Research
 
-**Domain:** Vue 3 / Capacitor mobile app modernization (dependency upgrades, TypeScript migration, component extraction)
-**Researched:** 2026-03-01
+**Domain:** Adding monetization, backend API, social login, app store submission, and cross-device sync to an existing Vue/Capacitor brain training app
+**Researched:** 2026-03-02
+**Confidence:** HIGH (IAP, App Store rules, FTC claims) | MEDIUM (Capacitor social login edge cases, offline sync conflict resolution)
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that cause data loss, app-breaking regressions, or force rewrites.
+### Pitfall 1: Client-Side IAP Trust — The Paywall Bypass Vulnerability
+
+**What goes wrong:**
+The Vue layer checks a Pinia store value (`isPremium: true`) to decide whether to show gated content. If the IAP transaction is verified only on the client side, a determined user can set `isPremium = true` in the console, or on a jailbroken device run tools like "iAPCracker" that fake StoreKit responses. The paywall evaporates. For a $3.99 one-time purchase, this is a real attack vector.
+
+**Why it happens:**
+Capacitor plugins return a purchase result to JavaScript. Developers trust that result and set premium state immediately. It feels complete — the store returned success. The missing step is that only Apple/Google servers can authoritatively confirm a purchase happened.
+
+**How to avoid:**
+- Never grant entitlement from client-side purchase result alone.
+- On purchase success, send the transaction receipt/token to the Laravel backend.
+- Backend verifies with Apple App Store Server API (for iOS) or Google Play Developer API (for Android).
+- Only after backend confirmation does the server mark the user's account as premium.
+- Premium status is fetched from the server on app launch, not inferred from local state.
+- For the web/GitHub Pages version, this is moot — but for native app builds, it is mandatory.
+
+**Warning signs:**
+- Pinia `isPremium` flag set from JS before backend confirmation
+- No `/api/verify-purchase` endpoint in the Laravel API
+- Premium state stored only in Capacitor Preferences (local storage)
+
+**Phase to address:** IAP phase (before App Store submission)
 
 ---
 
-### Pitfall 1: Capacitor Android Scheme Change Wipes localStorage
+### Pitfall 2: Apple Requires Sign In with Apple When Offering Google Sign-In
 
-**What goes wrong:** Upgrading from Capacitor 5 to 6 changes the default `androidScheme` from `http` to `https`. Because browsers isolate storage by origin (scheme + host), this change makes all existing localStorage and IndexedDB data inaccessible. High scores, audio preferences, tutorial completion status, and achievements are silently lost.
+**What goes wrong:**
+App Store guideline 4.8: if your app allows users to sign in via any third-party service (Google, Facebook, etc.), you must also offer an equivalent privacy-focused login option — meaning Sign In with Apple. Apps that offer Google Sign-In without Apple Sign-In get rejected at review.
 
-**Why it happens:** Capacitor 6 changed the default to `https` to enable Android Autofill features. The migration tool (`npx cap migrate`) updates the scheme automatically without warning that stored data becomes unreachable.
+**Why it happens:**
+Developers add Google Sign-In first (usually easier to configure), test it, ship it to review, and get hit with the 4.8 rejection. Apple's wording changed in early 2024 — the "exclusively" qualifier was removed, meaning the rule now applies even if you also have email/password login.
 
-**Consequences:** Users lose all persisted data (high scores, settings, achievements, tutorial-completed flag). The app appears to "reset" after update. For this project: `highScoreData`, `isAudioEnabled`, `tutorialCompleted`, and `achievements` in localStorage all vanish. Since the app is live at polynback.fun, any users who installed a native build would lose progress.
+**How to avoid:**
+- Build Sign In with Apple and Google Sign-In together in the same phase, not sequentially.
+- Sign In with Apple is required if ANY social/third-party login is offered.
+- Sign In with Apple must use `ASWebAuthenticationSession` on Capacitor, not a WKWebView — Apple rejects implementations that use a custom web view for the sign-in flow.
+- The SIWA button must meet Apple's visual guidelines exactly (color, sizing, corner radius). Deviations cause rejection.
+- Test SIWA on a real device — it does not work in the iOS Simulator.
 
-**Prevention:**
-- **Before migrating:** Check current `capacitor.config.json` for `androidScheme`. This project already has `"androidScheme": "https"` set, which means the scheme is ALREADY `https` -- no change occurs during migration and data is preserved. Verify this is the case before proceeding.
-- **If androidScheme were missing or set to `http`:** You would need to explicitly set it to `http` in config to preserve data, then plan a separate data migration later.
-- **Regardless:** Back up the `capacitor.config.json` before running `npx cap migrate` and verify the scheme value is unchanged after migration.
+**Warning signs:**
+- Only Google Sign-In configured with no Apple fallback
+- SIWA button using custom styling that doesn't match Apple's requirements
+- SIWA flow implemented via WKWebView instead of native ASWebAuthenticationSession
 
-**Detection:** After Capacitor upgrade, open the app on Android and check if high scores and settings persist. Test in emulator before any production build.
-
-**Confidence:** HIGH -- verified via [Capacitor 6.0 migration guide](https://capacitorjs.com/docs/updating/6-0) and [GitHub issue #7548](https://github.com/ionic-team/capacitor/issues/7548).
-
-**Phase:** Dependency upgrades (Capacitor migration step).
-
----
-
-### Pitfall 2: Multi-Version Capacitor Hop Without Sequential Migration
-
-**What goes wrong:** Attempting to jump directly from Capacitor 5 to 8 (skipping 6 and 7) by just changing version numbers in package.json. The native projects (ios/ and android/) contain version-specific Gradle configs, Podfiles, Xcode settings, SDK targets, and Kotlin versions that each major version expects to transform incrementally.
-
-**Why it happens:** The `npx cap migrate` CLI tool is designed for single-version hops (5->6, 6->7, 7->8). It applies incremental patches to native project files. Skipping versions means the tool finds unexpected file states and either fails silently or produces corrupt native configs.
-
-**Consequences:** Android builds fail with Gradle errors (wrong AGP version, missing SDK targets, Kotlin version mismatches). iOS builds fail with Xcode project configuration errors. Debugging these is extremely time-consuming because error messages point to native build tooling, not Capacitor migration.
-
-**Prevention:**
-- Migrate sequentially: 5 -> 6, test build, then 6 -> 7, test build, then 7 -> 8, test build.
-- At each step: run `npx cap migrate`, verify native builds compile, verify the app runs.
-- Keep each step in a separate commit so you can bisect if something breaks.
-- Each version has specific requirements:
-  - **Cap 6:** Node 18+, Xcode 15+, Android Studio Hedgehog, minSdk 22, targetSdk 34
-  - **Cap 7:** Node 20+, Xcode 16+, Android Studio Ladybug, minSdk 23, targetSdk 35, Gradle 8.7.2
-  - **Cap 8:** Node 22+, Xcode 26+, Android Studio Otter, minSdk 24, targetSdk 36, Gradle 8.13.0
-
-**Detection:** Build failures immediately after version bump. Native project files with conflicting version numbers.
-
-**Confidence:** HIGH -- each migration guide explicitly documents the sequential approach: [Cap 6](https://capacitorjs.com/docs/updating/6-0), [Cap 7](https://capacitorjs.com/docs/updating/7-0), [Cap 8](https://capacitorjs.com/docs/updating/8-0).
-
-**Phase:** Dependency upgrades (must be first major task).
+**Phase to address:** Auth/social login phase (must ship both providers together)
 
 ---
 
-### Pitfall 3: Capacitor 8 iOS Project Switches from CocoaPods to Swift Package Manager
+### Pitfall 3: FTC Compliance — "Scientifically Proven" Brain Training Claims
 
-**What goes wrong:** Capacitor 8 CLI defaults to creating Swift Package Manager (SPM) projects instead of CocoaPods. The existing project has a CocoaPods-based iOS setup (Podfile, Podfile.lock, Pods/ directory). Running `npx cap migrate` or re-initializing the iOS project could conflict with or silently replace the existing dependency management approach.
+**What goes wrong:**
+Any marketing copy or App Store description claiming the app will "improve your fluid intelligence," "increase IQ," "enhance memory," or "scientifically proven to make you smarter" exposes the developer to FTC enforcement action. In 2016, Lumosity paid $2M to settle. In 2016, LearningRx paid $200K. The FTC continues to monitor this space. Apple's App Store review team also flags unvalidated health claims and can reject or remove the app.
 
-**Why it happens:** Capacitor 8 adopted SPM as the default for new projects. Migration tooling may attempt to convert the project or generate conflicting configurations.
+**Why it happens:**
+Brain training is the product's core value prop. Developers write enthusiastic marketing copy that makes strong causal claims. The science around n-back training and fluid intelligence is real but contested — the research shows correlation and potential, not proof that any specific commercial app delivers specific outcomes to specific users.
 
-**Consequences:** iOS build fails due to mixed dependency management. Pods still referenced in Xcode project but SPM packages also configured. Manual cleanup of the iOS project required.
+**How to avoid:**
+- Distinguish claims: "n-back training is associated with improvements in working memory" (supportable) vs. "Our app will improve your fluid intelligence by 20%" (FTC target).
+- Safe framing patterns: "practice the task most associated with..." / "based on n-back research" / "train the cognitive skills studied in..." — these describe the science without guaranteeing personal outcomes.
+- Never claim the app treats, prevents, or mitigates any medical condition (ADHD, dementia, Alzheimer's, TBI, autism).
+- The App Store description, app screenshots, in-app copy, marketing site, and social posts all count as advertising under FTC jurisdiction — they must be consistent.
+- The existing `ABOUT_POLY_NBACK.md` marketing copy must be audited for compliance before any of it appears in App Store listings or on polynback.com.
 
-**Prevention:**
-- During the Capacitor 7 -> 8 migration, explicitly check whether `npx cap migrate` attempts to convert from CocoaPods to SPM.
-- If the project is simple (no custom CocoaPods beyond Capacitor defaults), regenerating the iOS project from scratch may be cleaner: delete `ios/`, run `npx cap add ios`, then `npx cap sync`.
-- If there are custom native configurations (status bar colors, splash screens, etc.), document them before deleting the native project.
-- The `capacitor.config.json` has `backgroundColor: "#0f1729"` for iOS -- this must be re-applied.
+**Warning signs:**
+- App Store description uses "proven," "clinically," "scientifically proven," or "guaranteed to improve"
+- Copy claims cognitive benefits will transfer to real-world tasks (the "far transfer" claim the FTC targeted)
+- Marketing site makes different (bolder) claims than the App Store listing
 
-**Detection:** Xcode build errors mentioning both Pod references and SPM packages. `pod install` failures after migration.
-
-**Confidence:** MEDIUM -- confirmed SPM is the new default in [Cap 8 migration guide](https://capacitorjs.com/docs/updating/8-0), but the exact behavior of `npx cap migrate` on existing CocoaPods projects needs validation during execution.
-
-**Phase:** Dependency upgrades (Capacitor 8 step specifically).
-
----
-
-### Pitfall 4: Tailwind v4 Renamed Utilities Cause Silent Visual Regressions
-
-**What goes wrong:** Tailwind v4 renamed dozens of utility classes. The most impactful for this project: `shadow-sm` becomes `shadow-xs`, `shadow` becomes `shadow-sm`, `rounded-sm` becomes `rounded-xs`, `rounded` becomes `rounded-sm`. If the upgrade tool misses occurrences (in dynamic class bindings, computed class strings, or ternary expressions), the app renders with wrong shadows, wrong border radii, or missing styles -- with zero build errors.
-
-**Why it happens:** The `npx @tailwindcss/upgrade` tool handles ~90% of mechanical changes but struggles with:
-- Dynamic class construction in JavaScript (e.g., the `buttonClass()` function in App.vue that builds class strings with template literals)
-- Conditional classes in `:class` bindings with ternary operators
-- Classes split across multiple lines in template expressions
-
-**Consequences:** Buttons, cards, and game elements render with subtly wrong visual treatment. The "charm" the project explicitly aims to preserve is damaged without any error or warning. On a solo project with no QA, these regressions can ship.
-
-**Prevention:**
-- Run the `npx @tailwindcss/upgrade` tool first, then manually audit ALL dynamic class bindings in `.vue` files.
-- Specifically audit `App.vue`'s `buttonClass()` function (line 260-267) and `feedbackClass()` function (line 270-278) which construct classes programmatically.
-- Search the entire codebase for old utility names after upgrade: `shadow-sm`, `rounded-sm`, `rounded`, `shadow`, `blur-sm`, `blur`, `ring` (bare, without size suffix).
-- Take before/after screenshots of every screen state (menu, gameplay, game over, pause modal, tutorial) and compare pixel-by-pixel.
-- Additional renamed classes to watch for:
-  - `outline-none` -> `outline-hidden`
-  - `flex-shrink-*` -> `shrink-*`
-  - `flex-grow-*` -> `grow-*`
-  - `ring` (bare) now means 1px instead of 3px -- use `ring-3` for old behavior
-
-**Detection:** Visual comparison of all app states before and after migration. No automated detection possible for visual regressions without screenshot tests.
-
-**Confidence:** HIGH -- confirmed in [Tailwind v4 upgrade guide](https://tailwindcss.com/docs/upgrade-guide). The renamed utilities list is extensive and well-documented.
-
-**Phase:** Tailwind migration.
+**Phase to address:** Marketing site + App Store metadata phase (before first submission)
 
 ---
 
-### Pitfall 5: Tailwind v4 Default Color Changes Break Dark UI
+### Pitfall 4: Google Play Billing — Unacknowledged Purchase Auto-Refund
 
-**What goes wrong:** Tailwind v4 changes several default color behaviors: `border` now defaults to `currentColor` instead of `gray-200`, `ring` defaults to `currentColor` instead of `blue-500`, and placeholder text uses opacity-based coloring. For a dark-themed app like Poly N-Back (background `#0f1729`), borders that previously showed as subtle gray now show as the text color (white), creating harsh, unexpected borders.
+**What goes wrong:**
+On Android, if your app purchases a product but fails to acknowledge it within 3 days, Google Play automatically refunds the user and revokes the purchase. Unlike iOS, Google Play does not handle acknowledgment automatically — you must call `BillingClient.acknowledgePurchase()`. If this call fails silently (network error, app backgrounded, etc.), the user paid but you must refund them 3 days later.
 
-**Why it happens:** Tailwind v4 aligned default colors with CSS standards (`currentColor`). This is more predictable in general but breaks assumptions in dark-theme apps that relied on the implicit gray defaults.
+**Why it happens:**
+iOS StoreKit 2 handles transaction finalization for non-consumables with `transaction.finish()`, which is more forgiving. Google Play Billing has a separate acknowledgment requirement that is easy to miss, especially when testing only the happy path. Many Capacitor IAP plugins handle this internally, but if using a lower-level plugin or custom integration, it must be called explicitly.
 
-**Consequences:** Game UI elements gain bright white borders where there were subtle gray ones. Ring effects on focus states become white instead of blue. The visual polish of the game degrades.
+**How to avoid:**
+- Verify that the Capacitor IAP plugin used automatically acknowledges non-consumable purchases. If not, implement acknowledgment explicitly.
+- After verifying purchase with backend, send acknowledgment to Google Play.
+- On app launch, check for purchases in `PURCHASED` state that are not yet acknowledged and acknowledge them.
+- Handle the `PENDING` purchase state separately — do not grant entitlement until a `PENDING` purchase transitions to `PURCHASED` state.
+- Never grant access based on `PENDING` state purchases (common when users pay via carrier billing or deferred payments).
 
-**Prevention:**
-- After upgrade, search for bare `border` utilities without explicit color (e.g., `border` without `border-gray-*`).
-- Search for bare `ring` utilities without explicit color.
-- Add explicit color values wherever defaults were relied upon: `border` -> `border border-gray-700` (or whatever the intended color was).
-- The `*:focus-visible` style in `style.css` uses explicit `rgba(59, 130, 246, 0.5)` (not Tailwind utilities), so it is safe.
+**Warning signs:**
+- Capacitor IAP plugin integration missing explicit acknowledgment call
+- No handling of `PENDING` purchase state in the purchase flow
+- No on-launch check for unacknowledged purchases
+- Testing only via sandbox accounts on Android (doesn't simulate all edge cases)
 
-**Detection:** Visual inspection of all bordered/ringed elements. Any element with just `border` or `ring` class without a color class.
-
-**Confidence:** HIGH -- documented in [Tailwind v4 upgrade guide](https://tailwindcss.com/docs/upgrade-guide) under "Default border color" and "Default ring color."
-
-**Phase:** Tailwind migration.
-
----
-
-### Pitfall 6: Tailwind v4 CSS Import Syntax and Config File Migration
-
-**What goes wrong:** Tailwind v4 completely replaces the configuration approach. The `@tailwind base; @tailwind components; @tailwind utilities;` directives in `style.css` must become `@import "tailwindcss";`. The `tailwind.config.js` file is replaced by `@theme` blocks in CSS. The PostCSS plugin changes from `tailwindcss` to `@tailwindcss/postcss` (or better, `@tailwindcss/vite` for Vite projects).
-
-**Why it happens:** Tailwind v4 moved to a CSS-first configuration model. The old JS config file and directives are not recognized.
-
-**Consequences:** Build completely fails with unrecognized directive errors. No styles load at all. Everything breaks visibly.
-
-**Prevention:**
-- Run `npx @tailwindcss/upgrade` which handles this automatically for most cases.
-- Manually verify `style.css` is updated from `@import 'tailwindcss/base'` etc. to `@import "tailwindcss"`.
-- Migrate `tailwind.config.js` theme extensions to `@theme` block in CSS:
-  ```css
-  @import "tailwindcss";
-  @theme {
-    --font-sans: 'Share Tech Mono', monospace;
-  }
-  ```
-- Replace PostCSS plugin setup: remove `tailwindcss` from `postcss.config.js` and either use `@tailwindcss/postcss` or (recommended) add `@tailwindcss/vite` to `vite.config.js` plugins and remove PostCSS entirely.
-- The `postcss.config.js` and `tailwind.config.js` files can both be deleted after migration.
-- **Content paths:** Tailwind v4 uses automatic content detection -- the `content: [...]` array in `tailwind.config.js` is no longer needed. However, verify it picks up all `.vue` files.
-
-**Detection:** Build failure immediately -- this is a "loud" failure, not a silent regression. The app will not compile.
-
-**Confidence:** HIGH -- [Tailwind v4 upgrade guide](https://tailwindcss.com/docs/upgrade-guide).
-
-**Phase:** Tailwind migration.
+**Phase to address:** IAP phase (Android implementation specifically)
 
 ---
 
-### Pitfall 7: Vite 7 and @tailwindcss/vite Peer Dependency Conflict
+### Pitfall 5: Migrating Local-Only Data to Server Sync Without Losing User History
 
-**What goes wrong:** As of March 2026, `@tailwindcss/vite` declares a peer dependency of `"vite": "^5.2.0 || ^6"`, which does not include Vite 7. Installing both together causes npm to reject the dependency tree with `ERESOLVE` errors.
+**What goes wrong:**
+The app currently stores all user data in Capacitor Preferences (iOS Keychain / Android SharedPreferences): high scores, achievements, game settings, tutorial completion, audio preferences. When accounts are introduced, users expect their existing data to carry over. If migration is not designed, a user creates an account and sees a blank profile — their months of progress gone.
 
-**Why it happens:** Tailwind Labs has not yet updated the peer dependency range to include Vite 7. Vite 7 was released June 2025 and the Tailwind team has been slow to update. The issue is tracked at [tailwindlabs/tailwindcss#18381](https://github.com/tailwindlabs/tailwindcss/issues/18381).
+**Why it happens:**
+Backend sync is designed for new users. Existing users are an afterthought. The migration path (local data → account → server) requires a specific "first login" flow that reads local state, uploads it, then uses server as source of truth going forward.
 
-**Consequences:** Cannot use the recommended `@tailwindcss/vite` plugin with Vite 7. Must either use workarounds or limit Vite version.
+**How to avoid:**
+- Design a "first account creation" migration flow:
+  1. User taps "Create Account."
+  2. App reads all local Capacitor Preferences data.
+  3. Data is uploaded to the backend as the user's initial state.
+  4. Server becomes source of truth from this point forward.
+  5. Local preferences remain as cache/offline fallback.
+- For "log into existing account on a new device," server state wins — but warn users before overwriting if local data exists.
+- Soft-delete local data after successful sync (don't immediately wipe it).
+- Test the migration path explicitly: user who has played for weeks, creates account, all data preserved.
 
-**Prevention:**
-- **Option A (recommended):** Target Vite 6 instead of Vite 7. Vite 6 has minimal breaking changes from 5 and is fully compatible with Tailwind v4, Vue 3, and all other dependencies. Vite 7's main addition (Rolldown for dependency optimization) is not critical for this project.
-- **Option B:** Use Vite 7 with `@tailwindcss/postcss` instead of `@tailwindcss/vite`. This works but is slightly slower.
-- **Option C:** Use `npm install --force` or add `overrides` in package.json to force Vite 7 + @tailwindcss/vite. Risky -- may cause runtime issues.
-- **Check before deciding:** By the time this phase is executed, Tailwind may have released a version with Vite 7 support. Check `npm info @tailwindcss/vite peerDependencies` before committing to a Vite version.
+**Warning signs:**
+- Backend API designed only for fresh users with no migration endpoint
+- No "upload local state" step in account creation flow
+- Local Preferences cleared on login without server confirmation of receipt
 
-**Detection:** `npm install` fails immediately with dependency resolution error.
-
-**Confidence:** MEDIUM -- the issue is confirmed as of March 2026 ([vitejs/vite#20284](https://github.com/vitejs/vite/issues/20284), [tailwindcss#18381](https://github.com/tailwindlabs/tailwindcss/issues/18381)), but may be resolved by the time migration is executed. The latest @tailwindcss/vite is 4.2.1 -- check its peer deps at migration time.
-
-**Phase:** Dependency upgrades (Vite + Tailwind must be coordinated).
-
----
-
-## Moderate Pitfalls
-
----
-
-### Pitfall 8: TypeScript Migration Breaks Options API Component
-
-**What goes wrong:** App.vue uses the Options API pattern (`export default { setup() { ... } }`) rather than `<script setup>`. When adding `lang="ts"` to the script tag, TypeScript cannot infer types for the Options API `setup()` return object, leading to a cascade of type errors in template bindings. The `defineComponent()` wrapper is required for proper type inference but adds boilerplate.
-
-**Why it happens:** Vue 3's TypeScript support is optimized for `<script setup>` with Composition API. The Options API requires `defineComponent()` for type inference, and even then, complex return types from `setup()` can be hard to type correctly.
-
-**Prevention:**
-- Convert App.vue (and all components) from Options API to `<script setup>` syntax as part of the TypeScript migration. Do NOT just add `lang="ts"` to existing Options API components.
-- Migration order matters: extract components FIRST (to make each file smaller), THEN convert to `<script setup lang="ts">`.
-- The current `setup()` function returns 20+ values -- in `<script setup>`, these are automatically available to the template without explicit returns.
-- Use `defineProps` and `defineEmits` with TypeScript generics for type-safe props/events.
-
-**Detection:** TypeScript errors on build after adding `lang="ts"`. Template binding errors in IDE.
-
-**Confidence:** HIGH -- [Vue TypeScript guide](https://vuejs.org/guide/typescript/overview) explicitly recommends `<script setup>` for TypeScript projects.
-
-**Phase:** TypeScript migration (must come AFTER component extraction).
+**Phase to address:** Auth + user accounts phase
 
 ---
 
-### Pitfall 9: Component Extraction Breaks Watcher and Event Chains
+### Pitfall 6: Sanctum Token Management — No Refresh Flow Means Forced Re-Login
 
-**What goes wrong:** Extracting UI sections from the 488-line App.vue into child components severs existing `watch()` calls that depend on direct access to the game store. Event handler chains (e.g., `handlePause` -> `gameStore.pauseGame()`) work fine, but watchers on store state that trigger local UI effects (score animation, strike animation, feedback toast) are tightly coupled to the parent component's lifecycle.
+**What goes wrong:**
+Laravel Sanctum issues personal access tokens with configurable expiration. If the token expires while the user is offline (which happens in a mobile app used sporadically), the next API call returns 401 Unauthorized. Without a refresh flow, the app either crashes the API call silently or forces the user to log in again — losing game context.
 
-**Why it happens:** The current App.vue has watchers on `gameStore.score`, `gameStore.incorrectResponses`, and `gameStore.lastFeedback.timestamp` that trigger local reactive refs (`scoreAnimating`, `strikeAnimating`, `feedbackVisible`). When extracting the score display or feedback indicator into separate components, these watchers and the reactive refs they control must move together.
+**Why it happens:**
+Sanctum's default token model does not include refresh tokens — unlike OAuth2's access/refresh token pair, Sanctum issues one durable token. Developers either set expiration too short (frequent logouts) or disable expiration entirely (security risk). The mobile app offline-first pattern makes this worse because tokens can age undetected.
 
-**Consequences:** Extracted component renders correctly but animations stop working. Score doesn't pulse. Strike counter doesn't shake. Feedback indicator doesn't appear. The "charm" regresses.
+**How to avoid:**
+- Use long-lived Sanctum tokens (30–90 days) for mobile apps where forced re-login is extremely disruptive.
+- Implement token rotation: on each successful API response, the backend can issue a new token and invalidate the old one.
+- Store tokens in Capacitor's secure storage (iOS Keychain / Android Keystore) — not in localStorage or Capacitor Preferences, which are not encrypted.
+- On 401 response: attempt one token refresh before presenting the login screen.
+- On app foreground (Capacitor App state change event): ping the backend to validate token freshness before user attempts a sync.
+- Run a scheduled Laravel command (`sanctum:prune-expired`) to clean the personal_access_tokens table.
 
-**Prevention:**
-- Map all watchers before extracting: identify which watcher belongs with which UI element.
-- Each extracted component should own its own animation state and its own watcher on the store.
-- Test each animation after extraction: score pulse, strike shake, feedback flash, button correct/incorrect flash, timer urgency pulse.
-- The `feedbackTimeout` variable (line 282) is a closure variable, not a ref -- it must be properly managed in the new component's lifecycle (cleared in `onUnmounted`).
-- Consider extracting game logic watchers into a composable (`useScoreAnimation`, `useFeedbackDisplay`) that can be used by any component.
+**Warning signs:**
+- Token stored in Capacitor Preferences (plaintext on Android)
+- No 401 handler in Axios/fetch interceptor
+- Token expiration set to `null` (never expires — security risk)
+- No mechanism to detect stale tokens before user hits a sync error
 
-**Detection:** Manual visual testing of all animation states during gameplay after each component extraction.
-
-**Confidence:** HIGH -- directly observed in the codebase. The coupling between watchers, timeouts, and local refs is visible in `App.vue` lines 222-293.
-
-**Phase:** Component extraction.
-
----
-
-### Pitfall 10: process.env.NODE_ENV Check Breaks in Vite 5+
-
-**What goes wrong:** `main.js` line 16 uses `process.env.NODE_ENV` to conditionally expose the game store for debugging. In Vite 5+, `process.env` is not automatically available in browser code. The check may silently fail (store not exposed) or throw a runtime error depending on Vite version and configuration.
-
-**Why it happens:** Vite replaces `process.env.NODE_ENV` during build but the behavior has become stricter across versions. The recommended approach is `import.meta.env.DEV` / `import.meta.env.PROD`.
-
-**Consequences:** Development debugging breaks silently. In worst case, runtime error on app startup in development mode.
-
-**Prevention:**
-- Replace `process.env.NODE_ENV === 'development'` with `import.meta.env.DEV` in `main.js`.
-- This is a one-line change but easy to miss.
-
-**Detection:** Check browser console for errors after Vite upgrade. Test dev mode specifically.
-
-**Confidence:** MEDIUM -- Vite has historically handled `process.env.NODE_ENV` replacement, but the recommended pattern is `import.meta.env`. The change is trivial but worth noting. [Vite env docs](https://vite.dev/guide/env-and-mode).
-
-**Phase:** Dependency upgrades (Vite migration step).
+**Phase to address:** Auth/backend phase
 
 ---
 
-### Pitfall 11: Tailwind v4 Hover Behavior Change on Mobile
+### Pitfall 7: Capacitor IAP Testing — "Product Not Found" During Development
 
-**What goes wrong:** Tailwind v4 wraps hover utilities in `@media (hover: hover)`, meaning hover styles only apply on devices with hover capability (mouse/trackpad). On mobile (touch-only), `hover:` prefixed styles no longer apply at all -- including `:active` states that some browsers previously triggered via hover.
+**What goes wrong:**
+Developers set up products in App Store Connect or Google Play Console, write the integration code, run the app in development — and get "Product not found" or empty product arrays. The integration looks broken. Hours are lost debugging the plugin, the product IDs, or the native build — when the actual cause is that newly created products take up to 24 hours to propagate to the Sandbox API, and Android APK-sideloaded builds cannot access Play Billing at all.
 
-**Why it happens:** This is a correctness improvement -- hover states on touch devices were always somewhat broken. But it changes observable behavior.
+**Why it happens:**
+- Apple's product propagation delay: newly created products in App Store Connect are not immediately available via the Sandbox API. The delay is typically a few hours, sometimes 24 hours.
+- Android: you must upload a signed APK/AAB to Google Play Console (even just to Internal Testing track) before Play Billing works. Direct APK installs cannot reach Play Billing.
+- Product status must be "Ready to Submit" or "Waiting for Review" in App Store Connect — not just "Prepared for Submission."
 
-**Consequences:** For this game (primarily mobile): `hover:bg-blue-500` on game buttons, `hover:bg-gray-500` on audio toggle, and `hover:text-white` on pause button will no longer show any visual feedback on mobile tap. If the active/pressed states rely solely on `hover:` classes, buttons appear unresponsive.
+**How to avoid:**
+- Create products in both stores before writing integration code — give them the propagation buffer.
+- Use StoreKit Configuration Files (Xcode) for iOS local sandbox testing that doesn't depend on App Store Connect.
+- For Android, always test via Google Play Internal Testing track, not direct APK install.
+- Use static product IDs that match exactly between code and store listings — they cannot be changed or reused after creation.
+- Set product IDs consistently across both platforms or accept cross-platform backend complexity.
 
-**Prevention:**
-- Audit all `hover:` classes in the codebase and ensure corresponding `active:` classes exist for touch feedback.
-- The game buttons already have `active:scale-95 active:bg-blue-700` which is good -- these will still work.
-- The audio toggle button has `hover:bg-gray-500` but no `active:` equivalent -- add one.
-- The pause button has `hover:text-white` but no `active:` equivalent -- add one.
-- If you need hover to work on touch: add `@custom-variant hover (&:hover);` to your CSS, but this re-enables the old (broken) behavior.
+**Warning signs:**
+- "Product not found" during testing after correct product ID setup
+- Testing Android IAP via direct APK install
+- No StoreKit configuration file set up for local Xcode testing
 
-**Detection:** Test all interactive elements on a real mobile device or mobile emulator after Tailwind migration.
-
-**Confidence:** HIGH -- [Tailwind v4 upgrade guide](https://tailwindcss.com/docs/upgrade-guide) documents this under "Hover styles on mobile."
-
-**Phase:** Tailwind migration.
-
----
-
-### Pitfall 12: Pinia Store `defineStore` Syntax May Need Update
-
-**What goes wrong:** Pinia v3 removed the deprecated `defineStore({ id: 'game' })` syntax, requiring `defineStore('game', { ... })` instead. This project already uses the correct syntax (`defineStore('game', { ... })` in gameStore.js line 65), so no change is needed. However, if this is not verified before upgrading, the store silently fails to register.
-
-**Why it happens:** Pinia v3 is a cleanup release that removes deprecated APIs.
-
-**Consequences:** If the deprecated syntax were used, the store would fail to initialize and the entire app would break.
-
-**Prevention:**
-- Verify `gameStore.js` uses `defineStore('game', { ... })` syntax (it does).
-- Also verify `PiniaStorePlugin` is not used anywhere (it isn't -- the project only uses `createPinia()`).
-- The migration from Pinia 2 to 3 should be the simplest upgrade in the stack. No code changes expected for this project.
-
-**Detection:** App fails to load store on startup. Console errors about invalid store definition.
-
-**Confidence:** HIGH -- [Pinia v2 to v3 migration guide](https://pinia.vuejs.org/cookbook/migration-v2-v3.html). Verified against current codebase.
-
-**Phase:** Dependency upgrades (low risk, bundle with other npm updates).
+**Phase to address:** IAP phase (setup and testing sub-task)
 
 ---
 
-### Pitfall 13: Native Project Files Become Stale Across 3 Major Capacitor Versions
+### Pitfall 8: Freemium Gate Backlash — Over-Restricting the Free Tier
 
-**What goes wrong:** The existing `ios/` and `android/` directories contain native project files generated by Capacitor 5. After migrating through 3 major versions, these files accumulate incremental patches that may leave behind deprecated configs, old SDK references, or orphaned files. The native projects work but carry technical debt and may behave unexpectedly.
+**What goes wrong:**
+The planned free tier caps gameplay at 2-back. If the free experience feels crippled (2-back is genuinely too easy for returning players, and users can't even explore the game properly), the App Store reviews will say "used to be free, now gutted" and the conversion rate will be driven by resentment rather than genuine value perception. This is the Duolingo "energy system" problem — users experience the gate as punishment.
 
-**Why it happens:** Each `npx cap migrate` adds and modifies files but doesn't always clean up files from previous versions. Over 3 major hops, the cruft accumulates.
+**Why it happens:**
+Developers design the paywall to maximize pressure to convert. The free tier becomes a demo, not a product. Users who came from the free web version at polynback.fun feel betrayed rather than excited.
 
-**Consequences:** Build warnings, unexpected runtime behavior on specific OS versions, difficulty debugging native issues, App Store review rejections for targeting old SDKs.
+**How to avoid:**
+- The 2-back cap is a reasonable starting constraint but evaluate it honestly: can a new user actually experience the game's core loop and feel its value at 2-back? If yes, proceed. If the game only gets interesting at 3-back+, the cap kills conversion by eliminating the "aha moment."
+- Frame the paywall as "unlock your potential" not "you've hit a wall." Messaging matters enormously.
+- Show the locked content clearly (grayed-out modes, locked level indicators) — users who see what they're missing convert better than users who hit invisible walls.
+- Offer a clear one-time purchase call to action at the moment of natural frustration (just after a great run that would unlock at higher levels), not as a constant overlay.
+- Do NOT convert the polynback.fun web version to freemium — keep it fully free as the marketing/discovery funnel to the app.
 
-**Prevention:**
-- After completing all Capacitor version hops (5->6->7->8), consider regenerating native projects from scratch:
-  1. Document any custom native configurations (background colors, status bar settings, splash screens, app icons).
-  2. Delete `ios/` and `android/` directories.
-  3. Run `npx cap add ios` and `npx cap add android`.
-  4. Run `npx cap sync`.
-  5. Re-apply custom native configurations.
-- The project's native customizations are minimal: just `backgroundColor: "#0f1729"` in capacitor.config.json and standard Capacitor defaults.
-- This also resolves Pitfall 3 (CocoaPods -> SPM migration) cleanly.
+**Warning signs:**
+- Conversion rate under 1% after launch (industry average 2.18% freemium, 12.11% hard paywall)
+- App Store reviews mentioning "used to be free" or "cash grab"
+- No clear in-app explanation of what premium unlocks
 
-**Detection:** Gradle deprecation warnings, Xcode warnings about outdated settings, stale Podfile references.
-
-**Confidence:** MEDIUM -- based on community patterns for multi-version Capacitor upgrades. The regeneration approach is recommended by [Quasar Framework's Capacitor guide](https://quasar.dev/quasar-cli-vite/developing-capacitor-apps/capacitor-version-support/) and Capacitor community discussions.
-
-**Phase:** Dependency upgrades (final step after all Capacitor version hops).
+**Phase to address:** IAP + UX phase
 
 ---
 
-## Minor Pitfalls
+### Pitfall 9: App Store Metadata Rejection — Capacitor/WebView Apps
+
+**What goes wrong:**
+Apple reviews Capacitor apps (WKWebView-based) more carefully than fully native apps. Common rejection reasons specific to Capacitor/hybrid apps:
+- Privacy manifest (`PrivacyInfo.xcprivacy`) is missing or incomplete — rejection since May 2024, required for all submissions.
+- App looks identical to a website (reviewer perceives it as "web app wrapped in native shell") and rejects under guideline 4.2 (minimum functionality).
+- Non-public API usage flags — older Capacitor/Ionic framework versions had this issue; Capacitor 8 resolved most cases but third-party plugins may still trigger it.
+- App accesses UserDefaults (Capacitor Preferences) without listing `NSPrivacyAccessedAPICategoryUserDefaults` with reason code `CA92.1` in the privacy manifest.
+
+**Why it happens:**
+Privacy manifest requirements were introduced in 2024. Many Capacitor plugin authors have added manifests to their plugins, but app-level manifests still need to list each API category and approved reason code. The `@capacitor/preferences` plugin accesses UserDefaults, which requires explicit privacy manifest declaration.
+
+**How to avoid:**
+- Ensure `PrivacyInfo.xcprivacy` exists in the Xcode project and includes all required API categories.
+- `@capacitor/preferences` requires `NSPrivacyAccessedAPICategoryUserDefaults` with reason `CA92.1`.
+- Audit all Capacitor plugins for their own privacy manifests — each plugin with a manifest contributes to the aggregate.
+- The app must have enough native differentiation to pass guideline 4.2 — haptic feedback, native IAP sheets, native social login flows, and offline capability all support this.
+- Use Capacitor 6+ (this project uses 8) — versions 4 and 5 before patch releases lacked privacy manifest support.
+
+**Warning signs:**
+- No `PrivacyInfo.xcprivacy` file in the Xcode project
+- Privacy manifest exists but does not list `NSPrivacyAccessedAPICategoryUserDefaults`
+- First submission — expect higher scrutiny; have responses ready for common reviewer questions
+
+**Phase to address:** App Store submission phase (before first submission)
 
 ---
 
-### Pitfall 14: Tailwind v4 Button Cursor Default Change
+### Pitfall 10: Restore Purchases — Missing Flow Causes App Store Rejection
 
-**What goes wrong:** Tailwind v4's Preflight changes the default cursor on `<button>` elements from `pointer` to `default`. Game buttons will no longer show a pointer cursor on hover (desktop).
+**What goes wrong:**
+Apple requires that all apps with non-consumable IAP provide a "Restore Purchases" mechanism. Users who bought on one device and reinstall or buy a new device must be able to restore without paying again. If the restore button is absent or non-functional, Apple rejects the app at review.
 
-**Prevention:** Add `cursor-pointer` explicitly to button elements or add a global CSS rule: `button { cursor: pointer; }`. The game is primarily mobile so this is cosmetic.
+**Why it happens:**
+Developers implement the purchase flow but forget the restore flow. The restore flow is also the mechanism for users who uninstall and reinstall — without it, they must repurchase or lose access.
 
-**Confidence:** HIGH -- [Tailwind v4 upgrade guide](https://tailwindcss.com/docs/upgrade-guide).
+**How to avoid:**
+- Include a visible "Restore Purchases" button accessible from the paywall screen and from Settings.
+- The restore function must be wired to the platform's restore API (StoreKit `Transaction.currentEntitlements` / Google Play `queryPurchasesAsync`).
+- After restore, the backend must be notified to re-validate and re-mark the account as premium.
+- Test restore explicitly: purchase in sandbox, delete app, reinstall, tap Restore — confirm premium status returns without repurchasing.
+- For account-based premium (the planned model), restore is simpler — user logs in and the server knows they're premium. Still, a standalone "Restore Purchases" button is required even if it just triggers a server re-check.
 
-**Phase:** Tailwind migration.
+**Warning signs:**
+- No Restore Purchases button in the app
+- Restore flow only works for logged-in users (breaks for users who bought before accounts existed)
+- Restore tested only on the same device without reinstall
 
----
-
-### Pitfall 15: Tailwind v4 Important Modifier Position Change
-
-**What goes wrong:** The `!` important modifier moved from before the utility to after: `!bg-red-500` becomes `bg-red-500!`. If any templates use the `!` prefix, they silently stop working.
-
-**Prevention:** Search codebase for `!` prefix in class strings. The upgrade tool handles this but verify in dynamic class bindings.
-
-**Confidence:** HIGH -- [Tailwind v4 upgrade guide](https://tailwindcss.com/docs/upgrade-guide).
-
-**Phase:** Tailwind migration.
-
----
-
-### Pitfall 16: TypeScript Strict Mode Reveals Hidden Bugs
-
-**What goes wrong:** Enabling TypeScript's `strict` mode surfaces dozens of legitimate issues that existed silently in JavaScript: nullable access without checks (`highScoreData.nBack` could be null), implicit `any` types, and unreachable code paths. The developer sees a wall of errors and either waters down strict mode or gets stuck fixing issues for days.
-
-**Prevention:**
-- Start with `strict: false` in `tsconfig.json` and enable strict options incrementally:
-  1. `noImplicitAny: true` first (forces type annotations)
-  2. `strictNullChecks: true` second (catches the null/undefined bugs in CONCERNS.md)
-  3. `strict: true` last (enables all remaining checks)
-- This staged approach prevents the "wall of errors" problem and lets you address each category of issue systematically.
-- The CONCERNS.md already documents the exact issues `strictNullChecks` will catch (division by zero, unvalidated localStorage reads, optional nBack field).
-
-**Detection:** TypeScript compiler output. Count of errors at each strictness level.
-
-**Confidence:** HIGH -- standard TypeScript migration pattern, documented across multiple migration guides.
-
-**Phase:** TypeScript migration.
+**Phase to address:** IAP phase
 
 ---
 
-### Pitfall 17: Testing Infrastructure Depends on Correct Migration Order
+## Technical Debt Patterns
 
-**What goes wrong:** Setting up Vitest before completing dependency upgrades means configuring test infrastructure twice -- once for the old stack, once for the new. Setting up tests after TypeScript migration means the extracted components and new types are already established, and tests can be written once in their final form.
-
-**Prevention:**
-- Dependency upgrades FIRST (Capacitor, Vite, Tailwind, Pinia, Vue).
-- Component extraction SECOND.
-- TypeScript migration THIRD.
-- Test infrastructure FOURTH (tests are written against the final codebase shape).
-- This order minimizes rework and means every test written is a test that survives.
-
-**Detection:** Having to rewrite test configs or test files after a subsequent migration step.
-
-**Confidence:** MEDIUM -- based on general software engineering principles and reports from teams doing similar migrations.
-
-**Phase:** All phases (ordering concern).
+| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
+|----------|-------------------|----------------|-----------------|
+| Store premium flag only in Capacitor Preferences | Simple, instant | Bypassable, lost on reinstall | Never — always back with server |
+| Skip server-side receipt validation | Saves backend work | IAP bypass on jailbroken devices | Never for paid content |
+| Never-expiring Sanctum tokens | No re-login friction | Security risk if token leaked | Never — use long but finite expiry |
+| Single token for both iOS and Android with same product ID | Simplified backend | Product IDs are platform-specific in store consoles | Acceptable at backend level — one product record maps to two platform IDs |
+| Use Capacitor Preferences for auth token storage | Quick to implement | Unencrypted on Android | Never — use secure keychain/keystore plugin |
+| Same marketing claims on web and App Store | Consistent messaging | App Store reviews both; FTC covers both | Acceptable if claims are already conservative/compliant |
+| Hardcode product prices in UI | Avoids async product fetch | Breaks when price is localized or discounted | Never — always use `product.displayPrice` from the store |
+| Skip grandfathering plan for web users | Simpler IAP logic | Web users who migrate to app lose progress | Never — design migration path before launch |
 
 ---
 
-### Pitfall 18: @vitejs/plugin-vue Version Must Match Vite Major Version
+## Integration Gotchas
 
-**What goes wrong:** The project uses `@vitejs/plugin-vue ^4.2.3` which is paired with Vite 4. When upgrading Vite, the plugin must also be upgraded to the matching major version. Mismatched versions cause cryptic build errors or silent SFC compilation issues.
-
-**Prevention:**
-- Vite 5 requires `@vitejs/plugin-vue` v5.x
-- Vite 6 requires `@vitejs/plugin-vue` v5.x or v6.x (check compatibility)
-- Vite 7 requires `@vitejs/plugin-vue` v6.x
-- Always upgrade both together: `npm install vite@latest @vitejs/plugin-vue@latest`
-
-**Detection:** Build errors about SFC compilation, missing Vue compiler, or HMR failures.
-
-**Confidence:** MEDIUM -- based on npm registry version alignment and [Vite plugin docs](https://vite.dev/plugins/).
-
-**Phase:** Dependency upgrades (Vite step).
+| Integration | Common Mistake | Correct Approach |
+|-------------|----------------|------------------|
+| StoreKit 2 / Capacitor | Trust client-side `Transaction.currentEntitlements` for access control | Verify transaction JWS with Apple App Store Server API on backend |
+| Google Play Billing | Call `consume()` on non-consumable to "re-enable" purchasing | Call `acknowledge()` only — consuming makes it repurchasable |
+| Laravel Sanctum + Mobile | Use cookie-based session auth (web default) | Use token-based auth (header `Authorization: Bearer {token}`) |
+| Google Sign-In / iOS | Use WKWebView for Google OAuth redirect | Use ASWebAuthenticationSession (required by App Store) |
+| Apple Sign-In / Android | Implement natively with Google SDK equivalent | Use capacitor-social-login plugin or backend-side SIWA validation |
+| Capacitor Preferences | Store auth token directly | Use `capacitor-secure-storage` or equivalent (AES-256 on Keychain/Keystore) |
+| Google Sign-In | Include Facebook SDK transitively | Explicitly set `facebook: false` in capacitor config to avoid AD_ID permission |
+| App Store Connect products | Create product, immediately test in sandbox | Wait 1–24 hours for product propagation, or use StoreKit Config File locally |
+| Privacy manifest | Write single app-level manifest | Each plugin with NSPrivacyAccessedAPITypes contributes; audit all plugins |
+| iOS URL scheme for OAuth | Skip or use wrong bundle ID | URL scheme must match exactly; Google Sign-In requires reversed client ID scheme |
 
 ---
 
-## Phase-Specific Warnings
+## Performance Traps
 
-| Phase Topic | Likely Pitfall | Mitigation |
-|---|---|---|
-| Capacitor 5->6 | localStorage data loss (Pitfall 1) | Verify `androidScheme` is already `https` (it is) |
-| Capacitor 5->6->7->8 | Skipping versions (Pitfall 2) | Sequential migration with build verification at each step |
-| Capacitor 7->8 | CocoaPods -> SPM (Pitfall 3) | Plan to regenerate native projects (Pitfall 13) |
-| Vite upgrade | Version ceiling (Pitfall 7) | Target Vite 6 unless Tailwind adds Vite 7 support |
-| Vite upgrade | process.env usage (Pitfall 10) | Replace with import.meta.env.DEV |
-| Vite upgrade | Plugin version mismatch (Pitfall 18) | Upgrade @vitejs/plugin-vue together with Vite |
-| Tailwind 3->4 | Silent visual regressions (Pitfall 4) | Screenshot comparison of all states before/after |
-| Tailwind 3->4 | Default color changes (Pitfall 5) | Audit bare border/ring classes |
-| Tailwind 3->4 | Config file migration (Pitfall 6) | Run upgrade tool, verify CSS imports |
-| Tailwind 3->4 | Mobile hover (Pitfall 11) | Add active: states alongside hover: states |
-| Component extraction | Broken animations (Pitfall 9) | Map watchers to components, test each animation |
-| TypeScript migration | Options API incompatibility (Pitfall 8) | Convert to script setup during TS migration |
-| TypeScript migration | Strict mode overwhelm (Pitfall 16) | Enable strict options incrementally |
-| Test infrastructure | Wasted effort on wrong codebase (Pitfall 17) | Tests come LAST, after all migrations |
+| Trap | Symptoms | Prevention | When It Breaks |
+|------|----------|------------|----------------|
+| Sync on every game round completion | Slow round transitions as API waits | Batch sync asynchronously, fire-and-forget with queue | From day 1 on slow connections |
+| Fetch all user stats on app launch | Slow app startup, spinner before game | Cache stats locally, update in background after game session | At 1k+ sessions per user |
+| No offline queue for stats | Data loss when user plays offline | Queue writes locally, flush on next connection | Any time a user plays on airplane mode |
+| Re-validate premium status on every screen navigation | UI flash as premium check resolves | Cache entitlement, revalidate on foreground/session start only | From day 1 on slow connections |
+| Sync conflict resolution by last-write-wins | High scores overwritten by older device data | Use max() strategy for scores, not last-write-wins | When user has multiple devices |
 
-## Recommended Migration Order (Based on Pitfalls)
+---
 
-Based on dependency chains and pitfall avoidance:
+## Security Mistakes
 
-1. **Capacitor 5->6->7->8** -- must be sequential, involves native builds, highest risk of data loss
-2. **Vite 4->6** (skip 5, target 6 for Tailwind compatibility) + **@vitejs/plugin-vue** + **Vue 3.5** + **Pinia 3**
-3. **Tailwind 3->4** -- requires Vite to be settled first, visual regression testing
-4. **Component extraction** -- smaller files are easier to type
-5. **TypeScript migration** -- types are written once on final component shapes
-6. **Test infrastructure** -- tests are written once against final codebase
+| Mistake | Risk | Prevention |
+|---------|------|------------|
+| Premium entitlement gated only by local Pinia flag | Trivially bypassed via devtools or jailbreak | Gate on server-issued JWT claim or backend-verified session |
+| Sanctum token stored in Capacitor Preferences (plaintext) | Token readable from device file system | Use `@capacitor-community/secure-storage` with Keychain/Keystore |
+| Receipt validation logic in client JavaScript | Attacker can modify JS bundle | All validation runs server-side in Laravel; client only passes receipts |
+| No HTTPS enforcement on Laravel API | Token interception on open WiFi | Enforce HTTPS in Laravel, Capacitor already uses HTTPS for WKWebView |
+| Google Sign-In client secret exposed in frontend code | OAuth credential theft | Only `client_id` (public) goes in frontend; `client_secret` stays in Laravel .env |
+| Hardcoded App Store shared secret in mobile bundle | Receipt validation secret extractable from IPA | Shared secret only in Laravel `.env`, never in Capacitor/JS bundle |
+
+---
+
+## UX Pitfalls
+
+| Pitfall | User Impact | Better Approach |
+|---------|-------------|-----------------|
+| Paywall modal fires immediately on first launch | Alienates new users before they understand the game | Gate only after user has completed at least one game session |
+| No indication what premium unlocks | Users don't know what they're paying for | Show locked content visually (grayed modes, locked n-back levels) with clear unlock CTA |
+| "Log in required" for stats during first session | Friction kills early engagement | Allow offline stats locally, prompt account creation after first few sessions |
+| Restore Purchases requires account login | Users who bought before accounts existed cannot restore | Restore must work via platform's native receipt lookup, independent of account |
+| Paywall interrupts game mid-session | Breaks the flow the product is built around | Show paywall only at natural pause points: game over screen, menu navigation |
+| Account creation email verification blocks immediate play | User abandons during verification wait | Allow immediate play after registration; verify email asynchronously |
+| Sync failure shown as error modal | Disruptive to gameplay | Surface sync issues silently (banner or subtle indicator), never block gameplay |
+
+---
+
+## "Looks Done But Isn't" Checklist
+
+- [ ] **IAP Purchase Flow:** Purchase succeeds on device — verify backend also confirmed via receipt validation. Both iOS and Android must go through server.
+- [ ] **Restore Purchases:** "Restore" button visible, wired to platform restore API, tested with reinstall on sandbox account.
+- [ ] **Sign In with Apple:** Flows through `ASWebAuthenticationSession`, not a WKWebView. Tested on physical device (not simulator).
+- [ ] **Google Sign-In iOS:** Reversed client ID URL scheme registered in `Info.plist`. Tested on physical device with correct bundle ID.
+- [ ] **Privacy Manifest:** `PrivacyInfo.xcprivacy` lists `NSPrivacyAccessedAPICategoryUserDefaults` with `CA92.1`. All plugins audited.
+- [ ] **Auth Token Storage:** Token written to Keychain/Keystore (secure storage plugin), not Capacitor Preferences.
+- [ ] **FTC Compliance:** App Store description, marketing site copy, and in-app copy reviewed for unsubstantiated efficacy claims.
+- [ ] **Data Migration:** User who played before accounts were introduced can create an account and finds their history preserved.
+- [ ] **Offline Gameplay:** App functions fully without internet. Stats queue locally. Sync happens when connection returns.
+- [ ] **Premium State on Launch:** App fetches/validates premium status from server on each foreground event, not only on purchase.
+- [ ] **Google Play Acknowledgment:** Non-consumable purchase acknowledged within 3 days (by backend) — not silently auto-refunded.
+- [ ] **PENDING Purchase State (Android):** App does not grant entitlement to purchases in PENDING state; waits for PURCHASED state.
+- [ ] **Marketing Claims:** No copy uses "scientifically proven," "clinically proven," "guaranteed to improve," or disease-treatment language.
+- [ ] **Apple Sign-In Button:** Meets Apple's visual design requirements exactly (color, corner radius, sizing). Custom styling causes rejection.
+
+---
+
+## Recovery Strategies
+
+| Pitfall | Recovery Cost | Recovery Steps |
+|---------|---------------|----------------|
+| Client-side IAP bypass discovered post-launch | HIGH | Add server validation endpoint, force app update, revoke local entitlements on next launch |
+| App Store rejection for guideline 4.8 (missing SIWA) | MEDIUM | Implement SIWA, resubmit — typical review turnaround 24–48h |
+| App Store rejection for unsubstantiated claims | MEDIUM | Revise metadata/copy, resubmit — no code change needed, review 24–48h |
+| User data lost during local→server migration | HIGH | Restore from backup (if any), implement migration flow, issue goodwill credits |
+| Google Play auto-refund from missing acknowledgment | MEDIUM | Add acknowledgment logic, release patch, accept revenue loss for unacknowledged transactions |
+| FTC inquiry into marketing claims | VERY HIGH | Remove claims immediately, consult legal, preserve all marketing materials for audit |
+| Auth token in plaintext discovered | HIGH | Force token invalidation server-side, push update with secure storage, rotate all tokens |
+| SIWA implementation rejected for using WKWebView | LOW | Switch to ASWebAuthenticationSession (supported by capacitor-social-login plugin), resubmit |
+
+---
+
+## Pitfall-to-Phase Mapping
+
+| Pitfall | Prevention Phase | Verification |
+|---------|------------------|--------------|
+| Client-side IAP trust (Pitfall 1) | IAP implementation phase | Test paywall bypass attempt with devtools; confirm server-side validation rejects it |
+| Missing Apple Sign-In alongside Google (Pitfall 2) | Auth/social login phase | Submit test build to TestFlight; both login providers visible and functional |
+| FTC marketing claims (Pitfall 3) | Marketing site + App Store metadata phase | Legal review of all copy; cross-reference against FTC Lumosity order language |
+| Google Play unacknowledged purchase auto-refund (Pitfall 4) | IAP implementation phase | Simulate interrupted purchase in Android sandbox; confirm acknowledgment fires |
+| Local data migration to server (Pitfall 5) | Auth/accounts phase | QA path: existing user with data, creates account, all history present |
+| Sanctum token expiry / forced re-login (Pitfall 6) | Auth/backend phase | Expire a test token manually; confirm app handles 401 gracefully without data loss |
+| IAP "Product not found" during development (Pitfall 7) | IAP implementation phase | Use StoreKit Config File (iOS) and Internal Testing track (Android) from day one |
+| Freemium gate backlash (Pitfall 8) | IAP + UX design phase | Internal playtest: is the free experience genuinely enjoyable for a new user? |
+| App Store metadata / privacy manifest rejection (Pitfall 9) | App Store submission phase | Run Xcode privacy report before submission; ensure all APIs declared |
+| Missing Restore Purchases flow (Pitfall 10) | IAP implementation phase | Sandbox test: purchase, uninstall, reinstall, restore — premium state returns |
+
+---
 
 ## Sources
 
-- [Capacitor 6.0 Migration Guide](https://capacitorjs.com/docs/updating/6-0) -- HIGH confidence
-- [Capacitor 7.0 Migration Guide](https://capacitorjs.com/docs/updating/7-0) -- HIGH confidence
-- [Capacitor 8.0 Migration Guide](https://capacitorjs.com/docs/updating/8-0) -- HIGH confidence
-- [Capacitor 6 localStorage Bug - GitHub #7548](https://github.com/ionic-team/capacitor/issues/7548) -- HIGH confidence
-- [Tailwind CSS v4 Upgrade Guide](https://tailwindcss.com/docs/upgrade-guide) -- HIGH confidence
-- [Tailwind v4 @apply in Vue SFC - GitHub #15717](https://github.com/tailwindlabs/tailwindcss/issues/15717) -- MEDIUM confidence
-- [Vite 7 + @tailwindcss/vite Incompatibility - GitHub #20284](https://github.com/vitejs/vite/issues/20284) -- MEDIUM confidence (may be resolved by execution time)
-- [@tailwindcss/vite Vite 7 Support - GitHub #18381](https://github.com/tailwindlabs/tailwindcss/issues/18381) -- MEDIUM confidence
-- [Pinia v2 to v3 Migration](https://pinia.vuejs.org/cookbook/migration-v2-v3.html) -- HIGH confidence
-- [Vite 5 Migration Guide](https://v5.vite.dev/guide/migration) -- HIGH confidence
-- [Vite 6 Migration Guide](https://v6.vite.dev/guide/migration) -- HIGH confidence
-- [Vue TypeScript Overview](https://vuejs.org/guide/typescript/overview) -- HIGH confidence
-- [Vue TypeScript with Composition API](https://vuejs.org/guide/typescript/composition-api) -- HIGH confidence
-- [Vite Environment Variables](https://vite.dev/guide/env-and-mode) -- HIGH confidence
+- [Apple App Store Review Guidelines — Sections 3.1.1, 3.1.2, 4.8](https://developer.apple.com/app-store/review/guidelines/) — HIGH confidence
+- [Capawesome: Tips for Setting Up In-App Purchases with Capacitor](https://capawesome.io/blog/tips-for-setting-up-in-app-purchases-with-capacitor/) — HIGH confidence
+- [FTC v. Lumos Labs (Lumosity) — Stipulated Final Order](https://www.ftc.gov/system/files/documents/cases/160105lumoslabsstip.pdf) — HIGH confidence
+- [FTC: Marketers of LearningRx Programs Settle FTC Charges](https://www.ftc.gov/news-events/news/press-releases/2016/05/marketers-one-one-brain-training-programs-settle-ftc-charges-claims-about-ability-treat-severe) — HIGH confidence
+- [Apple: Sign in with Apple No Longer Exclusively Required — 9to5Mac / Jan 2024](https://9to5mac.com/2024/01/27/sign-in-with-apple-rules-app-store/) — HIGH confidence
+- [Google Play Billing: One-Time Purchase Lifecycle — Android Developers](https://developer.android.com/google/play/billing/lifecycle/one-time) — HIGH confidence
+- [Google Play Billing: Fighting Fraud and Abuse](https://developer.android.com/google/play/billing/security) — HIGH confidence
+- [RevenueCat: Handling Google Play Billing Edge Cases](https://www.revenuecat.com/blog/engineering/google-play-edge-cases/) — MEDIUM confidence
+- [Cap-go: capacitor-social-login issues — URL scheme and provider bugs](https://github.com/Cap-go/capacitor-social-login/issues) — MEDIUM confidence
+- [Capacitor: Privacy Manifest Documentation](https://capacitorjs.com/docs/v5/ios/privacy-manifest) — HIGH confidence
+- [Adapty: iOS In-App Purchase Server-Side Receipt Validation](https://adapty.io/blog/ios-in-app-purchase-server-side-validation/) — MEDIUM confidence
+- [Laravel Sanctum — Refresh Token Patterns](https://www.liquidbcn.com/en/insights/implementing-access-tokens-refresh-tokens-laravel-sanctum) — MEDIUM confidence
+- [Medium: Freemium Bait-and-Switch Pattern 2025](https://www.bez-kabli.pl/news/free-apps-are-getting-worse-in-2025-how-freemium-turned-into-a-bait-and-switch/) — MEDIUM confidence
+- [Adapty: Freemium to Premium Conversion Techniques](https://adapty.io/blog/freemium-to-premium-conversion-techniques/) — MEDIUM confidence
+- [Offline Sync Conflict Resolution Patterns — Sachith Dassanayake, Feb 2026](https://www.sachith.co.uk/offline-sync-conflict-resolution-patterns-architecture-trade%E2%80%91offs-practical-guide-feb-19-2026/) — MEDIUM confidence
+- [Paywall Bypass via Client-Side Trust — Medium, Feb 2026](https://medium.com/@default_Ox/paywall-bypass-how-client-side-trust-led-to-a-free-premium-upgrade-f54e65699628) — MEDIUM confidence
 
 ---
 
-*Pitfalls analysis: 2026-03-01*
+*Pitfalls research for: Adding monetization, backend API, social login, app store submission to Vue/Capacitor brain training app*
+*Researched: 2026-03-02*

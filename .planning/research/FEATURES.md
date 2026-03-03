@@ -1,213 +1,300 @@
-# Feature Landscape: Production Hardening
+# Feature Research: v2.0 Monetized Platform
 
-**Domain:** Cognitive training mobile app (Vue 3 + Capacitor) -- codebase hardening milestone
-**Researched:** 2026-03-01
-**Confidence:** HIGH (well-established patterns, verified against official docs and current ecosystem)
+**Domain:** Brain training / cognitive training mobile app — freemium monetization, stats, game modes, social auth, cross-device sync, marketing site
+**Researched:** 2026-03-02
+**Confidence:** MEDIUM-HIGH (verified against competitor analysis, App Store requirements, and industry patterns)
 
 ## Context
 
-This feature landscape covers Milestone 1: "Harden the Foundation" -- everything needed to make an existing, charming but fragile Vue 3 + Capacitor game app production-ready for app store submission. This is NOT about new gameplay features. It is about engineering quality, reliability, and app store compliance.
+This is the M2 research document. The v1.0 foundation is complete: a polished, tested, TypeScript Capacitor app with quad n-back gameplay. M2 adds monetization, accounts, progression, new modes, and a marketing presence. The existing gameplay loop is already strong — M2 must extend it without breaking it.
 
-The existing app has: working quad n-back gameplay, high scores, achievements, audio feedback, basic mobile layout. It lacks: tests, TypeScript, error handling, monitoring, accessibility, proper native lifecycle management, and has stale dependencies (Capacitor 5, Vite 4, Tailwind 3).
-
----
-
-## Table Stakes
-
-Features/capabilities without which the app will either be rejected from stores, get bad reviews, or have operational blind spots that make paid-user support impossible.
-
-### Engineering Foundation
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| TypeScript migration | Type safety prevents entire classes of runtime bugs. The existing codebase has documented implicit coercion issues and missing type annotations. Without TS, every subsequent feature (M2 subscriptions, sync) is built on sand. | High | Full migration of all `.vue` and `.js` files to `<script setup lang="ts">`. Vue 3.5+ and Pinia both have excellent TS support. Do after dependency updates. |
-| Unit test infrastructure (Vitest) | Zero tests means zero confidence in refactors. The game logic (score calculation, accuracy, stimulus matching, n-back comparison) is the core product -- regressions here are catastrophic. | Medium | Vitest + @vue/test-utils. Prioritize store actions (game logic) over component rendering tests. Target 90%+ coverage on `gameStore`. |
-| Integration test coverage | Individual units passing does not guarantee the game flow works. Start-to-game-over flow, pause/resume, modal transitions all need coverage. | Medium | Mount App component with real store, simulate user flows. Fake timers for game loop testing. |
-| Dependency updates (Capacitor 5->8, Vite 4->7, Tailwind 3->4, Vue 3.3->3.5, Pinia 2->3) | Capacitor 5 is 3 major versions behind. Security patches, performance improvements, and new platform requirements (Android API 36, iOS 15 minimum) all mandate this. App store submissions on stale SDKs risk rejection. | High | Must be sequential: Vue/Vite first (foundational), then Tailwind (CSS), then Capacitor (most breaking changes). Capacitor 8 requires Node 22, Xcode 26+, Android Studio 2025.2.1+. |
-| Component decomposition | 488-line App.vue is a maintenance and testing nightmare. Extracting components enables isolated testing, faster comprehension, and safer refactoring. | Medium | Extract: game display area, control buttons, config panel, modal container. Keep App.vue as orchestrator only (~100 lines). |
-
-### Error Handling & Resilience
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Global error handler (`app.config.errorHandler`) | Unhandled errors currently go to browser console only. Users see white screens with no feedback. Production apps must catch, report, and gracefully recover from errors. | Low | Vue 3 provides `app.config.errorHandler` and `app.config.warnHandler`. Also add `window.onerror` and `window.onunhandledrejection` for non-Vue errors. |
-| Error boundary components | A crash in AchievementToast should not take down the entire game. Error boundaries isolate failures to the component that caused them. | Low | Vue 3 `onErrorCaptured` hook. Wrap non-critical components (achievements, hints, modals) in boundaries that show fallback UI. |
-| localStorage error handling | Documented concern: `JSON.parse()` without try-catch, no `QuotaExceededError` handling. Corrupted localStorage crashes app on startup. | Low | Wrap all reads in try-catch with sensible defaults. Wrap all writes in try-catch with silent degradation. Create a `useStorage` utility. |
-| Audio failure graceful degradation | Audio loading failures are silent. Users do not know sound is broken. Audio is part of the core game feedback loop. | Low | Track audio readiness state. If initialization fails, disable audio toggle and show brief notification. Game must remain fully playable without audio. |
-| Network error handling for assets | Audio files loaded via `fetch()` with no retry logic. Failed loads silently degrade experience. | Low | Bundle audio assets directly in the build output rather than fetching at runtime. For a Capacitor native app, all assets ship with the binary -- no network needed. |
-
-### App Store Compliance
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Privacy policy | Mandatory for both iOS and Android app store submission regardless of whether the app collects data. Must be accessible in-app and linked in store listing. | Low | Even though Poly N-Back collects no PII, a privacy policy stating "we collect no personal data" is required. Host at polynback.com/privacy or polynback.fun/privacy. |
-| App icons (all sizes) | App store submission requires icons at specific resolutions for both platforms. Missing sizes = rejection. | Low | Capacitor 8 provides `@capacitor/assets` tool for generating all required icon sizes from a single source image. |
-| Splash screen configuration | Apps without splash screens show white flash on launch. Looks broken and unprofessional. Apple/Google both expect proper launch screens. | Low | `@capacitor/splash-screen` plugin. Configure `launchShowDuration`, `launchAutoHide`, match app theme color `#0f1729`. |
-| App completeness | Apple rejects apps with placeholder content, "coming soon" features, or incomplete flows. 40%+ of rejections are for incomplete apps. | Low | Audit all UI for placeholder text. Ensure every button has a destination. Remove any dead code paths or unreachable UI states. |
-| Content rating | Both stores require honest completion of content rating questionnaire. | Low | Cognitive training game with no violence, no user-generated content, no social features = lowest age rating. |
-| Correct build format | Google Play requires AAB (Android App Bundle) format. iOS requires proper signing and provisioning profiles. | Low | Capacitor 8 handles this. Ensure `capacitor build android` produces AAB, not APK. |
-
-### Data Persistence & Reliability
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Migrate localStorage to Capacitor Preferences | Mobile OSes periodically clear `window.localStorage` in WebView contexts. Apple and Google both document this behavior. High scores and achievements vanishing = terrible UX and 1-star reviews. | Medium | `@capacitor/preferences` uses native `UserDefaults` (iOS) and `SharedPreferences` (Android). Falls back to localStorage on web. All current localStorage usage must migrate. |
-| Data validation on load | Corrupted or incomplete data from storage should not crash the app. Every stored value needs schema validation and default fallbacks. | Low | Validate `highScoreData` has all required fields. Validate `achievements` is a valid JSON array. Use defaults if validation fails. |
-
-### Memory & Performance
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Timer cleanup on unmount | Documented concern: `feedbackTimeout` can be overwritten without clearing previous instance. Accumulating timeouts in long sessions causes memory buildup. | Low | Create a `useManagedTimeout` composable that auto-clears on component unmount. Replace all raw `setTimeout`/`setInterval` calls. |
-| Stimulus history cap | `stimulusHistory` grows unbounded. Extended sessions (1000+ stimuli) accumulate significant memory. | Low | Cap to `nBack + 50` entries using shift-on-push or circular buffer. Only need `nBack` entries for game logic. |
-| Audio context cleanup | AudioContext never cleaned up on app unmount. Multiple buffer sources created without management. | Low | Close AudioContext in app teardown. Track active buffer sources. |
-
-### App Lifecycle Management
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Background/foreground state handling | When a user switches away from the app mid-game, the game timer keeps running in the background. Coming back to a game-over state is confusing. | Medium | Use `@capacitor/app` plugin's `appStateChange` listener. Auto-pause game when app goes to background. Resume when returning to foreground. |
-| Status bar configuration | Status bar must match app theme. Inconsistent styling looks broken. | Low | `@capacitor/status-bar` plugin. Set style to dark content, background color to match app theme `#0f1729`. Handle Android 13+ splash screen timing. |
-
-### Bug Fixes (Documented Concerns)
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Division-by-zero guards | Accuracy calculations can produce `Infinity` or `NaN` if `potentialCorrectAnswers` is zero. | Low | Add explicit zero-check guards in all division operations in gameStore getters and actions. |
-| Response validation bounds checking | `respondToStimulus()` accesses `stimulusHistory[nBackIndex]` without validating array bounds. | Low | Add guard: `if (nBackIndex < 0 \|\| nBackIndex >= stimulusHistory.length) return early`. |
-| Button response debouncing | Rapid clicks could theoretically record multiple responses for a single stimulus. | Low | Debounce or gate responses per stimulus turn. Disable buttons immediately on first response of each type per turn. |
+**Framing:** This isn't a new product. It's a monetized version of something that already works. Every feature judgment is filtered through: does this add to the "one more round" experience, or does it introduce friction that kills it?
 
 ---
 
-## Differentiators
+## Feature Landscape
 
-Not expected for a basic app store listing, but these significantly improve perceived quality and set the app apart from typical brain training apps that feel generic or cheaply made.
+### Table Stakes (Users Expect These)
+
+Features users assume exist in a paid brain training app. Missing these = product feels incomplete or untrustworthy.
+
+#### Monetization & Purchase
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Freemium tier with clear free value | Users evaluate before paying. A completely locked app gets uninstalled immediately. Free tier must deliver genuine cognitive training value, not a taste-tease. | LOW | Free = quad n-back capped at 2-back, no stats history, no game modes beyond core. Clear but not punitive. |
+| Transparent paywall gate | Users must understand exactly what they're buying before they pay. Surprise paywalls after investment = rage reviews. | LOW | Show locked indicators on mode/level selectors with clear "Unlock all levels & modes — $3.99" messaging. Not a popup wall — an inline signal. |
+| One-time purchase (not subscription) | Cognitive training users are highly resistant to subscriptions for "practice tools." Competitors like Lumosity switched to subscription and lost goodwill. One-time purchase signals fairness and respects users. | MEDIUM | Implemented via native StoreKit 2 (iOS) and Google Play Billing 7.x (Android). Needs server-side receipt validation via the Laravel backend. |
+| Purchase restoration | Apple requires "Restore Purchases" button. Users upgrading devices expect their purchase to follow them. Failing here = 1-star review explosion. | LOW | Call `restorePurchases()` on the IAP plugin. Surface as a button in settings/paywall screen. |
+| Paywall accessible from settings | Users who upgrade devices need to find the restore/purchase path without starting a new game. | LOW | Settings screen with "Upgrade" section always visible to non-premium users. |
+
+#### User Accounts & Sync
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Social login (Google + Apple) | Password entry on mobile is a conversion killer. Users expect "Continue with Google" or "Sign in with Apple" — not email + password form. | MEDIUM | Apple Sign-In is required by App Store guidelines if any social login is offered. Google covers Android-first users. Both via Laravel Socialite on backend. |
+| Sign In with Apple (mandatory) | Apple App Store Review Guideline 4.8: apps offering third-party social login must also offer Sign in with Apple. Violation = rejection. | MEDIUM | Privacy-first (email relay, no tracking). Laravel Socialite has Apple driver. |
+| Cross-device progress sync | Users with iPhone + iPad, or who upgrade phones, expect their levels and history to persist. "I lost my data" is a common 1-star trigger. | HIGH | Session history, premium status, personal bests synced via Laravel API. Offline-first: local writes with periodic background sync. Conflict resolution: last-write-wins is sufficient for non-collaborative data. |
+| Account deletion | Apple App Store requires account deletion capability (since 2022). Failure to implement = rejection. | LOW | "Delete account" flow in settings. Laravel: soft-delete user, queue data deletion. |
+| Guest / play-without-account option | Forcing account creation before letting users play kills conversion. Users need to experience the game before committing. | LOW | App starts unauthenticated. Account prompt appears at paywall or after first session. Never before. |
+
+#### Stats & Progression
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Session history list | Users want to see their training record. A blank stats page after 10 sessions = app feels broken. | MEDIUM | Store session metadata: date, duration, n-back level, mode, overall accuracy. Display as reverse-chronological list. |
+| Overall accuracy over time (chart) | The primary cognitive training value prop is improvement. Without a visible trendline, users have no evidence it's working and churn. | MEDIUM | Simple line chart showing accuracy percentage per session. Use a lightweight chart library (Chart.js or uPlot). No fancy AI needed — just a trendline. |
+| Current streak (days trained) | Streak systems reduce 30-day churn by ~35% (Forrester 2024 data). Every brain training competitor has this. Missing it = users feel no pull to return daily. | LOW | Track last-trained date in persistenceStore. Show "🔥 5-day streak" on home screen. Break on missed day, not missed session. |
+| Personal best tracking | Users want to know their record n-back level achieved. Clear goal to beat. | LOW | Store `highestNBackAchieved` per mode. Already partially done in v1.0 score tracking — extend it. |
+| Per-attribute accuracy breakdown | Poly N-Back's USP is four simultaneous attributes. Showing which attribute a user struggles with (position vs. color vs. emoji vs. shape) is directly actionable coaching. No competitor offers this because most have single-attribute games. | MEDIUM | Per session: track hits/misses per button type. Store as `{ position: 0.72, color: 0.91, emoji: 0.65, shape: 0.88 }`. Display as bar chart or attribute card grid. |
+
+#### Game Modes
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Zen Mode | Users burned out by strike-based pressure need an accessible entry point. Without a no-pressure mode, casual users self-select out. | LOW | Disable strike system. No game-over. Session ends on user tap. Timer pressure optional. All scoring/stats still tracked. |
+| Time Attack (2-minute sprint) | Competitive users want fixed-duration challenges for consistent comparison and scheduling. "I have 2 minutes" is a real user behavior. | LOW | Fixed 120-second countdown. Game ends at zero. Score compared to personal best. Uses existing game loop — just add a countdown timer. |
+| Daily Challenge (fixed seed) | Creates daily return habit and social currency ("I got 87% today, what did you get?"). Spelunky, Wordle, and dozens of games proved this pattern. | MEDIUM | Seed = YYYY-MM-DD string hashed to RNG seed. Same seed = identical stimulus sequence for all players on that day. One attempt per day per user. Server provides today's seed to prevent cheating. |
+| Endless Mode (progressive difficulty) | Advanced users who blow past 5-back need a true progression challenge. Without it, expert users have no ceiling. | MEDIUM | Start at user's current n-back level. Auto-promote after N consecutive correct rounds (e.g., 3). Auto-demote after 2 misses. Session continues until user quits. Log final level reached. |
+
+#### App Store & Store Listing
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| App Store listing (iOS + Android) | The app doesn't exist for users until it's in the stores. | HIGH | App Store Connect + Google Play Console. Screenshots, description, keywords, privacy policy URL, age rating. Apply for App Store subscription entitlements only for IAP, not subscription. |
+| Privacy policy at polynback.com/privacy | Required by both stores. Required to be linked in App Store Connect. | LOW | Static page. "We collect: email (if you sign in), session stats (if syncing). We do not sell data." Simple and honest. |
+| App review demo credentials | If reviewers can't test premium features, they'll reject the app. Include test account credentials in App Review notes with premium already unlocked. | LOW | Create a test account with premium unlocked via a backend flag. Include in submission notes. |
+
+#### Marketing Site
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Marketing landing page at polynback.com | Users who hear about the app via word of mouth or press will Google it. No website = no credibility. | MEDIUM | Hero, value prop, screenshots, App Store + Google Play badges, FAQs. Static or Laravel blade view. |
+| App store download badges (iOS + Android) | Standard convention. Users expect to tap a badge and go directly to the store listing. Missing = unprofessional. | LOW | Official Apple and Google badge assets with deep links to app store listings. |
+| Privacy policy page | Required for store listing. Must be a live, accessible URL — not a PDF or in-app only. | LOW | polynback.com/privacy — static content, consistent with in-app policy. |
+| polynback.fun → polynback.com redirect | The existing live URL needs to continue working while brand transitions. Users who bookmarked it should land on the new domain. | LOW | 301 redirect from polynback.fun to polynback.com. GitHub Pages supports custom redirects via HTML meta refresh or Cloudflare redirect rules. Keep GitHub Pages live during transition. |
+
+---
+
+### Differentiators (Competitive Advantage)
+
+Features that set Poly N-Back apart. Not required, but each one meaningfully improves conversion, retention, or brand.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Crash reporting (Sentry) | Operational visibility into what breaks in production. Without this, you only learn about bugs from 1-star reviews. Sentry has an official `@sentry/capacitor` SDK with native crash support on iOS and Android. Free tier covers 5K events/month. | Medium | Integrate with Vue 3 via `Sentry.init({ app })`. Captures unhandled exceptions, promise rejections, and native crashes. Worth doing in M1 because it pays dividends immediately on launch. |
-| Haptic feedback | Physical feedback on correct/incorrect responses makes the game feel native and premium. Competitors like Lumosity and Peak use haptics extensively. Brain training apps without haptics feel like web pages, not apps. | Low | `@capacitor/haptics` plugin. Light impact on correct answer, medium impact on incorrect, heavy on game over. Three lines of code per feedback point. |
-| Basic accessibility (color contrast, semantic markup) | WCAG 2.2 Level AA compliance is increasingly expected. EAA (European Accessibility Act) mandates it for EU users as of June 2025. More practically: good contrast and readable text directly improve the experience for ALL users, not just those with disabilities. | Medium | Audit color contrast ratios (4.5:1 minimum). Add ARIA labels to game buttons. Ensure screen readers can navigate core game flow. Poly N-Back's visual nature makes full accessibility complex, but basic compliance is achievable. |
-| ESLint + Prettier configuration | Consistent code style across the entire codebase prevents style-related merge conflicts and catches bugs before runtime. ESLint 9 flat config is the current standard. | Low | `eslint` + `@eslint/js` + `eslint-plugin-vue` + `typescript-eslint` + `prettier`. Configure before TS migration so linting catches issues during conversion. |
-| Performance guard (bundle size monitoring) | As dependencies update (Capacitor 5->8 adds weight), monitoring bundle size prevents bloat that degrades app startup time. | Low | `rollup-plugin-visualizer` for Vite. Add bundle size check to CI. Set threshold alerts. |
-| Structured logging utility | Replace scattered `console.log`/`console.warn` with a structured logger that can be silenced in production and routed to Sentry in error cases. | Low | Simple wrapper: `logger.info()`, `logger.warn()`, `logger.error()`. Production mode suppresses info/warn, routes errors to Sentry. |
+| Per-attribute accuracy stats | No n-back competitor shows per-attribute breakdown because they only have 1-2 attributes. This is a direct translation of Poly N-Back's unique 4-attribute gameplay into unique analytical value. "You're good at color matching but weak on position — focus there." | MEDIUM | High-value, low-marginal-cost. Per-session data already tracked in gameplay; this is storage + visualization. |
+| Science credibility framing | Brain training space has FTC scrutiny (Lumosity $2M fine in 2016). Apps that lean into legitimate n-back research without overclaiming convert better with the target audience (students, knowledge workers, parents). | LOW | Copy-driven. Already documented in ABOUT_POLY_NBACK.md. Translate to landing page, App Store description, and onboarding screen. No extra engineering. |
+| No subscription, no ads, ever | In a market dominated by aggressive subscription models (Lumosity, Peak, Elevate), a one-time $3.99 with no hidden costs is a meaningful differentiator. Users explicitly search for "brain training without subscription." | LOW | Position this in marketing and paywall copy. Existing PROJECT.md decision confirms ads are never. |
+| Quad n-back (4 simultaneous attributes) | Dual n-back is the scientific standard. Poly N-Back extends to 4 attributes simultaneously — genuine novelty in the space. No other published app does this at quad level. | EXISTING | Core gameplay already built. Needs better marketing articulation, not engineering. Ensure app store screenshots and marketing site showcase all 4 attributes clearly. |
+| Daily Challenge with date-seeded RNG | Most n-back apps have no social sharing moment. Daily Challenge creates a daily conversation point. Implemented correctly (deterministic seed from date), it requires no server infrastructure beyond seed delivery. | MEDIUM | Seed generation is trivial. The challenge is: enforce one-attempt-per-day without backend games. Use server-issued seed with UTC date to prevent local time manipulation. |
+| Fresh visual identity | The existing UI is functional but generic. Competitors like Elevate and Peak have invested in distinctive visual languages. A coherent brand (wordmark, color system, iconography) increases perceived value and App Store screenshot quality. | MEDIUM | Solo dev — use AI tooling (Midjourney, Figma AI, or Canva Brand Kit) to establish identity without hiring a designer. Core decisions: primary color, wordmark, app icon system. Apply consistently to app + site. |
+| Offline-first with sync on reconnect | Users train on subway, airplane, and gym where connectivity is intermittent. Offline-first = game always works. Sync on reconnect = data preserved when connectivity returns. Shows architectural maturity. | HIGH | Already partial: Capacitor Preferences persist locally. Add: queue failed sync attempts, replay on reconnect. Laravel endpoint accepts timestamped session payloads. |
 
 ---
 
-## Anti-Features
+### Anti-Features (Commonly Requested, Often Problematic)
 
-Things to explicitly NOT build in Milestone 1. These are tempting but belong in M2 or later, and building them now would delay the foundation work or create premature complexity.
+Features that seem like good ideas but create problems disproportionate to their value for this product at this stage.
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| User accounts / authentication | M2 scope. Requires backend (Laravel), database, session management. Building auth before the foundation is solid means building on sand. | Keep all data local. Migrate localStorage to Capacitor Preferences for reliability. Auth comes in M2 with Laravel backend. |
-| Cross-device sync | Requires accounts + backend + conflict resolution. Massive complexity for zero current users paying. | Local-only data in M1. Sync in M2 after accounts exist. |
-| RevenueCat / in-app purchases | App store submission without monetization is simpler (no IAP review, no subscription flow testing). Get approved first, add payments second. | Submit free app in M1 (or end of M1). Add RevenueCat in M2. |
-| Analytics / event tracking (Mixpanel, Firebase Analytics) | Different from crash reporting. Analytics require privacy policy updates, consent flows, and data processing agreements. Premature optimization of metrics before you have users. | Sentry for errors is sufficient for M1. Add analytics in M2 when there are users to analyze. |
-| Service worker / offline mode | Capacitor native apps bundle all assets locally -- they are inherently offline-capable. Service workers do not work in iOS WKWebView. The existing `registerServiceWorker.js` is already disabled and uses a legacy `@vue/cli-plugin-pwa`. | Remove the dead service worker code. Native Capacitor app does not need it. If web PWA support is desired later, use `vite-plugin-pwa` (not the Vue CLI plugin). |
-| New game modes (Zen, Time Attack, etc.) | M2 scope per PROJECT.md. Adding modes before the foundation is solid means testing N modes x M configurations. | Harden the one existing mode. New modes in M2 build on the hardened foundation. |
-| E2E testing (Playwright/Cypress) | Valuable but heavy setup. Unit + integration tests provide 90% of the safety net. E2E adds CI complexity and flakiness for diminishing returns at this stage. | Unit tests (Vitest) + integration tests (Vitest + @vue/test-utils) cover game logic and flows. E2E can come in M2 if mobile-specific behaviors need testing. |
-| Internationalization (i18n) | No evidence of international user demand. Adds complexity to every string in the app. | English only for M1. If international users appear post-launch, add in a future milestone. |
-| Over-the-air updates (Capgo/Appflow) | Useful for hotfixes after launch, but adds infrastructure dependency and cost before there are users to update. | Standard app store update flow for M1. Consider OTA updates if rapid iteration becomes necessary post-launch. |
-| Dark mode toggle | The app is already dark-themed by default. A toggle adds UI surface area, theme management complexity, and testing burden for negligible benefit. | Keep the existing dark theme. It matches the cognitive training "focus zone" aesthetic. |
-| Complex accessibility (VoiceOver game narration) | Full screen reader support for a fast-paced visual pattern matching game is extremely complex and may fundamentally conflict with the game mechanic (timed visual stimuli). | Basic accessibility (contrast, labels, semantic HTML) in M1. If accessibility demand materializes, consider a dedicated accessible game mode in a future milestone. |
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| Subscription model (monthly/yearly) | Higher LTV per user theoretically | Brain training users specifically resist subscriptions ("it's a practice tool, not a service"). Market data shows paid one-time is fastest-growing segment in 2025. Subscription adds entitlement management complexity, refund policy complexity, and ongoing churn pressure. | One-time $3.99 as planned. Revisit subscription as M3 only if one-time revenue validates the audience size. |
+| RevenueCat | Subscription management made easy | RevenueCat is optimized for subscriptions. For a one-time purchase-only app, it adds an unnecessary third-party SDK, a monthly cost after thresholds, and a dependency that complicates the simple "buy once, own forever" transaction. Overkill. | Direct StoreKit 2 + Google Play Billing via `capacitor-native-purchases`. Server-side validation via Laravel. Simple, no ongoing cost. |
+| Social leaderboards | Competitive motivation; "compare with friends" | Leaderboards in cognitive training create anxiety for below-average performers (the majority) and skew the product toward gaming over training. They require moderation infrastructure. They produce fake accounts and score inflation. Per PROJECT.md: out of scope for M2, future consideration. | Streak counts and personal best tracking give competitive users something to beat without the infrastructure and anxiety of leaderboards. |
+| Ads of any kind | Revenue without user payment | Ads fracture the focus experience that is literally the product's core value proposition. A brain training app with ads is a self-defeating product. Users in focus mode should not be interrupted. Per PROJECT.md: "never." | Pure IAP revenue. Small audience of paying users is better than large audience of distracted ad-viewers for this product. |
+| Email/password authentication | Familiar login pattern | Mobile users have universally adopted social login. Email + password requires: secure password hashing, forgot password flow, email verification flow, and still ends up being lower conversion than social login. Doubles auth surface area for no UX gain. | Google Sign-In + Sign in with Apple covers 95%+ of users. No email/password needed. |
+| Real-time multiplayer / head-to-head | "Play with friends" appeal | Real-time sync across two game instances requires WebSocket infrastructure, match-making, and fundamentally changes the game from a solo practice tool to a competitive game. Different product category, different user expectation. | Daily Challenge creates shared experience (same sequence, same day) without live infrastructure. |
+| Push notifications (aggressive) | Re-engagement / retention | Cognitive training apps that send daily push notifications are among the most aggressively uninstalled categories. Users feel nagged. Low-quality notification strategies damage the brand. | Optional streak reminder notification only, user-configured. "You haven't trained today" at user-chosen time, off by default. |
+| Full analytics suite (Mixpanel, Firebase) | Data-driven iteration | Zero users currently. Analytics before users is premature optimization. Adds privacy policy burden, consent flow engineering, GDPR compliance surface area, and another SDK. Sentry already provides error signal. | Add analytics in M3 after real user base exists. Sentry covers error signal. Manual review of session data from own Laravel backend provides behavior insight. |
+| Dark mode toggle | User preference | App is already dark-themed. A toggle requires full light-mode design system, doubles visual testing surface, and adds UI complexity. The dark theme is part of the "focus zone" brand identity — it should not be optional. | Keep dark-only. It's a feature, not a limitation. |
+| Multiple n-back attribute sets (new shapes, sounds) | Variety | Attribute variety is a future-milestone feature (per PROJECT.md "Out of Scope"). Adding new attributes before cross-device sync and IAP are solid adds combinatorial complexity to testing all modes × all attributes. | Ship the 4 existing attributes perfectly. Document attribute catalog for M3. |
+| Onboarding wizard (multi-step) | First-time user guidance | The existing tutorial overlay already handles onboarding. A lengthy wizard delays the first game session — the moment users decide if the app is worth keeping. Every screen between download and first stimulus is churn opportunity. | Keep existing single-overlay tutorial. Move it to appear on first game start, not app launch. |
+| Web app / PWA at polynback.com | Reach web users | iOS WKWebView doesn't support service workers. Web delivery requires a separate distribution, build, and test path. The marketing site at polynback.com is not the web app — it's the storefront for the native apps. | polynback.fun stays as legacy web demo. polynback.com is the marketing site. Native apps are the product. |
 
 ---
 
 ## Feature Dependencies
 
 ```
-Dependency updates ──────────┬──→ TypeScript migration
-                             ├──→ Capacitor Preferences (needs Cap 8)
-                             ├──→ App lifecycle management (needs @capacitor/app 8.x)
-                             ├──→ Status bar config (needs @capacitor/status-bar 8.x)
-                             ├──→ Splash screen config (needs @capacitor/splash-screen 8.x)
-                             ├──→ Haptic feedback (needs @capacitor/haptics 8.x)
-                             └──→ Sentry integration (needs @sentry/capacitor compatible version)
+User accounts (social login)
+    └──requires──> Laravel API backend
+    └──requires──> Apple Sign-In (mandatory if Google offered)
+    └──enables──> Cross-device sync
+    └──enables──> Daily Challenge (server-issued seed, one-attempt enforcement)
+    └──enables──> Stats persistence beyond device
+    └──enables──> Purchase receipt validation
 
-TypeScript migration ────────┬──→ Unit test infrastructure (tests should be written in TS)
-                             └──→ ESLint + Prettier (TS-aware linting)
+IAP (one-time purchase)
+    └──requires──> Native app in app stores (iOS + Android)
+    └──requires──> Laravel API (receipt validation endpoint)
+    └──requires──> User accounts (to persist premium status cross-device)
+    └──enables──> Freemium gate logic (check premium status before unlocking)
 
-Component decomposition ─────┬──→ Error boundary components (wrap extracted components)
-                             └──→ Integration tests (test composed component tree)
+App Store submission (iOS + Android)
+    └──requires──> App icons, splash screen (done in v1.0)
+    └──requires──> Privacy policy live at polynback.com/privacy
+    └──requires──> marketing site (polynback.com must exist before review)
+    └──requires──> IAP configured in App Store Connect / Google Play Console
 
-Unit test infrastructure ────┬──→ Integration test coverage (builds on unit test setup)
-                             └──→ CI pipeline test step (run tests in CI)
+Stats dashboard
+    └──requires──> Session data model (schema for stored sessions)
+    └──requires──> persistenceStore extension (save per-session data)
+    └──requires──> Premium gate (stats are paid feature)
+    └──enhances with──> User accounts (sync history cross-device)
 
-localStorage error handling ─→ Capacitor Preferences migration (fix handling first, then migrate)
+Game modes (Zen, Time Attack, Endless, Daily Challenge)
+    └──requires──> Existing game loop (already built — modes are configuration layers)
+    └──requires──> Premium gate (modes are paid feature)
+    Daily Challenge additionally requires──> Server-issued daily seed
+    Daily Challenge additionally requires──> One-attempt enforcement (server or client)
 
-Global error handler ────────→ Sentry integration (Sentry hooks into error handler)
+Marketing site (polynback.com)
+    └──requires──> Laravel backend is live
+    └──requires──> App Store listings exist (to link the badges)
+    └──requires──> Privacy policy content written
+    └──enhances──> Brand refresh (visual identity applied to site)
 
-Bug fixes (all) ─────────────→ Unit tests (write tests that prove fixes, prevent regressions)
+Brand refresh
+    └──enhances──> App Store screenshots (more professional listing)
+    └──enhances──> Marketing site (visual identity consistency)
+    └──has no hard blockers──> Can start independently of backend work
 
-Timer cleanup ───────────────→ App lifecycle management (pause timers on background)
+Cross-device sync
+    └──requires──> User accounts
+    └──requires──> Laravel API (sync endpoints)
+    └──requires──> Session data model defined
 ```
 
-### Critical Path
+### Dependency Notes
 
-The longest dependency chain is:
-
-1. **Dependency updates** (foundation everything else builds on)
-2. **TypeScript migration** (requires updated deps)
-3. **Component decomposition** (easier with TS, enables testing)
-4. **Unit tests + bug fixes** (test the decomposed, typed code)
-5. **Integration tests** (test the assembled system)
-
-Parallel work possible: App store compliance items (privacy policy, icons, splash screen) can happen alongside any engineering work. Sentry integration can happen after dependency updates, independent of TS migration.
+- **IAP requires app store listings:** You cannot configure IAP products in App Store Connect or Google Play Console until the app is registered. App registration should happen early.
+- **User accounts gate multiple features:** Accounts, sync, Daily Challenge enforcement, and premium persistence all depend on the Laravel backend. Backend is the critical path dependency for the second half of M2.
+- **Game modes are configuration layers, not rewrites:** Zen, Time Attack, Endless all reuse the existing game loop. They are low-risk additions. Daily Challenge adds server dependency.
+- **Brand refresh is independent:** Design work can happen in parallel with backend work. Apply brand to site and screenshots when both are ready.
+- **Marketing site requires app store listings to be complete:** You can't include real download badge links until the app is live. Build the site structure first, add live links post-submission.
 
 ---
 
-## M1 Hardening Recommendation
+## MVP Definition for M2
 
-### Must Complete (App Store Viability)
+### Launch With (v2.0)
 
-1. **Dependency updates** -- everything else depends on current tooling
-2. **Bug fixes** (division-by-zero, bounds checking, timer cleanup, stimulus history cap) -- these are live defects
-3. **localStorage -> Capacitor Preferences migration** -- data loss prevention
-4. **Error handling** (global handler, localStorage guards, audio degradation) -- crash prevention
-5. **TypeScript migration** -- type safety for all subsequent work
-6. **Component decomposition** -- testability and maintainability
-7. **Unit + integration tests** -- regression prevention
-8. **App lifecycle management** (background/foreground pause) -- expected mobile behavior
-9. **App store compliance** (privacy policy, icons, splash screen, status bar) -- submission requirements
+Minimum set to ship a monetized, reviewable product.
 
-### Should Complete (Production Quality)
+- [ ] App Store + Google Play listings live — without this, nothing else matters
+- [ ] One-time IAP ($3.99) with purchase + restore — monetization core
+- [ ] Freemium gate (2-back cap for free, all levels for paid) — defines the value exchange
+- [ ] Google Sign-In + Sign in with Apple — required for App Store (Apple mandate) and reduces friction
+- [ ] Account creation / guest mode — account required for sync, but game must work without it
+- [ ] Cross-device premium status sync — buying on iPhone must unlock on iPad
+- [ ] Session history storage (local + synced) — users expect to see their history
+- [ ] Streak tracking — strongest retention lever, lowest engineering cost
+- [ ] Privacy policy at polynback.com/privacy — required for both store submissions
+- [ ] Marketing landing page at polynback.com — storefront for the product
+- [ ] polynback.fun → polynback.com redirect — legacy URL continuity
 
-10. **Sentry crash reporting** -- operational visibility from day one
-11. **Haptic feedback** -- native feel for minimal effort
-12. **ESLint + Prettier** -- code quality enforcement
-13. **Basic accessibility** -- contrast audit, ARIA labels
+### Add After Validation (v2.x)
 
-### Defer to M2
+Features that make M2 better but are not blocking.
 
-- Everything in Anti-Features list
-- Performance monitoring dashboards
-- Advanced accessibility (screen reader game modes)
+- [ ] Per-attribute accuracy charts — after session data model is live and populated, add visualization layer
+- [ ] Zen Mode — very low complexity, add once core game modes are stable
+- [ ] Time Attack Mode — low complexity, add once core game modes are stable
+- [ ] Endless Mode — moderate complexity, add after simpler modes are tested
+- [ ] Daily Challenge — add after server infrastructure is live; seed delivery is simple, one-attempt enforcement needs design
+- [ ] Progression accuracy trendline chart — after sufficient session history exists to make it meaningful
+- [ ] Brand refresh applied to app — after visual identity is established, apply to UI
+
+### Future Consideration (v3+)
+
+Explicitly deferred.
+
+- [ ] Leaderboards / social features — per PROJECT.md, future milestone
+- [ ] Subscription layer — revisit if one-time revenue validates demand
+- [ ] Analytics suite — add when real user base exists to analyze
+- [ ] New attributes (sound, size, etc.) — per PROJECT.md, future milestone
+- [ ] RevenueCat — reconsider only if subscription model is added
+
+---
+
+## Feature Prioritization Matrix
+
+| Feature | User Value | Implementation Cost | Priority |
+|---------|------------|---------------------|----------|
+| App Store submission (iOS) | HIGH | HIGH | P1 |
+| App Store submission (Android) | HIGH | MEDIUM | P1 |
+| One-time IAP | HIGH | MEDIUM | P1 |
+| Freemium gate (2-back cap) | HIGH | LOW | P1 |
+| Sign in with Apple | HIGH | MEDIUM | P1 (App Store required) |
+| Google Sign-In | HIGH | MEDIUM | P1 |
+| Cross-device premium sync | HIGH | MEDIUM | P1 |
+| Guest/unauthenticated mode | HIGH | LOW | P1 |
+| Session history storage | HIGH | MEDIUM | P1 |
+| Privacy policy (polynback.com/privacy) | HIGH | LOW | P1 (store required) |
+| Marketing site (polynback.com) | HIGH | MEDIUM | P1 |
+| Streak tracking | HIGH | LOW | P1 |
+| Purchase restoration | HIGH | LOW | P1 (Apple required) |
+| Account deletion | MEDIUM | LOW | P1 (Apple required) |
+| polynback.fun → polynback.com redirect | MEDIUM | LOW | P1 |
+| Zen Mode | MEDIUM | LOW | P2 |
+| Time Attack Mode | MEDIUM | LOW | P2 |
+| Endless Mode | MEDIUM | MEDIUM | P2 |
+| Per-attribute accuracy breakdown | HIGH | MEDIUM | P2 |
+| Accuracy trendline chart | HIGH | MEDIUM | P2 |
+| Daily Challenge | MEDIUM | MEDIUM | P2 |
+| Brand refresh | MEDIUM | MEDIUM | P2 |
+| Personal best tracking | MEDIUM | LOW | P2 |
+| Optional streak reminder notification | LOW | LOW | P3 |
+
+**Priority key:**
+- P1: Required for v2.0 launch (blocking)
+- P2: Significant value, add in v2.x (enhancing)
+- P3: Nice to have, future consideration
+
+---
+
+## Competitor Feature Analysis
+
+| Feature | Lumosity | Peak | Elevate | Dual N-Back (generic) | Poly N-Back M2 |
+|---------|----------|------|---------|----------------------|----------------|
+| Monetization | Subscription ($11.99/mo or $59.99/yr) | Subscription ($3.99/mo) | Subscription ($2.99/mo) | Mostly free/ads | One-time $3.99 (no subscription) |
+| Free tier | 3 games/day | Limited games | 5 games/day | Full game, fewer modes | Core quad n-back, 2-back cap |
+| Social login | Email only | Email only | Google + Apple | None | Google + Apple |
+| Stats depth | Per-game scores, age comparison | Brain map, comparative stats | Weekly reports | Basic score | Per-attribute + session history + trendline |
+| Game modes | Fixed daily 15-min workout | Multiple games, single-attribute | Writing/math focus | Configurable n-back | Zen, Time Attack, Endless, Daily Challenge |
+| Cross-device sync | Yes (subscription) | Yes (subscription) | Yes (subscription) | No | Yes (with account) |
+| Attributes tracked | Single per game | Single per game | Single per game | 2 (position + audio) | 4 simultaneous (position, color, emoji, shape) |
+| Science credibility | Moderate (FTC issues) | Moderate | Moderate | High (n-back research) | High (n-back + honest claims) |
+| Marketing site | lumosity.com (heavy, subscription-push) | peakapp.co (minimal) | elevateapp.com (moderate) | None or minimal | polynback.com (clean, credibility-first) |
+
+**Key observation:** No competitor offers a one-time purchase model at this price point. The "no subscription" positioning is genuinely differentiated in 2026.
 
 ---
 
 ## Sources
 
-### Official Documentation (HIGH confidence)
-- [Capacitor App Plugin API](https://capacitorjs.com/docs/apis/app)
-- [Capacitor Preferences Plugin API](https://capacitorjs.com/docs/apis/preferences)
-- [Capacitor Status Bar Plugin API](https://capacitorjs.com/docs/apis/status-bar)
-- [Capacitor Splash Screen Plugin API](https://capacitorjs.com/docs/apis/splash-screen)
-- [Capacitor Haptics Plugin API](https://capacitorjs.com/docs/apis/haptics)
-- [Capacitor 8 Migration Guide](https://capacitorjs.com/docs/updating/8-0)
-- [Vue.js Testing Guide](https://vuejs.org/guide/scaling-up/testing)
-- [Sentry Capacitor SDK](https://docs.sentry.io/platforms/javascript/guides/capacitor/)
-- [Sentry Vue Integration](https://docs.sentry.io/platforms/javascript/guides/vue/)
-- [Apple App Store Review Guidelines](https://developer.apple.com/app-store/review/guidelines/)
+### Verified (MEDIUM-HIGH confidence)
+- [Brain Training Apps Market Report 2025-2033](https://www.snsinsider.com/reports/brain-training-apps-market-8665) — Freemium 45.24% market share; Paid fastest-growing at 19.20% CAGR
+- [Peak App on Google Play](https://play.google.com/store/apps/details?id=com.peak.brain&hl=en_US) — Peak subscription pricing ($3.99/mo) and freemium structure
+- [Sign in with Apple — Apple Developer](https://developer.apple.com/sign-in-with-apple/) — Mandatory when any third-party social login offered (App Store guideline 4.8)
+- [App Store Requirements 2026](https://natively.dev/articles/app-store-requirements) — SDK requirements, submission checklist, AI disclosure rules
+- [App Store Review Guidelines](https://developer.apple.com/app-store/review/guidelines/) — Account deletion requirement, IAP rules, completeness requirements
+- [Streaks and Milestones for Gamification](https://www.plotline.so/blog/streaks-for-gamification-in-mobile-apps) — 40-60% higher DAU with streak + milestone systems
+- [Social Login Rise 2025](https://www.marketingscoop.com/marketing/the-rise-of-social-logins-which-platforms-do-users-prefer-in-2024/) — Google 10%, Apple 5% and growing; mobile social login as expected pattern
+- [Capacitor In-App Purchases Guide](https://capacitorjs.com/docs/guides/in-app-purchases) — Official Capacitor IAP guidance
+- [Cap-go Capacitor Native Purchases](https://github.com/Cap-go/capacitor-native-purchases) — StoreKit 2 + Google Play Billing 7.x plugin
+- [Daily Challenge Mode — Spelunky Wiki](https://spelunky.fandom.com/wiki/Daily_Challenge_Mode) — Fixed-seed daily mode pattern documentation
+- [App Landing Page Best Practices](https://webflow.com/blog/app-landing-page) — Marketing site structure and conversion patterns
+- [Offline-First Sync Patterns](https://developersvoice.com/blog/mobile/offline-first-sync-patterns/) — Mobile sync architecture patterns
+- [Free Brain Training Without Subscription](https://moadly.app/blog/en/free-non-subscription-brain-training-games-like-luminosity) — User demand evidence for non-subscription models
 
-### Verified Sources (MEDIUM confidence)
-- [App Store Requirements 2026](https://natively.dev/articles/app-store-requirements) -- Comprehensive submission guide
-- [Error Handling in Capacitor Apps](https://capgo.app/blog/error-handling-in-capacitor-apps-ux-best-practices/) -- UX patterns for error handling
-- [Apple App Store Rejection Reasons 2025](https://twinr.dev/blogs/apple-app-store-rejection-reasons-2025/) -- Common rejection data
-- [WCAG 2.2 Mobile Application Guidance](https://www.w3.org/TR/wcag2mobile-22/) -- Accessibility standards
-- [Vue 3 + TypeScript Best Practices 2025](https://eastondev.com/blog/en/posts/dev/20251124-vue3-typescript-best-practices/) -- Enterprise architecture patterns
-- [Capacitor Storage Guide](https://ionic.io/blog/choosing-a-data-storage-solution-ionic-storage-capacitor-storage-sqlite-or-ionic-secure-storage) -- Data storage comparison
+### Community / Industry Pattern (LOW-MEDIUM confidence)
+- [Brain Training Competitive Analysis (Brainturk)](https://www.brainturk.com/comparing-brain-training-apps) — Feature matrix across Lumosity, Peak, Elevate, Neuronation
+- [Impulse Brain Training Paywall Analysis (ScreensDesign)](https://screensdesign.com/showcase/impulse-brain-training) — Paywall strategy patterns
+- [JMIR Formative Research — Cognitive Training Engagement](https://formative.jmir.org/2025/1/e80027) — More weeks of use correlates with reported cognitive improvement
+- Forrester 2024 (cited via plotline.so) — Dual streak+milestone system reduces 30-day churn 35% vs. non-gamified
 
-### Community/WebSearch (LOW confidence, needs validation)
-- [Cognitive Training App Quality Review (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC10258500/) -- User expectations in brain training space
-- [Mobile App Performance Monitoring Patterns](https://www.metricfire.com/blog/how-to-monitor-mobile-game-application-performance/) -- Monitoring approaches
+---
+
+*Feature research for: Poly N-Back v2.0 Monetized Platform*
+*Researched: 2026-03-02*
