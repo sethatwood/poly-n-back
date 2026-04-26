@@ -116,30 +116,30 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HARD-01 | TBD | Pending |
-| HARD-02 | TBD | Pending |
-| HARD-03 | TBD | Pending |
-| IAP-01 | TBD | Pending |
-| IAP-02 | TBD | Pending |
-| IAP-03 | TBD | Pending |
-| IAP-04 | TBD | Pending |
-| IAP-05 | TBD | Pending |
-| STAT-01 | TBD | Pending |
-| STAT-02 | TBD | Pending |
-| STAT-03 | TBD | Pending |
-| BRAND-01 | TBD | Pending |
-| BRAND-02 | TBD | Pending |
-| MKT-01 | TBD | Pending |
-| MKT-02 | TBD | Pending |
-| MKT-03 | TBD | Pending |
-| STORE-01 | TBD | Pending |
-| STORE-02 | TBD | Pending |
+| HARD-01 | Phase 11 | Pending |
+| HARD-02 | Phase 11 | Pending |
+| HARD-03 | Phase 11 | Pending |
+| IAP-01 | Phase 12 | Pending |
+| IAP-02 | Phase 12 | Pending |
+| IAP-03 | Phase 12 | Pending |
+| IAP-04 | Phase 12 | Pending |
+| IAP-05 | Phase 12 | Pending |
+| STAT-01 | Phase 13 | Pending |
+| STAT-02 | Phase 13 | Pending |
+| STAT-03 | Phase 13 | Pending |
+| BRAND-01 | Phase 14 | Pending |
+| BRAND-02 | Phase 14 | Pending |
+| MKT-01 | Phase 14 | Pending |
+| MKT-02 | Phase 14 | Pending |
+| MKT-03 | Phase 14 | Pending |
+| STORE-01 | Phase 15 | Pending |
+| STORE-02 | Phase 15 | Pending |
 
 **Coverage:**
 - v1 requirements: 18 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 18 — will be resolved when roadmap is created
+- Mapped to phases: 18 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-25*
-*Last updated: 2026-04-25 after initial definition*
+*Last updated: 2026-04-25 after roadmap creation (Phases 11-15 mapped)*
