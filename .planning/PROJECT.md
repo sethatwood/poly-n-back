@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A science-backed cognitive training app built on the n-back paradigm — the only task consistently shown to improve fluid intelligence. Players track multiple visual attributes (color, emoji, position, shape) simultaneously across rounds, creating a "poly" n-back experience that's more engaging and challenging than classic dual n-back. Live at polynback.fun since 2023, now a production-ready codebase targeting iOS and Android app store submission.
+A science-backed cognitive training app built on the n-back paradigm — the only task consistently shown to improve fluid intelligence. Players track multiple visual attributes (color, emoji, position, shape) simultaneously across rounds, creating a "poly" n-back experience that's more engaging and challenging than classic dual n-back. Live on the web since 2023 (at polynback.com since October 2026), now a production-ready codebase targeting iOS and Android app store submission.
 
 ## Core Value
 
@@ -28,7 +28,7 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 - ✓ Game hints system — existing
 - ✓ Mobile-responsive design with safe area support — existing
 - ✓ iOS audio context unlock on user gesture — existing
-- ✓ GitHub Pages deployment (polynback.fun) — existing
+- ✓ GitHub Pages deployment (polynback.com) — existing
 - ✓ Modern toolchain (Node 22, Vue 3.5, Vite 7, Pinia 3, Capacitor 8, Tailwind 4) — v1.0
 - ✓ All game logic bugs fixed (division-by-zero, debounce, bounds checks, history cap) — v1.0
 - ✓ Persistent storage via Capacitor Preferences with schema validation — v1.0
@@ -58,7 +58,6 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 - Cross-device progress sync — M3 (requires backend)
 - Game modes (Zen, Time Attack, Endless, Daily Challenge) — M3
 - Stats charts, streaks, per-attribute breakdown — M3 (M2 ships minimal stats)
-- polynback.fun → polynback.com cutover — M3
 - Subscription model — M3+ (one-time purchase first, subscription layer later if warranted)
 - RevenueCat — M3+ (not needed for one-time IAP)
 - New attributes (sound, size, rotation, 2D grid) — future
@@ -72,7 +71,7 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 
 ## Context
 
-**Product status:** v1.0 "Harden the Foundation" shipped 2026-03-02. v2.0 "Monetized Platform" in progress — backend-free: IAP, minimal stats, brand refresh, app store submission. Live at polynback.fun via GitHub Pages.
+**Product status:** v1.0 "Harden the Foundation" shipped 2026-03-02. v2.0 "Monetized Platform" in progress — backend-free: IAP, minimal stats, brand refresh, app store submission. Live at polynback.com via GitHub Pages.
 
 **Codebase:** 4,235 LOC TypeScript + Vue. Tech stack: Vue 3.5, Vite 7, Pinia 3, Tailwind 4, Capacitor 8, TypeScript strict mode. 103 commits across 10 phases, 24 plans in v1.0.
 
@@ -87,9 +86,9 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 
 **Codebase analysis:** Architecture, concerns, conventions, integrations, stack, structure, and testing documented in `.planning/codebase/`.
 
-**Hosting plan (M2):** polynback.com hosted on Laravel Forge (dev's existing production infrastructure). Serves Laravel API backend, marketing site, and web teaser. GitHub Pages at polynback.fun stays live until cutover.
+**Hosting:** polynback.com is served by GitHub Pages, auto-deployed from `main` via `.github/workflows/deploy.yml`. Moved off polynback.fun on 2026-10-24; .fun renewal was too expensive and there were no external players yet, so it was left to expire (2026-11-08) with no redirect. The web game currently sits at the domain root, so the M2 landing page and privacy policy need to fit around it. Laravel Forge remains the likely host if M3 adds a backend.
 
-**Branch strategy:** Development happened on `feat/gsd`. `main` stays untouched to preserve live GitHub Pages deployment at polynback.fun. Merge to `main` when ready to deploy.
+**Branch strategy:** `feat/gsd` has been merged into `main`. Every push to `main` deploys polynback.com.
 
 **Known tech debt (4 items from v1.0):**
 - GameState type exported but never consumed
@@ -102,7 +101,7 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 - **Developer capacity**: Solo developer, evenings and weekends on top of 50hr/week day job — quality over speed
 - **Budget**: Bootstrapped. Apple Developer $99/yr, Google Play $25
 - **Stack**: Vue 3 + Vite + Pinia + Tailwind + Capacitor (decided — no framework switches)
-- **Deployment**: polynback.fun via GitHub Pages stays live; feat/gsd branch not yet merged to main
+- **Deployment**: polynback.com via GitHub Pages; every push to `main` deploys
 - **Charm preservation**: The game feels good to play. Changes must protect or enhance this, never regress it
 
 ## Key Decisions
@@ -111,7 +110,7 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 |----------|-----------|---------|
 | Stay with Vue 3 + Capacitor (not React Native/Expo) | Tried rebuild — lost the charm. Existing codebase works, dev has Laravel+Vue expertise | ✓ Good |
 | Freemium + one-time purchase, no ads | $3.99 one-time unlock. Free = core quad capped at 2-back. Paid = all levels, modes, stats. Subscription deferred to M3 | — Pending (M2) |
-| polynback.com as production domain | .fun stays as legacy, .com is the brand going forward | — Pending (M2) |
+| polynback.com as production domain | .com is the brand going forward; .fun retired without a redirect (renewal too expensive, no external players yet) | ✓ Good — live 2026-10-24 |
 | Laravel backend for API | Dev's professional stack, hosts other production sites on Forge | — Pending (M2) |
 | Dependency updates first in M1 | All subsequent work should build on current foundation, not stale deps | ✓ Good — clean foundation enabled fast execution |
 | Address CONCERNS.md systematically | Every documented concern becomes amplified with paying users | ✓ Good — all concerns resolved in 10 phases |
@@ -119,7 +118,7 @@ The n-back gameplay loop must feel incredible — responsive, satisfying, imposs
 | TypeScript after architecture extraction | Types are most valuable on stable API surfaces | ✓ Good — no rework needed |
 | Tests after TypeScript | Test against final typed interfaces, not shifting shapes | ✓ Good — 58 tests, no false failures |
 | SPM for iOS (not CocoaPods) | Capacitor 8 default for new projects, simpler dependency management | ✓ Good |
-| App ID com.polynback | Aligns with future polynback.com domain | ✓ Good |
+| App ID com.polynback | Aligns with polynback.com domain | ✓ Good |
 
 ---
-*Last updated: 2026-03-02 after v2.0 milestone start*
+*Last updated: 2026-10-24 after moving the site to polynback.com*

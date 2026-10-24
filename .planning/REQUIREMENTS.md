@@ -42,7 +42,7 @@ Visual identity refresh applied to in-app UI and store assets.
 
 ### Marketing Site
 
-Landing page and privacy policy at `polynback.com`. The `.fun` GitHub Pages deployment stays live (cutover deferred to M3).
+Landing page and privacy policy at `polynback.com`, which already serves the web game via GitHub Pages (moved from `.fun` on 2026-10-24).
 
 - [ ] **MKT-01**: Landing page exists at `polynback.com` with hero, gameplay screenshots, app store badges (links populated post-submission), and FTC-compliant marketing copy.
 - [ ] **MKT-02**: Privacy policy is published at `polynback.com/privacy` meeting App Store and Google Play requirements (data collected, retention policy, contact information, jurisdiction).
@@ -89,7 +89,7 @@ Deferred to M3. Tracked but not in current roadmap.
 
 ### Domain Cutover
 
-- **DOM-01**: `polynback.fun` → `polynback.com` 301 redirect once `.com` is the canonical domain
+- ~~**DOM-01**: `polynback.fun` → `polynback.com` 301 redirect once `.com` is the canonical domain~~ — dropped 2026-10-24: `.com` went live directly and `.fun` was retired without a redirect
 
 ## Out of Scope
 
@@ -142,4 +142,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-25*
-*Last updated: 2026-04-25 after roadmap creation (Phases 11-15 mapped)*
+*Last updated: 2026-10-24 — DOM-01 dropped after moving the site to polynback.com*

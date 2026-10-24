@@ -141,7 +141,7 @@ The dependency graph from research is definitive about build order. The Laravel 
 ### Phase 5: Brand Refresh + Marketing Site
 
 **Rationale:** Marketing work is independent of the backend — it can theoretically run in parallel with any phase. However, it benefits from the app being nearly feature-complete so screenshots capture the real product. The marketing site needs app store listings to link download badges, so it logically finalizes here.
-**Delivers:** Visual identity (wordmark, primary color, icon system), brand applied to marketing landing page at polynback.com, privacy policy at polynback.com/privacy, polynback.fun → polynback.com 301 redirect, App Store + Google Play download badges, app screenshots with brand applied.
+**Delivers:** Visual identity (wordmark, primary color, icon system), brand applied to marketing landing page at polynback.com, privacy policy at polynback.com/privacy, App Store + Google Play download badges, app screenshots with brand applied.
 **Features addressed:** Marketing site, privacy policy, domain redirect, brand differentiation.
 **Pitfalls to avoid:** FTC-violating marketing claims in any copy (App Store listing, polynback.com, in-app) — audit `ABOUT_POLY_NBACK.md` before use; avoid "scientifically proven," "clinically proven," "guaranteed," or any disease-treatment language.
 

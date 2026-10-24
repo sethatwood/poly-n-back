@@ -95,7 +95,7 @@ None active.
 | Sync | Cross-device premium + session sync | Deferred to M3 | 2026-04-25 |
 | Modes | Zen / Time Attack / Endless / Daily Challenge | Deferred to M3 | 2026-04-25 |
 | Stats | Charts, streaks, per-attribute breakdown | Deferred to M3 | 2026-04-25 |
-| Domain | polynback.fun → polynback.com 301 cutover | Deferred to M3 | 2026-04-25 |
+| Domain | polynback.fun → polynback.com cutover | Done 2026-10-24 — no redirect; .fun left to expire 2026-11-08 | 2026-04-25 |
 
 ## Session Continuity
 

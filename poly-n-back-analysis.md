@@ -98,7 +98,7 @@ Nobody has built the "Duolingo of N-Back" — the app that makes an evidence-bas
 - **No social features** — No leaderboards, no sharing, no streaks with friends.
 - **Minimal visual feedback** — Correct/incorrect gets basic feedback, but there's no celebration, no particle effects, no satisfying micro-animations.
 - **No content variety** — One game mode (classic n-back). No themed sessions, no daily challenges, no varied stimuli sets.
-- **No SEO/marketing presence** — polynback.fun exists but has no content marketing, no blog, no landing page optimized for conversion.
+- **No SEO/marketing presence** — polynback.com exists but has no content marketing, no blog, no landing page optimized for conversion.
 - **0 GitHub stars, 0 forks** — No community traction yet.
 
 ---
@@ -146,7 +146,7 @@ Payment: Stripe for web, App Store / Google Play in-app purchases for mobile. Re
 
 1. **App Store presence** — Ship native iOS and Android apps via Capacitor. You already have the directories set up. The App Store is where brain training discovery happens. Target "n-back," "brain training," "working memory," "cognitive training" keywords.
 
-2. **Content marketing** — Blog at polynback.fun/blog. Articles: "N-Back Training: What the Science Actually Says," "Dual N-Back vs Poly N-Back: Why More Dimensions Matter," "How I Improved My Working Memory in 30 Days." Target long-tail SEO for "best n-back app," "dual n-back training," "improve working memory."
+2. **Content marketing** — Blog at polynback.com/blog. Articles: "N-Back Training: What the Science Actually Says," "Dual N-Back vs Poly N-Back: Why More Dimensions Matter," "How I Improved My Working Memory in 30 Days." Target long-tail SEO for "best n-back app," "dual n-back training," "improve working memory."
 
 3. **Community** — Share on r/nootropics, r/BrainTraining, HackerNews, IndieHackers. The "built by Human+AI collaboration" angle is genuinely interesting to tech communities. Post your MRR journey transparently.
 

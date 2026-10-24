@@ -192,14 +192,14 @@ Developers set up products in App Store Connect or Google Play Console, write th
 The planned free tier caps gameplay at 2-back. If the free experience feels crippled (2-back is genuinely too easy for returning players, and users can't even explore the game properly), the App Store reviews will say "used to be free, now gutted" and the conversion rate will be driven by resentment rather than genuine value perception. This is the Duolingo "energy system" problem — users experience the gate as punishment.
 
 **Why it happens:**
-Developers design the paywall to maximize pressure to convert. The free tier becomes a demo, not a product. Users who came from the free web version at polynback.fun feel betrayed rather than excited.
+Developers design the paywall to maximize pressure to convert. The free tier becomes a demo, not a product. Users who came from the free web version at polynback.com feel betrayed rather than excited.
 
 **How to avoid:**
 - The 2-back cap is a reasonable starting constraint but evaluate it honestly: can a new user actually experience the game's core loop and feel its value at 2-back? If yes, proceed. If the game only gets interesting at 3-back+, the cap kills conversion by eliminating the "aha moment."
 - Frame the paywall as "unlock your potential" not "you've hit a wall." Messaging matters enormously.
 - Show the locked content clearly (grayed-out modes, locked level indicators) — users who see what they're missing convert better than users who hit invisible walls.
 - Offer a clear one-time purchase call to action at the moment of natural frustration (just after a great run that would unlock at higher levels), not as a constant overlay.
-- Do NOT convert the polynback.fun web version to freemium — keep it fully free as the marketing/discovery funnel to the app.
+- Do NOT convert the web version at polynback.com to freemium — keep it fully free as the marketing/discovery funnel to the app.
 
 **Warning signs:**
 - Conversion rate under 1% after launch (industry average 2.18% freemium, 12.11% hard paywall)

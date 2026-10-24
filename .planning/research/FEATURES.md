@@ -72,7 +72,7 @@ Features users assume exist in a paid brain training app. Missing these = produc
 | Marketing landing page at polynback.com | Users who hear about the app via word of mouth or press will Google it. No website = no credibility. | MEDIUM | Hero, value prop, screenshots, App Store + Google Play badges, FAQs. Static or Laravel blade view. |
 | App store download badges (iOS + Android) | Standard convention. Users expect to tap a badge and go directly to the store listing. Missing = unprofessional. | LOW | Official Apple and Google badge assets with deep links to app store listings. |
 | Privacy policy page | Required for store listing. Must be a live, accessible URL — not a PDF or in-app only. | LOW | polynback.com/privacy — static content, consistent with in-app policy. |
-| polynback.fun → polynback.com redirect | The existing live URL needs to continue working while brand transitions. Users who bookmarked it should land on the new domain. | LOW | 301 redirect from polynback.fun to polynback.com. GitHub Pages supports custom redirects via HTML meta refresh or Cloudflare redirect rules. Keep GitHub Pages live during transition. |
+| ~~polynback.fun → polynback.com redirect~~ | Dropped 2026-10-24: the site moved straight to polynback.com and .fun was retired without a redirect (no external players yet). | — | — |
 
 ---
 
@@ -109,7 +109,7 @@ Features that seem like good ideas but create problems disproportionate to their
 | Dark mode toggle | User preference | App is already dark-themed. A toggle requires full light-mode design system, doubles visual testing surface, and adds UI complexity. The dark theme is part of the "focus zone" brand identity — it should not be optional. | Keep dark-only. It's a feature, not a limitation. |
 | Multiple n-back attribute sets (new shapes, sounds) | Variety | Attribute variety is a future-milestone feature (per PROJECT.md "Out of Scope"). Adding new attributes before cross-device sync and IAP are solid adds combinatorial complexity to testing all modes × all attributes. | Ship the 4 existing attributes perfectly. Document attribute catalog for M3. |
 | Onboarding wizard (multi-step) | First-time user guidance | The existing tutorial overlay already handles onboarding. A lengthy wizard delays the first game session — the moment users decide if the app is worth keeping. Every screen between download and first stimulus is churn opportunity. | Keep existing single-overlay tutorial. Move it to appear on first game start, not app launch. |
-| Web app / PWA at polynback.com | Reach web users | iOS WKWebView doesn't support service workers. Web delivery requires a separate distribution, build, and test path. The marketing site at polynback.com is not the web app — it's the storefront for the native apps. | polynback.fun stays as legacy web demo. polynback.com is the marketing site. Native apps are the product. |
+| Web app / PWA at polynback.com | Reach web users | iOS WKWebView doesn't support service workers. Web delivery requires a separate distribution, build, and test path. The marketing site at polynback.com is not the web app — it's the storefront for the native apps. | The web game lives at polynback.com (moved from .fun 2026-10-24), so the marketing site has to share the domain with it. Native apps are the product. |
 
 ---
 
@@ -191,7 +191,7 @@ Minimum set to ship a monetized, reviewable product.
 - [ ] Streak tracking — strongest retention lever, lowest engineering cost
 - [ ] Privacy policy at polynback.com/privacy — required for both store submissions
 - [ ] Marketing landing page at polynback.com — storefront for the product
-- [ ] polynback.fun → polynback.com redirect — legacy URL continuity
+- ~~polynback.fun → polynback.com redirect~~ — dropped; .fun retired 2026-10-24
 
 ### Add After Validation (v2.x)
 
@@ -235,7 +235,7 @@ Explicitly deferred.
 | Streak tracking | HIGH | LOW | P1 |
 | Purchase restoration | HIGH | LOW | P1 (Apple required) |
 | Account deletion | MEDIUM | LOW | P1 (Apple required) |
-| polynback.fun → polynback.com redirect | MEDIUM | LOW | P1 |
+| ~~polynback.fun → polynback.com redirect~~ | — | — | Dropped |
 | Zen Mode | MEDIUM | LOW | P2 |
 | Time Attack Mode | MEDIUM | LOW | P2 |
 | Endless Mode | MEDIUM | MEDIUM | P2 |
