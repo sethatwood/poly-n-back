@@ -12,7 +12,7 @@ Poly N-Back isn't merely a game; it's a cerebral celebration! N-Back tasks are r
 
 ### Virtual Playground
 
-Leap into the action at [polynback.fun](https://polynback.fun)! No downloads, no delays - just instant intellectual amusement!
+Leap into the action at [polynback.com](https://polynback.com)! No downloads, no delays - just instant intellectual amusement!
 
 ### Local Laboratory
 
